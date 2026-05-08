@@ -68,6 +68,8 @@ export function EventCard({ event }: EventCardProps) {
           )}
         </div>
       )}
+
+      {!hasEventLinks && <p className={styles.pendingLinks}>Links pending</p>}
     </article>
   );
 }

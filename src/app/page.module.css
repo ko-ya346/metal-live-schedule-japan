@@ -195,6 +195,14 @@
   color: #9f1d1d;
 }
 
+.pendingLinks {
+  margin: 0;
+  color: #767676;
+  font-size: 0.9rem;
+  font-weight: 700;
+  text-align: right;
+}
+
 .empty {
   padding: 24px;
   border: 1px solid #dfdfdf;
@@ -220,6 +228,10 @@
   .primaryLink,
   .secondaryLink {
     width: 100%;
+  }
+
+  .pendingLinks {
+    text-align: left;
   }
 
   .filterActions {
