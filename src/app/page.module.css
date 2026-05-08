@@ -87,6 +87,104 @@
   cursor: not-allowed;
 }
 
+.calendar {
+  display: grid;
+  gap: 14px;
+  margin-bottom: 36px;
+}
+
+.calendarHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.calendarTitle {
+  margin: 0;
+  font-size: 1.4rem;
+}
+
+.monthButton {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #c9c9c9;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #171717;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.monthButton:hover {
+  border-color: #9f1d1d;
+  color: #9f1d1d;
+}
+
+.calendarGrid {
+  display: grid;
+  grid-template-columns: repeat(7, minmax(0, 1fr));
+  overflow: hidden;
+  border: 1px solid #dfdfdf;
+  border-radius: 8px;
+  background: #ffffff;
+}
+
+.weekDay {
+  padding: 10px 6px;
+  border-bottom: 1px solid #dfdfdf;
+  background: #f3f3f3;
+  color: #5f5f5f;
+  font-size: 0.82rem;
+  font-weight: 700;
+  text-align: center;
+}
+
+.calendarCell {
+  min-height: 104px;
+  padding: 8px;
+  border-right: 1px solid #eeeeee;
+  border-bottom: 1px solid #eeeeee;
+  background: #ffffff;
+}
+
+.calendarCell:nth-child(7n + 7) {
+  border-right: 0;
+}
+
+.calendarDate {
+  display: block;
+  margin-bottom: 6px;
+  color: #5f5f5f;
+  font-size: 0.82rem;
+  font-weight: 700;
+}
+
+.calendarEvents {
+  display: grid;
+  gap: 4px;
+}
+
+.calendarEvent {
+  margin: 0;
+  padding: 4px 6px;
+  border-radius: 4px;
+  background: #171717;
+  color: #ffffff;
+  font-size: 0.78rem;
+  font-weight: 700;
+  overflow-wrap: anywhere;
+}
+
+.outsideMonth {
+  background: #f7f7f7;
+}
+
+.outsideMonth .calendarDate {
+  color: #a0a0a0;
+}
+
 .dateGroups {
   display: grid;
   gap: 28px;
@@ -219,6 +317,31 @@
   .filters,
   .eventCard {
     grid-template-columns: 1fr;
+  }
+
+  .calendarHeader {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+  }
+
+  .calendarTitle {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    text-align: center;
+  }
+
+  .monthButton {
+    grid-row: 2;
+  }
+
+  .calendarCell {
+    min-height: 86px;
+    padding: 6px;
+  }
+
+  .calendarEvent {
+    padding: 3px 4px;
+    font-size: 0.68rem;
   }
 
   .eventLinks {

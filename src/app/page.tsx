@@ -10,6 +10,8 @@ import {
   groupEventsByDate,
   sortEventsByDate,
 } from "../utils/events";
+import { getEventMonthKey } from "../utils/date";
+import { EventCalendar } from "./EventCalendar";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
 import styles from "./page.module.css";
@@ -21,6 +23,9 @@ function formatEventCount(count: number) {
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
+  const [visibleMonth, setVisibleMonth] = useState(() =>
+    getEventMonthKey(sortEventsByDate(events)[0].date),
+  );
   const hasActiveFilters =
     selectedPrefecture !== ALL_FILTER_VALUE || selectedGenre !== ALL_FILTER_VALUE;
 
@@ -59,6 +64,12 @@ export default function Page() {
         onGenreChange={setSelectedGenre}
         onPrefectureChange={setSelectedPrefecture}
         onReset={resetFilters}
+      />
+
+      <EventCalendar
+        events={filteredEvents}
+        monthKey={visibleMonth}
+        onMonthChange={setVisibleMonth}
       />
 
       {groupedDates.length === 0 ? (
