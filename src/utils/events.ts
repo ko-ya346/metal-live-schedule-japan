@@ -5,7 +5,14 @@ export const ALL_FILTER_VALUE = "all";
 
 type EventGroupsByDate = Record<string, Event[]>;
 
-const PREFECTURE_ORDER = ["北海道", "東京都", "愛知県", "大阪府", "福岡県"];
+const PREFECTURE_ORDER = [
+  "北海道",
+  "東京都",
+  "神奈川県",
+  "愛知県",
+  "大阪府",
+  "福岡県",
+];
 
 export function getEventGenres(eventList: Event[]) {
   return Array.from(new Set(eventList.flatMap((event) => event.genres))).sort();
