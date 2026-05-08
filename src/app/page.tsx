@@ -34,7 +34,7 @@ export default function Page() {
   );
 
   const eventsByDate = groupEventsByDate(filteredEvents);
-  const eventDates = Object.keys(eventsByDate);
+  const groupedDates = Object.keys(eventsByDate);
 
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
@@ -60,13 +60,13 @@ export default function Page() {
         onReset={resetFilters}
       />
 
-      {eventDates.length === 0 ? (
+      {groupedDates.length === 0 ? (
         <p className={styles.empty}>
           No events match these filters. Try changing or resetting the filters.
         </p>
       ) : (
         <div className={styles.dateGroups}>
-          {eventDates.map((date) => (
+          {groupedDates.map((date) => (
             <EventDateGroup date={date} events={eventsByDate[date]} key={date} />
           ))}
         </div>
