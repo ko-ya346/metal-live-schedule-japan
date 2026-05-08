@@ -7,6 +7,7 @@ export type Event = {
     venue: string;
     genres: string[];
     ticketUrl: string;
+    // Artist, venue, or organizer event page used to verify event details.
     officialUrl: string;
     status: "scheduled" | "cancelled" | "postponed";
 };
