@@ -154,21 +154,41 @@
   margin: 0;
 }
 
-.ticketLink {
+.eventLinks {
+  display: flex;
+  gap: 8px;
+  justify-content: flex-end;
+}
+
+.primaryLink,
+.secondaryLink {
   display: inline-flex;
   align-items: center;
   justify-content: center;
   min-height: 40px;
   padding: 0 16px;
   border-radius: 6px;
-  background: #171717;
-  color: #ffffff;
   font-weight: 700;
   text-decoration: none;
 }
 
-.ticketLink:hover {
+.primaryLink {
+  background: #171717;
+  color: #ffffff;
+}
+
+.primaryLink:hover {
   background: #9f1d1d;
+}
+
+.secondaryLink {
+  border: 1px solid #c9c9c9;
+  color: #171717;
+}
+
+.secondaryLink:hover {
+  border-color: #9f1d1d;
+  color: #9f1d1d;
 }
 
 .empty {
@@ -189,7 +209,12 @@
     grid-template-columns: 1fr;
   }
 
-  .ticketLink {
+  .eventLinks {
+    justify-content: stretch;
+  }
+
+  .primaryLink,
+  .secondaryLink {
     width: 100%;
   }
 

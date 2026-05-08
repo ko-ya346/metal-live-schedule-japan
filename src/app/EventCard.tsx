@@ -26,14 +26,24 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </dl>
 
-      <a
-        className={styles.ticketLink}
-        href={event.ticketUrl}
-        target="_blank"
-        rel="noreferrer"
-      >
-        Ticket
-      </a>
+      <div className={styles.eventLinks}>
+        <a
+          className={styles.primaryLink}
+          href={event.ticketUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Ticket
+        </a>
+        <a
+          className={styles.secondaryLink}
+          href={event.officialUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Official
+        </a>
+      </div>
     </article>
   );
 }
