@@ -5,12 +5,33 @@ export const ALL_FILTER_VALUE = "all";
 
 type EventGroupsByDate = Record<string, Event[]>;
 
+const PREFECTURE_ORDER = ["北海道", "東京都", "愛知県", "大阪府", "福岡県"];
+
 export function getEventGenres(eventList: Event[]) {
   return Array.from(new Set(eventList.flatMap((event) => event.genres))).sort();
 }
 
 export function getEventPrefectures(eventList: Event[]) {
-  return Array.from(new Set(eventList.map((event) => event.prefecture))).sort();
+  return Array.from(new Set(eventList.map((event) => event.prefecture))).sort(
+    (a, b) => {
+      const aIndex = PREFECTURE_ORDER.indexOf(a);
+      const bIndex = PREFECTURE_ORDER.indexOf(b);
+
+      if (aIndex === -1 && bIndex === -1) {
+        return a.localeCompare(b, "ja");
+      }
+
+      if (aIndex === -1) {
+        return 1;
+      }
+
+      if (bIndex === -1) {
+        return -1;
+      }
+
+      return aIndex - bIndex;
+    },
+  );
 }
 
 export function sortEventsByDate(eventList: Event[]) {
