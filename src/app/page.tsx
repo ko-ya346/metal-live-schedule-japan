@@ -16,6 +16,8 @@ import styles from "./page.module.css";
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
+  const hasActiveFilters =
+    selectedPrefecture !== ALL_FILTER_VALUE || selectedGenre !== ALL_FILTER_VALUE;
 
   const genres = getEventGenres(events);
   const prefectures = getEventPrefectures(events);
@@ -29,6 +31,11 @@ export default function Page() {
 
   const eventsByDate = groupEventsByDate(filteredEvents);
   const eventDates = Object.keys(eventsByDate);
+
+  function resetFilters() {
+    setSelectedPrefecture(ALL_FILTER_VALUE);
+    setSelectedGenre(ALL_FILTER_VALUE);
+  }
 
   return (
     <main className={styles.page}>
@@ -45,8 +52,10 @@ export default function Page() {
         prefectures={prefectures}
         selectedGenre={selectedGenre}
         selectedPrefecture={selectedPrefecture}
+        canReset={hasActiveFilters}
         onGenreChange={setSelectedGenre}
         onPrefectureChange={setSelectedPrefecture}
+        onReset={resetFilters}
       />
 
       {eventDates.length === 0 ? (

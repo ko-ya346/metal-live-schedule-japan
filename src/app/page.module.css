@@ -59,6 +59,34 @@
   font: inherit;
 }
 
+.filterActions {
+  display: flex;
+  justify-content: flex-end;
+  grid-column: 1 / -1;
+}
+
+.resetButton {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #c9c9c9;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #171717;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.resetButton:hover:not(:disabled) {
+  border-color: #9f1d1d;
+  color: #9f1d1d;
+}
+
+.resetButton:disabled {
+  color: #9a9a9a;
+  cursor: not-allowed;
+}
+
 .dateGroups {
   display: grid;
   gap: 28px;
@@ -162,6 +190,14 @@
   }
 
   .ticketLink {
+    width: 100%;
+  }
+
+  .filterActions {
+    justify-content: stretch;
+  }
+
+  .resetButton {
     width: 100%;
   }
 }

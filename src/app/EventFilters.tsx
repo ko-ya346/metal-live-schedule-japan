@@ -6,8 +6,10 @@ type EventFiltersProps = {
   prefectures: string[];
   selectedGenre: string;
   selectedPrefecture: string;
+  canReset: boolean;
   onGenreChange: (genre: string) => void;
   onPrefectureChange: (prefecture: string) => void;
+  onReset: () => void;
 };
 
 export function EventFilters({
@@ -15,8 +17,10 @@ export function EventFilters({
   prefectures,
   selectedGenre,
   selectedPrefecture,
+  canReset,
   onGenreChange,
   onPrefectureChange,
+  onReset,
 }: EventFiltersProps) {
   return (
     <section className={styles.filters} aria-label="Event filters">
@@ -49,6 +53,17 @@ export function EventFilters({
           ))}
         </select>
       </label>
+
+      <div className={styles.filterActions}>
+        <button
+          className={styles.resetButton}
+          type="button"
+          onClick={onReset}
+          disabled={!canReset}
+        >
+          Reset filters
+        </button>
+      </div>
     </section>
   );
 }
