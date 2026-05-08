@@ -5,6 +5,18 @@ type EventCardProps = {
   event: Event;
 };
 
+function formatEventStatus(status: Event["status"]) {
+  if (status === "cancelled") {
+    return "Cancelled";
+  }
+
+  if (status === "postponed") {
+    return "Postponed";
+  }
+
+  return "Scheduled";
+}
+
 export function EventCard({ event }: EventCardProps) {
   const hasEventLinks = event.ticketUrl || event.officialUrl;
 
@@ -25,6 +37,10 @@ export function EventCard({ event }: EventCardProps) {
         <div>
           <dt>Genre</dt>
           <dd>{event.genres.join(", ")}</dd>
+        </div>
+        <div>
+          <dt>Status</dt>
+          <dd>{formatEventStatus(event.status)}</dd>
         </div>
       </dl>
 
