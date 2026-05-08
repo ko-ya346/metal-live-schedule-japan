@@ -5,16 +5,19 @@ export type Event = {
     id: string;
     artist: string;
     tourName: string;
+    // Use YYYY-MM-DD.
     date: EventDate;
     prefecture: string;
     venue: string;
     genres: string[];
+    // Use null when ticket information is not published yet.
     ticketUrl: string | null;
     // Artist, venue, or organizer event page used to verify event details.
     officialUrl: string | null;
     status: EventStatus;
 };
 
+// Replace this array when adding real events. Keep the Event shape above unchanged.
 export const events: Event[] = [
     {
         id: "1",
