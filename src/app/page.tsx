@@ -23,8 +23,8 @@ export default function Page() {
   const hasActiveFilters =
     selectedPrefecture !== ALL_FILTER_VALUE || selectedGenre !== ALL_FILTER_VALUE;
 
-  const genres = getEventGenres(events);
-  const prefectures = getEventPrefectures(events);
+  const filterGenres = getEventGenres(events);
+  const filterPrefectures = getEventPrefectures(events);
 
   const sortedEvents = sortEventsByDate(events);
   const filteredEvents = filterEvents(
@@ -50,8 +50,8 @@ export default function Page() {
       </header>
 
       <EventFilters
-        genres={genres}
-        prefectures={prefectures}
+        genres={filterGenres}
+        prefectures={filterPrefectures}
         selectedGenre={selectedGenre}
         selectedPrefecture={selectedPrefecture}
         canReset={hasActiveFilters}
