@@ -38,7 +38,7 @@ export const events: Event[] = [
         genres: ["Black Metal"],
         ticketUrl: "https://example.com/tickets",
         officialUrl: "https://example.com/crimson-fang",
-        status: "scheduled",
+        status: "postponed",
     },
     {
         id: "3",
@@ -86,6 +86,6 @@ export const events: Event[] = [
         genres: ["Death Metal"],
         ticketUrl: "https://example.com/tickets",
         officialUrl: "https://example.com/ashen-crown",
-        status: "scheduled",
+        status: "cancelled",
     },
 ];
