@@ -36,7 +36,7 @@ export const events: Event[] = [
         prefecture: "Osaka",
         venue: "Umeda Club Quattro",
         genres: ["Black Metal"],
-        ticketUrl: "https://example.com/tickets",
+        ticketUrl: null,
         officialUrl: "https://example.com/crimson-fang",
         status: "postponed",
     },
@@ -49,7 +49,7 @@ export const events: Event[] = [
         venue: "Nagoya Electric Lady Land",
         genres: ["Thrash Metal"],
         ticketUrl: "https://example.com/tickets",
-        officialUrl: "https://example.com/kurogane-riot",
+        officialUrl: null,
         status: "scheduled",
     },
     {
@@ -60,8 +60,8 @@ export const events: Event[] = [
         prefecture: "Tokyo",
         venue: "Spotify O-WEST",
         genres: ["Melodic Death Metal"],
-        ticketUrl: "https://example.com/tickets",
-        officialUrl: "https://example.com/azure-shrine",
+        ticketUrl: null,
+        officialUrl: null,
         status: "scheduled",
     },
     {
