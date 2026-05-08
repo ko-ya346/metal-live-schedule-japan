@@ -13,6 +13,10 @@ import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
 import styles from "./page.module.css";
 
+function formatEventCount(count: number) {
+  return count === 1 ? "1 event found" : `${count} events found`;
+}
+
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
@@ -42,9 +46,7 @@ export default function Page() {
       <header className={styles.header}>
         <p className={styles.kicker}>Japan heavy metal live events</p>
         <h1>Metal Live Calendar</h1>
-        <p className={styles.summary}>
-          {filteredEvents.length} event{filteredEvents.length === 1 ? "" : "s"} found
-        </p>
+        <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
       </header>
 
       <EventFilters
