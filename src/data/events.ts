@@ -9,9 +9,9 @@ export type Event = {
     prefecture: string;
     venue: string;
     genres: string[];
-    ticketUrl: string;
+    ticketUrl: string | null;
     // Artist, venue, or organizer event page used to verify event details.
-    officialUrl: string;
+    officialUrl: string | null;
     status: EventStatus;
 };
 

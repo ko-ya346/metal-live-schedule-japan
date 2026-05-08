@@ -6,6 +6,8 @@ type EventCardProps = {
 };
 
 export function EventCard({ event }: EventCardProps) {
+  const hasEventLinks = event.ticketUrl || event.officialUrl;
+
   return (
     <article className={styles.eventCard}>
       <div>
@@ -26,24 +28,30 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </dl>
 
-      <div className={styles.eventLinks}>
-        <a
-          className={styles.primaryLink}
-          href={event.ticketUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Ticket
-        </a>
-        <a
-          className={styles.secondaryLink}
-          href={event.officialUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Official
-        </a>
-      </div>
+      {hasEventLinks && (
+        <div className={styles.eventLinks}>
+          {event.ticketUrl && (
+            <a
+              className={styles.primaryLink}
+              href={event.ticketUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Ticket
+            </a>
+          )}
+          {event.officialUrl && (
+            <a
+              className={styles.secondaryLink}
+              href={event.officialUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              Official
+            </a>
+          )}
+        </div>
+      )}
     </article>
   );
 }
