@@ -1,3 +1,4 @@
+import { ALL_FILTER_VALUE } from "../utils/events";
 import styles from "./page.module.css";
 
 type EventFiltersProps = {
@@ -25,7 +26,7 @@ export function EventFilters({
           value={selectedPrefecture}
           onChange={(event) => onPrefectureChange(event.target.value)}
         >
-          <option value="all">All prefectures</option>
+          <option value={ALL_FILTER_VALUE}>All prefectures</option>
           {prefectures.map((prefecture) => (
             <option key={prefecture} value={prefecture}>
               {prefecture}
@@ -40,7 +41,7 @@ export function EventFilters({
           value={selectedGenre}
           onChange={(event) => onGenreChange(event.target.value)}
         >
-          <option value="all">All genres</option>
+          <option value={ALL_FILTER_VALUE}>All genres</option>
           {genres.map((genre) => (
             <option key={genre} value={genre}>
               {genre}

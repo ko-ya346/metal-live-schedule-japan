@@ -1,5 +1,7 @@
 import type { Event } from "../data/events";
 
+export const ALL_FILTER_VALUE = "all";
+
 export function getEventGenres(eventList: Event[]) {
   return Array.from(new Set(eventList.flatMap((event) => event.genres))).sort();
 }
@@ -21,9 +23,10 @@ export function filterEvents(
 ) {
   return eventList.filter((event) => {
     const matchesPrefecture =
-      selectedPrefecture === "all" || event.prefecture === selectedPrefecture;
+      selectedPrefecture === ALL_FILTER_VALUE ||
+      event.prefecture === selectedPrefecture;
     const matchesGenre =
-      selectedGenre === "all" || event.genres.includes(selectedGenre);
+      selectedGenre === ALL_FILTER_VALUE || event.genres.includes(selectedGenre);
 
     return matchesPrefecture && matchesGenre;
   });

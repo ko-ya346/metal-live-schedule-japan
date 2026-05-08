@@ -2,6 +2,7 @@
 import { useState } from "react";
 import { events } from "../data/events";
 import {
+  ALL_FILTER_VALUE,
   filterEvents,
   getEventGenres,
   getEventPrefectures,
@@ -13,8 +14,8 @@ import { EventFilters } from "./EventFilters";
 import styles from "./page.module.css";
 
 export default function Page() {
-  const [selectedPrefecture, setSelectedPrefecture] = useState("all");
-  const [selectedGenre, setSelectedGenre] = useState("all");
+  const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
+  const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
 
   const genres = getEventGenres(events);
   const prefectures = getEventPrefectures(events);
