@@ -59,7 +59,9 @@ export default function Page() {
       />
 
       {eventDates.length === 0 ? (
-        <p className={styles.empty}>No events match these filters.</p>
+        <p className={styles.empty}>
+          No events match these filters. Try changing or resetting the filters.
+        </p>
       ) : (
         <div className={styles.dateGroups}>
           {eventDates.map((date) => (
