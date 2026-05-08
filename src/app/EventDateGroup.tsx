@@ -4,7 +4,7 @@ import { EventCard } from "./EventCard";
 import styles from "./page.module.css";
 
 type EventDateGroupProps = {
-  date: string;
+  date: Event["date"];
   events: Event[];
 };
 

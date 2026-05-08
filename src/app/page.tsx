@@ -1,6 +1,6 @@
 "use client";
 import { useState } from "react";
-import { events } from "../data/events";
+import { events, type Event } from "../data/events";
 import {
   ALL_FILTER_VALUE,
   filterEvents,
@@ -34,7 +34,7 @@ export default function Page() {
   );
 
   const eventsByDate = groupEventsByDate(filteredEvents);
-  const groupedDates = Object.keys(eventsByDate);
+  const groupedDates = Object.keys(eventsByDate) as Event["date"][];
 
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);

@@ -1,4 +1,5 @@
 import type { Event } from "../data/events";
+import { getEventDateTime } from "./date";
 
 export const ALL_FILTER_VALUE = "all";
 
@@ -12,7 +13,7 @@ export function getEventPrefectures(eventList: Event[]) {
 
 export function sortEventsByDate(eventList: Event[]) {
   return [...eventList].sort(
-    (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
+    (a, b) => getEventDateTime(a.date) - getEventDateTime(b.date),
   );
 }
 
