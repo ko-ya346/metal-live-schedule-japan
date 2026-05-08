@@ -1,7 +1,13 @@
 "use client";
 import { useState } from "react";
 import { events } from "../data/events";
-import { filterEvents, groupEventsByDate, sortEventsByDate } from "../utils/events";
+import {
+  filterEvents,
+  getEventGenres,
+  getEventPrefectures,
+  groupEventsByDate,
+  sortEventsByDate,
+} from "../utils/events";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
 import styles from "./page.module.css";
@@ -10,10 +16,8 @@ export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState("all");
   const [selectedGenre, setSelectedGenre] = useState("all");
 
-  const genres = Array.from(new Set(events.flatMap((event) => event.genres))).sort();
-  const prefectures = Array.from(
-    new Set(events.map((event) => event.prefecture)),
-  ).sort();
+  const genres = getEventGenres(events);
+  const prefectures = getEventPrefectures(events);
 
   const sortedEvents = sortEventsByDate(events);
   const filteredEvents = filterEvents(

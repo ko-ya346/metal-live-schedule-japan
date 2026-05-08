@@ -1,5 +1,13 @@
 import type { Event } from "../data/events";
 
+export function getEventGenres(eventList: Event[]) {
+  return Array.from(new Set(eventList.flatMap((event) => event.genres))).sort();
+}
+
+export function getEventPrefectures(eventList: Event[]) {
+  return Array.from(new Set(eventList.map((event) => event.prefecture))).sort();
+}
+
 export function sortEventsByDate(eventList: Event[]) {
   return [...eventList].sort(
     (a, b) => new Date(a.date).getTime() - new Date(b.date).getTime(),
