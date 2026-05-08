@@ -1,7 +1,9 @@
-import type { Event } from "../data/events";
+import type { Event, EventDate } from "../data/events";
 import { getEventDateTime } from "./date";
 
 export const ALL_FILTER_VALUE = "all";
+
+type EventGroupsByDate = Record<string, Event[]>;
 
 export function getEventGenres(eventList: Event[]) {
   return Array.from(new Set(eventList.flatMap((event) => event.genres))).sort();
@@ -34,7 +36,7 @@ export function filterEvents(
 }
 
 export function groupEventsByDate(eventList: Event[]) {
-  return eventList.reduce<Record<string, Event[]>>((groups, event) => {
+  return eventList.reduce<EventGroupsByDate>((groups, event) => {
     if (!groups[event.date]) {
       groups[event.date] = [];
     }
@@ -42,4 +44,10 @@ export function groupEventsByDate(eventList: Event[]) {
     groups[event.date].push(event);
     return groups;
   }, {});
+}
+
+export function getGroupedEventDates(groups: EventGroupsByDate) {
+  return (Object.keys(groups) as EventDate[]).sort(
+    (a, b) => getEventDateTime(a) - getEventDateTime(b),
+  );
 }
