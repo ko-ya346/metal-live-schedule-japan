@@ -1,15 +1,18 @@
+export type EventDate = `${number}-${number}-${number}`;
+export type EventStatus = "scheduled" | "cancelled" | "postponed";
+
 export type Event = {
     id: string;
     artist: string;
     tourName: string;
-    date: string;
+    date: EventDate;
     prefecture: string;
     venue: string;
     genres: string[];
     ticketUrl: string;
     // Artist, venue, or organizer event page used to verify event details.
     officialUrl: string;
-    status: "scheduled" | "cancelled" | "postponed";
+    status: EventStatus;
 };
 
 export const events: Event[] = [
