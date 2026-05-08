@@ -15,7 +15,7 @@ import { EventFilters } from "./EventFilters";
 import styles from "./page.module.css";
 
 function formatEventCount(count: number) {
-  return count === 1 ? "1 event found" : `${count} events found`;
+  return `${count}件のライブが見つかりました`;
 }
 
 export default function Page() {
@@ -45,8 +45,8 @@ export default function Page() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <p className={styles.kicker}>Japan heavy metal live events</p>
-        <h1>Metal Live Calendar</h1>
+        <p className={styles.kicker}>日本のヘヴィメタルライブ予定</p>
+        <h1>Metal Live Schedule</h1>
         <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
       </header>
 
@@ -63,7 +63,7 @@ export default function Page() {
 
       {groupedDates.length === 0 ? (
         <p className={styles.empty}>
-          No events match these filters. Try changing or resetting the filters.
+          条件に一致するライブはありません。絞り込み条件を変更するか、リセットしてください。
         </p>
       ) : (
         <div className={styles.dateGroups}>

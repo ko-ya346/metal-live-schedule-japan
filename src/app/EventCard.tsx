@@ -7,14 +7,14 @@ type EventCardProps = {
 
 function formatEventStatus(status: Event["status"]) {
   if (status === "cancelled") {
-    return "Cancelled";
+    return "中止";
   }
 
   if (status === "postponed") {
-    return "Postponed";
+    return "延期";
   }
 
-  return "Scheduled";
+  return "開催予定";
 }
 
 export function EventCard({ event }: EventCardProps) {
@@ -29,17 +29,17 @@ export function EventCard({ event }: EventCardProps) {
 
       <dl className={styles.eventMeta}>
         <div>
-          <dt>Venue</dt>
+          <dt>会場</dt>
           <dd>
             {event.prefecture} / {event.venue}
           </dd>
         </div>
         <div>
-          <dt>Genre</dt>
+          <dt>ジャンル</dt>
           <dd>{event.genres.join(", ")}</dd>
         </div>
         <div>
-          <dt>Status</dt>
+          <dt>状況</dt>
           <dd>{formatEventStatus(event.status)}</dd>
         </div>
       </dl>
@@ -53,7 +53,7 @@ export function EventCard({ event }: EventCardProps) {
               target="_blank"
               rel="noreferrer"
             >
-              Ticket
+              チケット
             </a>
           )}
           {event.officialUrl && (
@@ -63,13 +63,13 @@ export function EventCard({ event }: EventCardProps) {
               target="_blank"
               rel="noreferrer"
             >
-              Official
+              公式
             </a>
           )}
         </div>
       )}
 
-      {!hasEventLinks && <p className={styles.pendingLinks}>Links pending</p>}
+      {!hasEventLinks && <p className={styles.pendingLinks}>リンク未定</p>}
     </article>
   );
 }

@@ -23,14 +23,14 @@ export function EventFilters({
   onReset,
 }: EventFiltersProps) {
   return (
-    <section className={styles.filters} aria-label="Event filters">
+    <section className={styles.filters} aria-label="ライブの絞り込み">
       <label className={styles.filterField}>
-        <span>Prefecture</span>
+        <span>都道府県</span>
         <select
           value={selectedPrefecture}
           onChange={(event) => onPrefectureChange(event.target.value)}
         >
-          <option value={ALL_FILTER_VALUE}>All prefectures</option>
+          <option value={ALL_FILTER_VALUE}>すべての都道府県</option>
           {prefectures.map((prefecture) => (
             <option key={prefecture} value={prefecture}>
               {prefecture}
@@ -40,12 +40,12 @@ export function EventFilters({
       </label>
 
       <label className={styles.filterField}>
-        <span>Genre</span>
+        <span>ジャンル</span>
         <select
           value={selectedGenre}
           onChange={(event) => onGenreChange(event.target.value)}
         >
-          <option value={ALL_FILTER_VALUE}>All genres</option>
+          <option value={ALL_FILTER_VALUE}>すべてのジャンル</option>
           {genres.map((genre) => (
             <option key={genre} value={genre}>
               {genre}
@@ -61,7 +61,7 @@ export function EventFilters({
           onClick={onReset}
           disabled={!canReset}
         >
-          Reset filters
+          絞り込みをリセット
         </button>
       </div>
     </section>
