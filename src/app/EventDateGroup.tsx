@@ -1,4 +1,5 @@
 import type { Event } from "../data/events";
+import { formatEventDate } from "../utils/date";
 import { EventCard } from "./EventCard";
 import styles from "./page.module.css";
 
@@ -6,14 +7,6 @@ type EventDateGroupProps = {
   date: string;
   events: Event[];
 };
-
-const dateFormatter = new Intl.DateTimeFormat("ja-JP", {
-  dateStyle: "full",
-});
-
-function formatEventDate(date: string) {
-  return dateFormatter.format(new Date(date));
-}
 
 export function EventDateGroup({ date, events }: EventDateGroupProps) {
   return (
