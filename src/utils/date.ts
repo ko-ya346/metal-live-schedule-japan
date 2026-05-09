@@ -22,6 +22,17 @@ export function getEventDateTime(date: EventDate) {
   return parseEventDate(date).getTime();
 }
 
+export function isPastEventDate(date: EventDate) {
+  const today = new Date();
+  const todayDateTime = new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  ).getTime();
+
+  return getEventDateTime(date) < todayDateTime;
+}
+
 export function formatEventDate(date: EventDate) {
   return eventDateFormatter.format(parseEventDate(date));
 }

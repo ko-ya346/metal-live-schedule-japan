@@ -1,4 +1,5 @@
 import type { Event } from "../data/events";
+import { isPastEventDate } from "../utils/date";
 import styles from "./page.module.css";
 
 type EventCardProps = {
@@ -21,8 +22,16 @@ function formatArtists(artists: Event["artists"]) {
   return artists.join(" / ");
 }
 
+function getSetlistSearchUrl(artists: Event["artists"]) {
+  const headliner = artists[0];
+  const query = encodeURIComponent(headliner);
+
+  return `https://www.setlist.fm/search?query=${query}`;
+}
+
 export function EventCard({ event }: EventCardProps) {
-  const hasEventLinks = event.ticketUrl || event.officialUrl;
+  const shouldShowSetlistLink = isPastEventDate(event.date);
+  const hasEventLinks = event.ticketUrl || event.officialUrl || shouldShowSetlistLink;
 
   return (
     <article className={styles.eventCard}>
@@ -68,6 +77,16 @@ export function EventCard({ event }: EventCardProps) {
               rel="noreferrer"
             >
               公式
+            </a>
+          )}
+          {shouldShowSetlistLink && (
+            <a
+              className={styles.secondaryLink}
+              href={getSetlistSearchUrl(event.artists)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              セットリストを探す
             </a>
           )}
         </div>
