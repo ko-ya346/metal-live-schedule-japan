@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import styles from "../page.module.css";
 
-const contactEmail = "metal-live-schedule@example.com";
+const xProfileUrl = "https://x.com/ko_ya346";
 
 export const metadata: Metadata = {
   title: "Contact | Metal Live Schedule",
@@ -25,10 +25,15 @@ export default function ContactPage() {
         <section className={styles.infoSection}>
           <h2>連絡先</h2>
           <p>
-            現時点ではバックエンドの問い合わせフォームは用意せず、メールリンクだけを置いています。
+            現時点ではバックエンドの問い合わせフォームは用意せず、X のプロフィールへのリンクだけを置いています。
           </p>
-          <a className={styles.primaryLink} href={`mailto:${contactEmail}`}>
-            メールで連絡する
+          <a
+            className={styles.primaryLink}
+            href={xProfileUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            X で連絡する
           </a>
         </section>
 
