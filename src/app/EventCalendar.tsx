@@ -27,6 +27,16 @@ function groupEventsByDate(events: Event[]) {
   }, {});
 }
 
+function formatCalendarEventArtists(artists: Event["artists"]) {
+  const [headliner, ...otherArtists] = artists;
+
+  if (otherArtists.length === 0) {
+    return headliner;
+  }
+
+  return `${headliner} +${otherArtists.length}`;
+}
+
 export function EventCalendar({
   events,
   monthKey,
@@ -78,7 +88,7 @@ export function EventCalendar({
               <div className={styles.calendarEvents}>
                 {dateEvents.map((event) => (
                   <p className={styles.calendarEvent} key={event.id}>
-                    {event.artist}
+                    {formatCalendarEventArtists(event.artists)}
                   </p>
                 ))}
               </div>

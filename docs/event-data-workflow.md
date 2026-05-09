@@ -20,11 +20,13 @@ Do not use discovery-only sources as the final source. Confirm with an artist, p
 2. Copy an existing event object.
 3. Replace every field.
 4. Keep `date` as `YYYY-MM-DD`.
-5. Use Japanese prefecture names, such as `東京都`, `大阪府`, `神奈川県`.
-6. Use `ticketUrl: null` when ticket information is not published yet.
-7. Use `officialUrl` for an artist, venue, or organizer page that verifies the event.
-8. Use one of these statuses: `scheduled`, `postponed`, `cancelled`.
-9. Run the local checks.
+5. Put all performers in `artists`.
+6. Put the headliner or main calendar label first in `artists`.
+7. Use Japanese prefecture names, such as `東京都`, `大阪府`, `神奈川県`.
+8. Use `ticketUrl: null` when ticket information is not published yet.
+9. Use `officialUrl` for an artist, venue, or organizer page that verifies the event.
+10. Use one of these statuses: `scheduled`, `postponed`, `cancelled`.
+11. Run the local checks.
 
 ```bash
 npm run lint
@@ -36,7 +38,7 @@ npm run build
 ```ts
 {
     id: "artist-2026-prefecture-or-city",
-    artist: "ARTIST NAME",
+    artists: ["HEADLINER", "SUPPORT ACT"],
     tourName: "TOUR NAME",
     date: "2026-01-01",
     prefecture: "東京都",

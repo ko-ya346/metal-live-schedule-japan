@@ -17,13 +17,17 @@ function formatEventStatus(status: Event["status"]) {
   return "開催予定";
 }
 
+function formatArtists(artists: Event["artists"]) {
+  return artists.join(" / ");
+}
+
 export function EventCard({ event }: EventCardProps) {
   const hasEventLinks = event.ticketUrl || event.officialUrl;
 
   return (
     <article className={styles.eventCard}>
       <div>
-        <p className={styles.artist}>{event.artist}</p>
+        <p className={styles.artist}>{formatArtists(event.artists)}</p>
         <p className={styles.tourName}>{event.tourName}</p>
       </div>
 

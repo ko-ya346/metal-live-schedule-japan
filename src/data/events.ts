@@ -3,7 +3,8 @@ export type EventStatus = "scheduled" | "cancelled" | "postponed";
 
 export type Event = {
     id: string;
-    artist: string;
+    // First artist is used as the calendar label/headliner.
+    artists: string[];
     tourName: string;
     // Use YYYY-MM-DD.
     date: EventDate;
@@ -21,7 +22,7 @@ export type Event = {
 export const events: Event[] = [
     {
         id: "helloween-2026-tokyo",
-        artist: "HELLOWEEN",
+        artists: ["HELLOWEEN", "BEAST IN BLACK"],
         tourName: "40 YEARS ANNIVERSARY TOUR",
         date: "2026-05-09",
         prefecture: "東京都",
@@ -33,7 +34,7 @@ export const events: Event[] = [
     },
     {
         id: "helloween-2026-osaka",
-        artist: "HELLOWEEN",
+        artists: ["HELLOWEEN", "BEAST IN BLACK"],
         tourName: "40 YEARS ANNIVERSARY TOUR",
         date: "2026-05-10",
         prefecture: "大阪府",
@@ -45,7 +46,7 @@ export const events: Event[] = [
     },
     {
         id: "loudness-2026-ishikawa",
-        artist: "LOUDNESS",
+        artists: ["LOUDNESS"],
         tourName: "45th ANNIVERSARY TOUR",
         date: "2026-05-10",
         prefecture: "石川県",
@@ -57,7 +58,7 @@ export const events: Event[] = [
     },
     {
         id: "loudness-2026-aichi",
-        artist: "LOUDNESS",
+        artists: ["LOUDNESS"],
         tourName: "45th ANNIVERSARY TOUR",
         date: "2026-05-12",
         prefecture: "愛知県",
@@ -69,7 +70,7 @@ export const events: Event[] = [
     },
     {
         id: "loudness-2026-hokkaido",
-        artist: "LOUDNESS",
+        artists: ["LOUDNESS"],
         tourName: "45th ANNIVERSARY TOUR",
         date: "2026-05-15",
         prefecture: "北海道",
@@ -81,7 +82,7 @@ export const events: Event[] = [
     },
     {
         id: "loudness-2026-miyagi",
-        artist: "LOUDNESS",
+        artists: ["LOUDNESS"],
         tourName: "45th ANNIVERSARY TOUR",
         date: "2026-05-17",
         prefecture: "宮城県",
@@ -93,7 +94,7 @@ export const events: Event[] = [
     },
     {
         id: "deftones-2026-tokyo",
-        artist: "DEFTONES",
+        artists: ["DEFTONES"],
         tourName: "DEFTONES JAPAN 2026",
         date: "2026-05-18",
         prefecture: "東京都",
@@ -105,7 +106,7 @@ export const events: Event[] = [
     },
     {
         id: "deftones-2026-osaka",
-        artist: "DEFTONES",
+        artists: ["DEFTONES"],
         tourName: "DEFTONES JAPAN 2026",
         date: "2026-05-19",
         prefecture: "大阪府",
@@ -117,7 +118,7 @@ export const events: Event[] = [
     },
     {
         id: "deftones-2026-aichi",
-        artist: "DEFTONES",
+        artists: ["DEFTONES"],
         tourName: "DEFTONES JAPAN 2026",
         date: "2026-05-20",
         prefecture: "愛知県",
@@ -129,7 +130,7 @@ export const events: Event[] = [
     },
     {
         id: "loudness-2026-fukuoka",
-        artist: "LOUDNESS",
+        artists: ["LOUDNESS"],
         tourName: "45th ANNIVERSARY TOUR",
         date: "2026-05-29",
         prefecture: "福岡県",
@@ -141,7 +142,7 @@ export const events: Event[] = [
     },
     {
         id: "onmyo-za-2026-osaka",
-        artist: "陰陽座",
+        artists: ["陰陽座"],
         tourName: "ツアー2026『生きることとみつけたり【参】』",
         date: "2026-09-10",
         prefecture: "大阪府",
@@ -153,7 +154,7 @@ export const events: Event[] = [
     },
     {
         id: "amorphis-2026-tokyo-1",
-        artist: "AMORPHIS",
+        artists: ["AMORPHIS"],
         tourName: "BORDERLAND JAPAN TOUR 2026",
         date: "2026-09-15",
         prefecture: "東京都",
@@ -165,7 +166,7 @@ export const events: Event[] = [
     },
     {
         id: "amorphis-2026-tokyo-2",
-        artist: "AMORPHIS",
+        artists: ["AMORPHIS"],
         tourName: "BORDERLAND JAPAN TOUR 2026",
         date: "2026-09-16",
         prefecture: "東京都",
@@ -177,7 +178,7 @@ export const events: Event[] = [
     },
     {
         id: "amorphis-2026-osaka",
-        artist: "AMORPHIS",
+        artists: ["AMORPHIS"],
         tourName: "BORDERLAND JAPAN TOUR 2026",
         date: "2026-09-17",
         prefecture: "大阪府",
@@ -189,7 +190,7 @@ export const events: Event[] = [
     },
     {
         id: "pig-2026-tokyo-1",
-        artist: "PIG",
+        artists: ["PIG"],
         tourName: "Japan Shows 2026 PIG “Hurt People Hurt” Tour",
         date: "2026-06-25",
         prefecture: "東京都",
@@ -201,7 +202,7 @@ export const events: Event[] = [
     },
     {
         id: "pig-2026-tokyo-2",
-        artist: "PIG",
+        artists: ["PIG"],
         tourName: "Japan Shows 2026 PIG “Hurt People Hurt” Tour",
         date: "2026-06-26",
         prefecture: "東京都",
@@ -213,7 +214,7 @@ export const events: Event[] = [
     },
     {
         id: "iron-maiden-2026-kanagawa-1",
-        artist: "IRON MAIDEN",
+        artists: ["IRON MAIDEN"],
         tourName: "RUN FOR YOUR LIVES WORLD TOUR 2026",
         date: "2026-11-24",
         prefecture: "神奈川県",
@@ -225,7 +226,7 @@ export const events: Event[] = [
     },
     {
         id: "iron-maiden-2026-kanagawa-2",
-        artist: "IRON MAIDEN",
+        artists: ["IRON MAIDEN"],
         tourName: "RUN FOR YOUR LIVES WORLD TOUR 2026",
         date: "2026-11-25",
         prefecture: "神奈川県",
@@ -237,7 +238,7 @@ export const events: Event[] = [
     },
     {
         id: "band-maid-2026-tokyo-1",
-        artist: "BAND-MAID",
+        artists: ["BAND-MAID"],
         tourName: "BAND-MAID WORLD TOUR 2026 FINAL",
         date: "2026-11-13",
         prefecture: "東京都",
@@ -249,7 +250,7 @@ export const events: Event[] = [
     },
     {
         id: "band-maid-2026-tokyo-2",
-        artist: "BAND-MAID",
+        artists: ["BAND-MAID"],
         tourName: "BAND-MAID WORLD TOUR 2026 FINAL",
         date: "2026-11-14",
         prefecture: "東京都",
