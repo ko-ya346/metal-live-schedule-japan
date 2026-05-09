@@ -7,7 +7,7 @@ const xProfileUrl = "https://x.com/ko_ya346";
 export const metadata: Metadata = {
   title: "Contact | Metal Live Schedule",
   description:
-    "Metal Live Schedule への連絡先です。掲載情報の修正依頼や情報提供はこちらからお願いします。",
+    "Metal Live Schedule への連絡先です。掲載情報の修正依頼、情報提供、ご要望、ご意見はこちらからお願いします。",
 };
 
 export default function ContactPage() {
@@ -17,7 +17,7 @@ export default function ContactPage() {
         <p className={styles.kicker}>Contact</p>
         <h1>お問い合わせ</h1>
         <p className={styles.summary}>
-          掲載情報の修正依頼や、公式情報にもとづくライブ情報の提供はこちらからお願いします。
+          掲載情報の修正依頼、公式情報にもとづくライブ情報の提供、ご要望、ご意見を受け付けています。
         </p>
       </header>
 
@@ -25,7 +25,7 @@ export default function ContactPage() {
         <section className={styles.infoSection}>
           <h2>連絡先</h2>
           <p>
-            現時点ではバックエンドの問い合わせフォームは用意せず、X のプロフィールへのリンクだけを置いています。
+            連絡は X からお願いします。掲載情報について連絡する場合は、アーティスト名、公演日、会場名、確認できる公式URLを添えてもらえると確認しやすいです。
           </p>
           <a
             className={styles.primaryLink}
@@ -35,13 +35,6 @@ export default function ContactPage() {
           >
             X で連絡する
           </a>
-        </section>
-
-        <section className={styles.infoSection}>
-          <h2>送るときの目安</h2>
-          <p>
-            アーティスト名、公演日、会場名、確認できる公式URLを添えてもらえると確認しやすいです。
-          </p>
         </section>
       </div>
 
