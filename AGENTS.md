@@ -52,3 +52,49 @@ For deployment and testing:
 - Add only lightweight checks.
 - Ensure `npm run build` passes before considering a change done.
 - Do not introduce a test framework yet unless there is a clear need.
+
+# Crawling policy
+
+## Goal
+
+Collect Japanese heavy metal live event information.
+
+## Priorities
+
+1. Reliability
+2. Simple implementation
+3. Easy maintenance
+
+## Current scope
+
+Only crawl:
+- official band websites
+- official event pages
+- promoter pages
+
+Do not crawl aggressively.
+
+## Rules
+
+- Respect robots.txt
+- Add delays between requests
+- Prefer RSS/API if available
+- Store raw HTML for debugging
+- Keep crawlers source-specific
+- Do not build a generic crawler framework yet
+
+## Data strategy
+
+The project is currently semi-manual.
+
+AI-generated or crawled data must be reviewable before publishing.
+
+## Discovery strategy
+
+Potential future feature:
+- discover related bands from co-performing events
+- manually approve newly discovered bands before enabling crawling
+
+## Important
+
+Keep implementations small and understandable.
