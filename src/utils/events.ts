@@ -7,8 +7,10 @@ type EventGroupsByDate = Record<string, Event[]>;
 
 const PREFECTURE_ORDER = [
   "北海道",
+  "宮城県",
   "東京都",
   "神奈川県",
+  "石川県",
   "愛知県",
   "大阪府",
   "福岡県",
