@@ -377,14 +377,18 @@
 
 .footerNav {
   display: flex;
+  align-items: center;
   flex-wrap: wrap;
   gap: 14px;
   margin-bottom: 12px;
 }
 
 .footerNav a {
+  display: inline-flex;
+  align-items: center;
   color: #ffffff;
   font-weight: 700;
+  line-height: 1;
   text-decoration: none;
 }
 
