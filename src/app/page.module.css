@@ -1,19 +1,27 @@
+.siteBody {
+  margin: 0;
+  background: #141414;
+}
+
 .page {
   max-width: 960px;
   margin: 0 auto;
   padding: 48px 20px 64px;
-  color: #171717;
-  background: #fafafa;
+  color: #181818;
+  background: #f6f6f4;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 .header {
+  padding: 24px 0 26px;
   margin-bottom: 28px;
+  border-top: 4px solid #9f1d1d;
+  border-bottom: 1px solid #d8d8d4;
 }
 
 .kicker {
   margin: 0 0 8px;
-  color: #9f1d1d;
+  color: #8f1515;
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -22,6 +30,7 @@
 .header h1 {
   margin: 0;
   font-size: clamp(2rem, 5vw, 3.5rem);
+  letter-spacing: 0;
   line-height: 1;
 }
 
@@ -36,9 +45,10 @@
   gap: 16px;
   padding: 16px;
   margin-bottom: 32px;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
+  border: 1px solid #d7d7d2;
+  border-radius: 6px;
   background: #ffffff;
+  box-shadow: 0 10px 24px rgb(20 20 20 / 0.06);
 }
 
 .filterField {
@@ -52,9 +62,9 @@
 .filterField select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #c9c9c9;
+  border: 1px solid #bdbdb8;
   border-radius: 6px;
-  background: #ffffff;
+  background: #fbfbfa;
   color: #171717;
   font: inherit;
 }
@@ -68,7 +78,7 @@
 .resetButton {
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid #c9c9c9;
+  border: 1px solid #bdbdb8;
   border-radius: 6px;
   background: #ffffff;
   color: #171717;
@@ -78,8 +88,8 @@
 }
 
 .resetButton:hover:not(:disabled) {
-  border-color: #9f1d1d;
-  color: #9f1d1d;
+  border-color: #8f1515;
+  color: #8f1515;
 }
 
 .resetButton:disabled {
@@ -103,12 +113,13 @@
 .calendarTitle {
   margin: 0;
   font-size: 1.4rem;
+  font-weight: 800;
 }
 
 .monthButton {
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid #c9c9c9;
+  border: 1px solid #bdbdb8;
   border-radius: 6px;
   background: #ffffff;
   color: #171717;
@@ -118,24 +129,25 @@
 }
 
 .monthButton:hover {
-  border-color: #9f1d1d;
-  color: #9f1d1d;
+  border-color: #8f1515;
+  color: #8f1515;
 }
 
 .calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   overflow: hidden;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
+  border: 1px solid #d7d7d2;
+  border-radius: 6px;
   background: #ffffff;
+  box-shadow: 0 12px 30px rgb(20 20 20 / 0.08);
 }
 
 .weekDay {
   padding: 10px 6px;
-  border-bottom: 1px solid #dfdfdf;
-  background: #f3f3f3;
-  color: #5f5f5f;
+  border-bottom: 1px solid #d7d7d2;
+  background: #1f1f1f;
+  color: #ffffff;
   font-size: 0.82rem;
   font-weight: 700;
   text-align: center;
@@ -144,8 +156,8 @@
 .calendarCell {
   min-height: 104px;
   padding: 8px;
-  border-right: 1px solid #eeeeee;
-  border-bottom: 1px solid #eeeeee;
+  border-right: 1px solid #eeeeea;
+  border-bottom: 1px solid #eeeeea;
   background: #ffffff;
 }
 
@@ -170,7 +182,7 @@
   margin: 0;
   padding: 4px 6px;
   border-radius: 4px;
-  background: #171717;
+  background: #8f1515;
   color: #ffffff;
   font-size: 0.78rem;
   font-weight: 700;
@@ -178,7 +190,7 @@
 }
 
 .outsideMonth {
-  background: #f7f7f7;
+  background: #f1f1ee;
 }
 
 .outsideMonth .calendarDate {
@@ -198,8 +210,9 @@
 .dateHeading {
   margin: 0;
   padding-bottom: 8px;
-  border-bottom: 2px solid #171717;
+  border-bottom: 2px solid #181818;
   font-size: 1.25rem;
+  font-weight: 800;
 }
 
 .eventList {
@@ -213,21 +226,24 @@
   gap: 20px;
   align-items: center;
   padding: 18px;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
+  border: 1px solid #d7d7d2;
+  border-left: 4px solid #8f1515;
+  border-radius: 6px;
   background: #ffffff;
+  box-shadow: 0 8px 18px rgb(20 20 20 / 0.05);
 }
 
 .artist {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 800;
+  color: #111111;
   overflow-wrap: anywhere;
 }
 
 .tourName {
   margin: 6px 0 0;
-  color: #5f5f5f;
+  color: #555555;
   overflow-wrap: anywhere;
 }
 
@@ -244,7 +260,7 @@
 }
 
 .eventMeta dt {
-  color: #767676;
+  color: #8f1515;
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -275,22 +291,22 @@
 }
 
 .primaryLink {
-  background: #171717;
+  background: #181818;
   color: #ffffff;
 }
 
 .primaryLink:hover {
-  background: #9f1d1d;
+  background: #8f1515;
 }
 
 .secondaryLink {
-  border: 1px solid #c9c9c9;
-  color: #171717;
+  border: 1px solid #bdbdb8;
+  color: #181818;
 }
 
 .secondaryLink:hover {
-  border-color: #9f1d1d;
-  color: #9f1d1d;
+  border-color: #8f1515;
+  color: #8f1515;
 }
 
 .pendingLinks {
@@ -303,8 +319,8 @@
 
 .empty {
   padding: 24px;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
+  border: 1px solid #d7d7d2;
+  border-radius: 6px;
   background: #ffffff;
   color: #5f5f5f;
 }
@@ -317,9 +333,11 @@
 
 .infoSection {
   padding: 20px;
-  border: 1px solid #dfdfdf;
-  border-radius: 8px;
+  border: 1px solid #d7d7d2;
+  border-left: 4px solid #8f1515;
+  border-radius: 6px;
   background: #ffffff;
+  box-shadow: 0 8px 18px rgb(20 20 20 / 0.05);
 }
 
 .infoSection h2 {
@@ -340,19 +358,19 @@
 .textLink {
   color: #171717;
   font-weight: 700;
-  text-decoration-color: #9f1d1d;
+  text-decoration-color: #8f1515;
   text-underline-offset: 4px;
 }
 
 .textLink:hover {
-  color: #9f1d1d;
+  color: #8f1515;
 }
 
 .siteFooter {
   max-width: 960px;
   margin: 0 auto;
   padding: 0 20px 36px;
-  color: #5f5f5f;
+  color: #d0d0d0;
   font-family: Arial, Helvetica, sans-serif;
 }
 
@@ -364,13 +382,13 @@
 }
 
 .footerNav a {
-  color: #171717;
+  color: #ffffff;
   font-weight: 700;
   text-decoration: none;
 }
 
 .footerNav a:hover {
-  color: #9f1d1d;
+  color: #ff6b6b;
 }
 
 .footerDisclaimer {

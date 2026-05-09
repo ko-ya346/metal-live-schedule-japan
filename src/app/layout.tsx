@@ -34,7 +34,7 @@ export default function RootLayout({
 }) {
   return (
     <html lang="ja">
-      <body>
+      <body className={styles.siteBody}>
         {children}
         <footer className={styles.siteFooter}>
           <nav className={styles.footerNav} aria-label="フッターナビゲーション">
