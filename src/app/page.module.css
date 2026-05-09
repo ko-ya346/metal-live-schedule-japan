@@ -7,21 +7,21 @@
   max-width: 960px;
   margin: 0 auto;
   padding: 48px 20px 64px;
-  color: #181818;
-  background: #f6f6f4;
+  color: #f2f2ef;
+  background: #000000;
   font-family: Arial, Helvetica, sans-serif;
 }
 
 .header {
   padding: 24px 0 26px;
   margin-bottom: 28px;
-  border-top: 4px solid #9f1d1d;
-  border-bottom: 1px solid #d8d8d4;
+  border-top: 4px solid #c52727;
+  border-bottom: 1px solid #2b2b2b;
 }
 
 .kicker {
   margin: 0 0 8px;
-  color: #8f1515;
+  color: #ff6b6b;
   font-size: 0.85rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -36,7 +36,7 @@
 
 .summary {
   margin: 12px 0 0;
-  color: #5f5f5f;
+  color: #b9b9b3;
 }
 
 .filters {
@@ -45,16 +45,16 @@
   gap: 16px;
   padding: 16px;
   margin-bottom: 32px;
-  border: 1px solid #d7d7d2;
+  border: 1px solid #2b2b2b;
   border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 10px 24px rgb(20 20 20 / 0.06);
+  background: #101010;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.36);
 }
 
 .filterField {
   display: grid;
   gap: 8px;
-  color: #4a4a4a;
+  color: #d9d9d4;
   font-size: 0.9rem;
   font-weight: 700;
 }
@@ -62,10 +62,10 @@
 .filterField select {
   width: 100%;
   padding: 10px 12px;
-  border: 1px solid #bdbdb8;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  background: #fbfbfa;
-  color: #171717;
+  background: #050505;
+  color: #f2f2ef;
   font: inherit;
 }
 
@@ -78,22 +78,22 @@
 .resetButton {
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid #bdbdb8;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  background: #ffffff;
-  color: #171717;
+  background: #151515;
+  color: #f2f2ef;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .resetButton:hover:not(:disabled) {
-  border-color: #8f1515;
-  color: #8f1515;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
 }
 
 .resetButton:disabled {
-  color: #9a9a9a;
+  color: #777777;
   cursor: not-allowed;
 }
 
@@ -119,33 +119,33 @@
 .monthButton {
   min-height: 38px;
   padding: 0 14px;
-  border: 1px solid #bdbdb8;
+  border: 1px solid #3a3a3a;
   border-radius: 6px;
-  background: #ffffff;
-  color: #171717;
+  background: #151515;
+  color: #f2f2ef;
   font: inherit;
   font-weight: 700;
   cursor: pointer;
 }
 
 .monthButton:hover {
-  border-color: #8f1515;
-  color: #8f1515;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
 }
 
 .calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
   overflow: hidden;
-  border: 1px solid #d7d7d2;
+  border: 1px solid #2b2b2b;
   border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 12px 30px rgb(20 20 20 / 0.08);
+  background: #101010;
+  box-shadow: 0 14px 34px rgb(0 0 0 / 0.44);
 }
 
 .weekDay {
   padding: 10px 6px;
-  border-bottom: 1px solid #d7d7d2;
+  border-bottom: 1px solid #2b2b2b;
   background: #1f1f1f;
   color: #ffffff;
   font-size: 0.82rem;
@@ -156,9 +156,9 @@
 .calendarCell {
   min-height: 104px;
   padding: 8px;
-  border-right: 1px solid #eeeeea;
-  border-bottom: 1px solid #eeeeea;
-  background: #ffffff;
+  border-right: 1px solid #252525;
+  border-bottom: 1px solid #252525;
+  background: #101010;
 }
 
 .calendarCell:nth-child(7n + 7) {
@@ -168,7 +168,7 @@
 .calendarDate {
   display: block;
   margin-bottom: 6px;
-  color: #5f5f5f;
+  color: #c8c8c2;
   font-size: 0.82rem;
   font-weight: 700;
 }
@@ -182,7 +182,7 @@
   margin: 0;
   padding: 4px 6px;
   border-radius: 4px;
-  background: #8f1515;
+  background: #b42020;
   color: #ffffff;
   font-size: 0.78rem;
   font-weight: 700;
@@ -190,11 +190,11 @@
 }
 
 .outsideMonth {
-  background: #f1f1ee;
+  background: #080808;
 }
 
 .outsideMonth .calendarDate {
-  color: #a0a0a0;
+  color: #6f6f6a;
 }
 
 .dateGroups {
@@ -210,7 +210,7 @@
 .dateHeading {
   margin: 0;
   padding-bottom: 8px;
-  border-bottom: 2px solid #181818;
+  border-bottom: 2px solid #c52727;
   font-size: 1.25rem;
   font-weight: 800;
 }
@@ -226,24 +226,24 @@
   gap: 20px;
   align-items: center;
   padding: 18px;
-  border: 1px solid #d7d7d2;
-  border-left: 4px solid #8f1515;
+  border: 1px solid #2b2b2b;
+  border-left: 4px solid #c52727;
   border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 8px 18px rgb(20 20 20 / 0.05);
+  background: #101010;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
 }
 
 .artist {
   margin: 0;
   font-size: 1.2rem;
   font-weight: 800;
-  color: #111111;
+  color: #ffffff;
   overflow-wrap: anywhere;
 }
 
 .tourName {
   margin: 6px 0 0;
-  color: #555555;
+  color: #b9b9b3;
   overflow-wrap: anywhere;
 }
 
@@ -260,7 +260,7 @@
 }
 
 .eventMeta dt {
-  color: #8f1515;
+  color: #ff6b6b;
   font-size: 0.78rem;
   font-weight: 700;
   text-transform: uppercase;
@@ -268,6 +268,7 @@
 
 .eventMeta dd {
   margin: 0;
+  color: #f2f2ef;
   overflow-wrap: anywhere;
 }
 
@@ -291,27 +292,27 @@
 }
 
 .primaryLink {
-  background: #181818;
+  background: #c52727;
   color: #ffffff;
 }
 
 .primaryLink:hover {
-  background: #8f1515;
+  background: #e33a3a;
 }
 
 .secondaryLink {
-  border: 1px solid #bdbdb8;
-  color: #181818;
+  border: 1px solid #4a4a4a;
+  color: #f2f2ef;
 }
 
 .secondaryLink:hover {
-  border-color: #8f1515;
-  color: #8f1515;
+  border-color: #ff6b6b;
+  color: #ff6b6b;
 }
 
 .pendingLinks {
   margin: 0;
-  color: #767676;
+  color: #a8a8a2;
   font-size: 0.9rem;
   font-weight: 700;
   text-align: right;
@@ -319,10 +320,10 @@
 
 .empty {
   padding: 24px;
-  border: 1px solid #d7d7d2;
+  border: 1px solid #2b2b2b;
   border-radius: 6px;
-  background: #ffffff;
-  color: #5f5f5f;
+  background: #101010;
+  color: #b9b9b3;
 }
 
 .infoContent {
@@ -333,11 +334,11 @@
 
 .infoSection {
   padding: 20px;
-  border: 1px solid #d7d7d2;
-  border-left: 4px solid #8f1515;
+  border: 1px solid #2b2b2b;
+  border-left: 4px solid #c52727;
   border-radius: 6px;
-  background: #ffffff;
-  box-shadow: 0 8px 18px rgb(20 20 20 / 0.05);
+  background: #101010;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
 }
 
 .infoSection h2 {
@@ -347,7 +348,7 @@
 
 .infoSection p {
   margin: 0;
-  color: #4a4a4a;
+  color: #d9d9d4;
   line-height: 1.8;
 }
 
@@ -356,14 +357,14 @@
 }
 
 .textLink {
-  color: #171717;
+  color: #f2f2ef;
   font-weight: 700;
-  text-decoration-color: #8f1515;
+  text-decoration-color: #ff6b6b;
   text-underline-offset: 4px;
 }
 
 .textLink:hover {
-  color: #8f1515;
+  color: #ff6b6b;
 }
 
 .siteFooter {
