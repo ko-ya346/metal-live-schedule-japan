@@ -1,37 +1,37 @@
-# Event data update workflow
+# イベントデータ更新フロー
 
-This app is manually maintained for now. Public event data lives in `src/data/events.ts`.
+このアプリは当面、手動メンテナンスで運用します。公開されるイベントデータは `src/data/events.ts` に置きます。
 
-Collected but unpublished information lives in `src/data/candidates.ts`. Candidate events are not shown on the public page. Move only reviewed events into `src/data/events.ts`.
+収集したが未公開の情報は `src/data/candidates.ts` に置きます。候補イベントは公開ページには表示されません。人間が確認したものだけ `src/data/events.ts` に移します。
 
-## Search sources
+## 探す情報源
 
-Use official or ticketing sources for final confirmation.
+最終確認には、公式情報またはチケット販売ページを使います。
 
-- Artist official sites: live, tour, schedule, news pages
-- Promoters: Creativeman, UDO, SMASH, Hayashi International Promotions, Evoken de Valhall Production
-- Ticket platforms: eplus, Ticket Pia, Lawson Ticket, Rakuten Ticket
-- Venue schedules: Club Citta, Zepp, Club Quattro, Shibuya venues, Osaka venues
-- Discovery only: metal news sites, SNS posts, fan calendars
+- アーティスト公式サイト: live、tour、schedule、news ページ
+- プロモーター: Creativeman、UDO、SMASH、Hayashi International Promotions、Evoken de Valhall Production
+- チケット販売: eplus、チケットぴあ、ローチケ、楽天チケット
+- 会場スケジュール: Club Citta、Zepp、Club Quattro、渋谷・大阪のライブハウス
+- 発見用のみ: メタルニュースサイト、SNS投稿、ファンカレンダー
 
-Do not use discovery-only sources as the final source. Confirm with an artist, promoter, venue, or ticket page before adding an event.
+発見用の情報源だけを最終ソースにしないでください。イベントを公開データに追加する前に、アーティスト、プロモーター、会場、チケット販売ページのいずれかで確認します。
 
-## Collection workflow
+## 収集フロー
 
-1. Check sources listed in `src/data/crawlTargets.ts`.
-2. Add possible events to `src/data/candidates.ts`.
-3. Use `reviewStatus: "new"` for unreviewed entries.
-4. Use `reviewStatus: "needs_review"` when details are missing or unclear.
-5. Confirm details against official sources before publishing.
-6. Copy only reviewed events into `src/data/events.ts`.
-7. Use `reviewStatus: "approved"` after publishing or approval.
-8. Use `reviewStatus: "rejected"` for out-of-scope or unreliable candidates.
+1. `src/data/crawlTargets.ts` にある情報源を確認する。
+2. 気になる公演を `src/data/candidates.ts` に追加する。
+3. 未確認の候補は `reviewStatus: "new"` にする。
+4. 情報が足りない、または不確かな候補は `reviewStatus: "needs_review"` にする。
+5. 公開前に公式情報で詳細を確認する。
+6. 確認できたイベントだけ `src/data/events.ts` にコピーする。
+7. 公開または掲載判断が済んだ候補は `reviewStatus: "approved"` にする。
+8. 対象外または信頼できない候補は `reviewStatus: "rejected"` にする。
 
-Candidate events are a review queue, not a publishing source.
+候補イベントはレビュー用の作業リストです。公開データの参照元にはしません。
 
-## Candidate event object template
+## 候補イベントのテンプレート
 
-Use this command to print a candidate template:
+候補イベントのテンプレートはこのコマンドで出力できます。
 
 ```bash
 npm run candidates:new
@@ -59,7 +59,7 @@ npm run candidates:new
 },
 ```
 
-## Review commands
+## レビュー用コマンド
 
 ```bash
 npm run candidates:list
@@ -67,28 +67,28 @@ npm run candidates:list -- --status=new
 npm run data:validate
 ```
 
-`npm run data:validate` checks published events, candidate events, and crawl targets. It warns when an approved candidate is not present in published events.
+`npm run data:validate` は、公開イベント、候補イベント、収集対象をチェックします。`approved` の候補が公開イベントに存在しない場合は警告します。
 
-## Add an event
+## イベントを追加する
 
-1. Open `src/data/events.ts`.
-2. Copy an existing event object.
-3. Replace every field.
-4. Keep `date` as `YYYY-MM-DD`.
-5. Put all performers in `artists`.
-6. Put the headliner or main calendar label first in `artists`.
-7. Use Japanese prefecture names, such as `東京都`, `大阪府`, `神奈川県`.
-8. Use `ticketUrl: null` when ticket information is not published yet.
-9. Use `officialUrl` for an artist, venue, or organizer page that verifies the event.
-10. Use one of these statuses: `scheduled`, `postponed`, `cancelled`.
-11. Run the local checks.
+1. `src/data/events.ts` を開く。
+2. 既存のイベントオブジェクトをコピーする。
+3. すべての項目を差し替える。
+4. `date` は `YYYY-MM-DD` にする。
+5. 出演者はすべて `artists` に入れる。
+6. ヘッドライナー、またはカレンダー上の主表示にしたいアーティストを `artists` の先頭に置く。
+7. 都道府県は `東京都`、`大阪府`、`神奈川県` のような日本語表記にする。
+8. チケット情報が未公開の場合は `ticketUrl: null` にする。
+9. `officialUrl` には、イベント内容を確認できるアーティスト、会場、主催者ページを入れる。
+10. `status` は `scheduled`、`postponed`、`cancelled` のいずれかにする。
+11. ローカルチェックを実行する。
 
 ```bash
 npm run lint
 npm run build
 ```
 
-## Event object template
+## 公開イベントのテンプレート
 
 ```ts
 {
@@ -105,21 +105,20 @@ npm run build
 },
 ```
 
-## ID naming
+## ID の付け方
 
-Use stable lowercase IDs. Include artist, year, and place or sequence.
+安定した小文字のIDにします。アーティスト名、年、場所、または連番を含めます。
 
 - `iron-maiden-2026-kanagawa-1`
 - `iron-maiden-2026-kanagawa-2`
 - `amorphis-2026-tokyo-1`
 
-## After editing
+## 編集後の確認
 
-Check the page manually:
+画面で以下を確認します。
 
-- Events are sorted by date.
-- Prefecture filter includes the new prefecture.
-- Genre filter includes the new genres.
-- Ticket and official links open correct pages.
-- Missing links show `リンク未定`.
-- Mobile width does not cause text overlap.
+- イベントが日付順に並んでいる。
+- 都道府県フィルターに新しい都道府県が入っている。
+- ジャンルフィルターに新しいジャンルが入っている。
+- チケットリンクと公式リンクが正しいページを開く。
+- スマホ幅で文字やボタンが崩れていない。
