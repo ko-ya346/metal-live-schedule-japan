@@ -21,6 +21,18 @@ export type Event = {
 // Replace this array when adding real events. Keep the Event shape above unchanged.
 export const events: Event[] = [
     {
+        id: "sample-2026-tokyo-multiple-artists",
+        artists: ["SAMPLE HEADLINER", "SAMPLE SUPPORT", "SAMPLE GUEST"],
+        tourName: "Multiple Artists Display Check",
+        date: "2026-05-24",
+        prefecture: "東京都",
+        venue: "表示確認用会場",
+        genres: ["Heavy Metal"],
+        ticketUrl: null,
+        officialUrl: null,
+        status: "scheduled",
+    },
+    {
         id: "bridear-2026-tokyo",
         artists: ["BRIDEAR"],
         tourName: "Still Burning",
