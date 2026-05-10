@@ -1,6 +1,8 @@
 # Event data update workflow
 
-This app is manually maintained for now. Update event data in `src/data/events.ts`.
+This app is manually maintained for now. Public event data lives in `src/data/events.ts`.
+
+Collected but unpublished information lives in `src/data/candidates.ts`. Candidate events are not shown on the public page. Move only reviewed events into `src/data/events.ts`.
 
 ## Search sources
 
@@ -13,6 +15,59 @@ Use official or ticketing sources for final confirmation.
 - Discovery only: metal news sites, SNS posts, fan calendars
 
 Do not use discovery-only sources as the final source. Confirm with an artist, promoter, venue, or ticket page before adding an event.
+
+## Collection workflow
+
+1. Check sources listed in `src/data/crawlTargets.ts`.
+2. Add possible events to `src/data/candidates.ts`.
+3. Use `reviewStatus: "new"` for unreviewed entries.
+4. Use `reviewStatus: "needs_review"` when details are missing or unclear.
+5. Confirm details against official sources before publishing.
+6. Copy only reviewed events into `src/data/events.ts`.
+7. Use `reviewStatus: "approved"` after publishing or approval.
+8. Use `reviewStatus: "rejected"` for out-of-scope or unreliable candidates.
+
+Candidate events are a review queue, not a publishing source.
+
+## Candidate event object template
+
+Use this command to print a candidate template:
+
+```bash
+npm run candidates:new
+```
+
+```ts
+{
+    id: "artist-2026-prefecture-or-city",
+    artists: ["ARTIST"],
+    tourName: null,
+    date: null,
+    prefecture: null,
+    venue: null,
+    genres: ["Heavy Metal"],
+    ticketUrl: null,
+    officialUrl: null,
+    sourceUrl: "https://example.com/source",
+    sourceType: "manual",
+    sourceName: "Source name",
+    eventStatus: "scheduled",
+    reviewStatus: "new",
+    notes: "",
+    collectedAt: "2026-05-10",
+    reviewedAt: null,
+},
+```
+
+## Review commands
+
+```bash
+npm run candidates:list
+npm run candidates:list -- --status=new
+npm run data:validate
+```
+
+`npm run data:validate` checks published events, candidate events, and crawl targets. It warns when an approved candidate is not present in published events.
 
 ## Add an event
 
