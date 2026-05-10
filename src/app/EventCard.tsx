@@ -1,6 +1,7 @@
 import type { Event } from "../data/events";
 import { isPastEventDate } from "../utils/date";
 import styles from "./page.module.css";
+import { useEffect, useRef, useState } from "react";
 
 type EventCardProps = {
   event: Event;
@@ -46,6 +47,26 @@ function formatYoutubeLinkLabel(artist: string, artistCount: number) {
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
+  const [isYoutubeOpen, setIsYoutubeOpen] = useState(false);
+  const youtubeDetailsRef = useRef<HTMLDetailsElement>(null);
+
+  useEffect(() => {
+    if (!isYoutubeOpen) {
+      return;
+    }
+
+    function closeYoutubeLinks(event: PointerEvent) {
+      if (!youtubeDetailsRef.current?.contains(event.target as Node)) {
+        setIsYoutubeOpen(false);
+      }
+    }
+
+    document.addEventListener("pointerdown", closeYoutubeLinks);
+
+    return () => {
+      document.removeEventListener("pointerdown", closeYoutubeLinks);
+    };
+  }, [isYoutubeOpen]);
 
   return (
     <article className={styles.eventCard}>
@@ -103,7 +124,12 @@ export function EventCard({ event }: EventCardProps) {
           </a>
         )}
         {shouldCollapseYoutubeLinks ? (
-          <details className={styles.youtubeDetails}>
+          <details
+            className={styles.youtubeDetails}
+            onToggle={(event) => setIsYoutubeOpen(event.currentTarget.open)}
+            open={isYoutubeOpen}
+            ref={youtubeDetailsRef}
+          >
             <summary className={styles.secondaryLink}>YouTube</summary>
             <div className={styles.youtubeArtistLinks}>
               {event.artists.map((artist) => (
