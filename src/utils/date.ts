@@ -45,6 +45,13 @@ export function getEventMonthKey(date: EventDate) {
   return `${year}-${month}`;
 }
 
+export function getCurrentMonthKey() {
+  const today = new Date();
+  const month = String(today.getMonth() + 1).padStart(2, "0");
+
+  return `${today.getFullYear()}-${month}`;
+}
+
 export function formatCalendarMonth(monthKey: string) {
   const [year, month] = monthKey.split("-").map(Number);
 

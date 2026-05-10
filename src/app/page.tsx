@@ -11,7 +11,7 @@ import {
   groupEventsByDate,
   sortEventsByDate,
 } from "../utils/events";
-import { getEventMonthKey, isPastEventDate } from "../utils/date";
+import { getCurrentMonthKey, isPastEventDate } from "../utils/date";
 import { EventCalendar } from "./EventCalendar";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
@@ -25,9 +25,7 @@ export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
   const [selectedDate, setSelectedDate] = useState<EventDate | null>(null);
-  const [visibleMonth, setVisibleMonth] = useState(() =>
-    getEventMonthKey(sortEventsByDate(events)[0].date),
-  );
+  const [visibleMonth, setVisibleMonth] = useState(getCurrentMonthKey);
   const hasActiveFilters =
     selectedPrefecture !== ALL_FILTER_VALUE || selectedGenre !== ALL_FILTER_VALUE;
 
