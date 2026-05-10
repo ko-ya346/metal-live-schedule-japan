@@ -29,9 +29,16 @@ function getSetlistSearchUrl(artists: Event["artists"]) {
   return `https://www.setlist.fm/search?query=${query}`;
 }
 
+function getYoutubeSearchUrl(event: Event) {
+  const query = encodeURIComponent(
+    `${event.artists.join(" ")} ${event.tourName} live`,
+  );
+
+  return `https://www.youtube.com/results?search_query=${query}`;
+}
+
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
-  const hasEventLinks = event.ticketUrl || event.officialUrl || shouldShowSetlistLink;
 
   return (
     <article className={styles.eventCard}>
@@ -57,42 +64,46 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </dl>
 
-      {hasEventLinks && (
-        <div className={styles.eventLinks}>
-          {event.ticketUrl && (
-            <a
-              className={styles.primaryLink}
-              href={event.ticketUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              チケット
-            </a>
-          )}
-          {event.officialUrl && (
-            <a
-              className={styles.secondaryLink}
-              href={event.officialUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              公式
-            </a>
-          )}
-          {shouldShowSetlistLink && (
-            <a
-              className={styles.secondaryLink}
-              href={getSetlistSearchUrl(event.artists)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              セットリストを探す
-            </a>
-          )}
-        </div>
-      )}
-
-      {!hasEventLinks && <p className={styles.pendingLinks}>リンク未定</p>}
+      <div className={styles.eventLinks}>
+        {event.ticketUrl && (
+          <a
+            className={styles.primaryLink}
+            href={event.ticketUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            チケット
+          </a>
+        )}
+        {event.officialUrl && (
+          <a
+            className={styles.secondaryLink}
+            href={event.officialUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            公式
+          </a>
+        )}
+        {shouldShowSetlistLink && (
+          <a
+            className={styles.secondaryLink}
+            href={getSetlistSearchUrl(event.artists)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            セットリストを探す
+          </a>
+        )}
+        <a
+          className={styles.secondaryLink}
+          href={getYoutubeSearchUrl(event)}
+          target="_blank"
+          rel="noreferrer"
+        >
+          YouTubeで探す
+        </a>
+      </div>
     </article>
   );
 }
