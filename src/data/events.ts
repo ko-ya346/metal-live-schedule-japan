@@ -18,8 +18,7 @@ export type Event = {
     status: EventStatus;
 };
 
-// Replace this array when adding real events. Keep the Event shape above unchanged.
-export const events: Event[] = [
+const sampleEvents: Event[] = [
     {
         id: "sample-2026-tokyo-multiple-artists",
         artists: ["SAMPLE HEADLINER", "SAMPLE SUPPORT", "SAMPLE GUEST"],
@@ -32,6 +31,10 @@ export const events: Event[] = [
         officialUrl: null,
         status: "scheduled",
     },
+];
+
+// Replace this array when adding real events. Keep the Event shape above unchanged.
+const realEvents: Event[] = [
     {
         id: "bridear-2026-tokyo",
         artists: ["BRIDEAR"],
@@ -333,3 +336,8 @@ export const events: Event[] = [
         status: "scheduled",
     },
 ];
+
+export const events =
+    process.env.NODE_ENV === "production"
+        ? realEvents
+        : [...sampleEvents, ...realEvents];
