@@ -51,7 +51,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "Example source",
         eventStatus: "scheduled",
         reviewStatus: "rejected",
-        notes: "Example candidate. Keep rejected so it does not appear in review queues.",
+        notes: "記入例。レビュー対象に出ないよう rejected のままにする。",
         collectedAt: "2026-05-10",
         reviewedAt: "2026-05-10",
     },

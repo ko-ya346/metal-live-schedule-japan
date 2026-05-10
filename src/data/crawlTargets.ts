@@ -26,7 +26,7 @@ export const crawlTargets: CrawlTarget[] = [
         url: "https://www.creativeman.co.jp/",
         enabled: true,
         priority: "high",
-        notes: "Major promoter. Check artist and event pages manually first.",
+        notes: "大手プロモーター。まずはアーティストページとイベントページを手動確認する。",
         lastCheckedAt: null,
     },
     {
@@ -36,7 +36,7 @@ export const crawlTargets: CrawlTarget[] = [
         url: "https://www.udo.jp/",
         enabled: true,
         priority: "high",
-        notes: "Useful for international artists and larger domestic shows.",
+        notes: "来日公演や大きめの国内公演の確認に使う。",
         lastCheckedAt: null,
     },
     {
@@ -46,7 +46,7 @@ export const crawlTargets: CrawlTarget[] = [
         url: "https://clubcitta.co.jp/",
         enabled: true,
         priority: "medium",
-        notes: "Venue schedule can surface domestic metal events.",
+        notes: "会場スケジュールから国内メタル公演を見つけるために使う。",
         lastCheckedAt: null,
     },
 ];
