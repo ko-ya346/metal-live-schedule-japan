@@ -373,6 +373,34 @@
   color: #ff6b6b;
 }
 
+.youtubeDetails {
+  position: relative;
+}
+
+.youtubeDetails summary {
+  list-style: none;
+  cursor: pointer;
+}
+
+.youtubeDetails summary::-webkit-details-marker {
+  display: none;
+}
+
+.youtubeArtistLinks {
+  position: absolute;
+  z-index: 1;
+  right: 0;
+  display: grid;
+  gap: 8px;
+  min-width: 180px;
+  padding: 8px;
+  margin-top: 8px;
+  border: 1px solid #383838;
+  border-radius: 6px;
+  background: #181818;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
+}
+
 .pendingLinks {
   margin: 0;
   color: #a8a8a2;
@@ -513,6 +541,11 @@
   .primaryLink,
   .secondaryLink,
   .clearDateButton {
+    width: 100%;
+  }
+
+  .youtubeArtistLinks {
+    position: static;
     width: 100%;
   }
 

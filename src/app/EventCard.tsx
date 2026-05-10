@@ -29,14 +29,23 @@ function getSetlistSearchUrl(artists: Event["artists"]) {
   return `https://www.setlist.fm/search?query=${query}`;
 }
 
-function getYoutubeSearchUrl(artists: Event["artists"]) {
-  const query = encodeURIComponent(artists.join(" "));
+function getYoutubeSearchUrl(artist: string) {
+  const query = encodeURIComponent(artist);
 
   return `https://www.youtube.com/results?search_query=${query}`;
 }
 
+function formatYoutubeLinkLabel(artist: string, artistCount: number) {
+  if (artistCount === 1) {
+    return "YouTubeで探す";
+  }
+
+  return `${artist}を探す`;
+}
+
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
+  const shouldCollapseYoutubeLinks = event.artists.length > 1;
 
   return (
     <article className={styles.eventCard}>
@@ -93,14 +102,33 @@ export function EventCard({ event }: EventCardProps) {
             セットリストを探す
           </a>
         )}
-        <a
-          className={styles.secondaryLink}
-          href={getYoutubeSearchUrl(event.artists)}
-          target="_blank"
-          rel="noreferrer"
-        >
-          YouTubeで探す
-        </a>
+        {shouldCollapseYoutubeLinks ? (
+          <details className={styles.youtubeDetails}>
+            <summary className={styles.secondaryLink}>YouTube</summary>
+            <div className={styles.youtubeArtistLinks}>
+              {event.artists.map((artist) => (
+                <a
+                  className={styles.secondaryLink}
+                  href={getYoutubeSearchUrl(artist)}
+                  key={artist}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {formatYoutubeLinkLabel(artist, event.artists.length)}
+                </a>
+              ))}
+            </div>
+          </details>
+        ) : (
+          <a
+            className={styles.secondaryLink}
+            href={getYoutubeSearchUrl(event.artists[0])}
+            target="_blank"
+            rel="noreferrer"
+          >
+            {formatYoutubeLinkLabel(event.artists[0], event.artists.length)}
+          </a>
+        )}
       </div>
     </article>
   );
