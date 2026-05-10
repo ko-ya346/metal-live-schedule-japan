@@ -11,7 +11,9 @@ import styles from "./page.module.css";
 type EventCalendarProps = {
   events: Event[];
   monthKey: string;
+  selectedDate: Event["date"] | null;
   onMonthChange: (monthKey: string) => void;
+  onDateSelect: (date: Event["date"]) => void;
 };
 
 const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
@@ -40,7 +42,9 @@ function formatCalendarEventArtists(artists: Event["artists"]) {
 export function EventCalendar({
   events,
   monthKey,
+  selectedDate,
   onMonthChange,
+  onDateSelect,
 }: EventCalendarProps) {
   const calendarDates = getCalendarDates(monthKey);
   const eventsByDate = groupEventsByDate(events);
@@ -76,13 +80,16 @@ export function EventCalendar({
           const dateKey = formatDateKey(date);
           const dateEvents = eventsByDate[dateKey] ?? [];
           const isCurrentMonth = dateKey.startsWith(monthKey);
+          const isSelected = selectedDate === dateKey;
 
           return (
-            <div
+            <button
               className={`${styles.calendarCell} ${
                 isCurrentMonth ? "" : styles.outsideMonth
-              }`}
+              } ${isSelected ? styles.selectedDate : ""}`}
               key={dateKey}
+              type="button"
+              onClick={() => onDateSelect(dateKey)}
             >
               <span className={styles.calendarDate}>{date.getDate()}</span>
               <div className={styles.calendarEvents}>
@@ -92,7 +99,7 @@ export function EventCalendar({
                   </p>
                 ))}
               </div>
-            </div>
+            </button>
           );
         })}
       </div>

@@ -156,13 +156,28 @@
 .calendarCell {
   min-height: 104px;
   padding: 8px;
+  border: 0;
   border-right: 1px solid #303030;
   border-bottom: 1px solid #303030;
   background: #181818;
+  color: inherit;
+  font: inherit;
+  text-align: left;
+  cursor: pointer;
 }
 
 .calendarCell:nth-child(7n + 7) {
   border-right: 0;
+}
+
+.calendarCell:hover,
+.selectedDate {
+  background: #241717;
+}
+
+.selectedDate {
+  outline: 2px solid #ff6b6b;
+  outline-offset: -2px;
 }
 
 .calendarDate {
@@ -193,6 +208,14 @@
   background: #080808;
 }
 
+.outsideMonth:hover {
+  background: #161010;
+}
+
+.outsideMonth.selectedDate {
+  background: #241717;
+}
+
 .outsideMonth .calendarDate {
   color: #6f6f6a;
 }
@@ -200,6 +223,46 @@
 .dateGroups {
   display: grid;
   gap: 28px;
+}
+
+.selectedDateSection,
+.upcomingSection {
+  display: grid;
+  gap: 14px;
+}
+
+.selectedDateSection {
+  margin-bottom: 34px;
+}
+
+.sectionHeader {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.sectionTitle {
+  margin: 0;
+  font-size: 1.35rem;
+  font-weight: 800;
+}
+
+.clearDateButton {
+  min-height: 36px;
+  padding: 0 12px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background: #151515;
+  color: #f2f2ef;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.clearDateButton:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
 }
 
 .dateGroup {
@@ -442,8 +505,14 @@
     justify-content: stretch;
   }
 
+  .sectionHeader {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
   .primaryLink,
-  .secondaryLink {
+  .secondaryLink,
+  .clearDateButton {
     width: 100%;
   }
 
