@@ -29,10 +29,8 @@ function getSetlistSearchUrl(artists: Event["artists"]) {
   return `https://www.setlist.fm/search?query=${query}`;
 }
 
-function getYoutubeSearchUrl(event: Event) {
-  const query = encodeURIComponent(
-    `${event.artists.join(" ")} ${event.tourName} live`,
-  );
+function getYoutubeSearchUrl(artists: Event["artists"]) {
+  const query = encodeURIComponent(artists.join(" "));
 
   return `https://www.youtube.com/results?search_query=${query}`;
 }
@@ -97,7 +95,7 @@ export function EventCard({ event }: EventCardProps) {
         )}
         <a
           className={styles.secondaryLink}
-          href={getYoutubeSearchUrl(event)}
+          href={getYoutubeSearchUrl(event.artists)}
           target="_blank"
           rel="noreferrer"
         >
