@@ -447,6 +447,124 @@
   margin-top: 16px;
 }
 
+.adminToolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 10px;
+  margin-bottom: 24px;
+}
+
+.adminStatusButton {
+  min-height: 38px;
+  padding: 0 14px;
+  border: 1px solid #3a3a3a;
+  border-radius: 6px;
+  background: #151515;
+  color: #f2f2ef;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adminStatusButton:hover,
+.activeAdminStatusButton {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.adminCandidateList {
+  display: grid;
+  gap: 18px;
+}
+
+.adminCandidateCard {
+  display: grid;
+  gap: 18px;
+  padding: 20px;
+  border: 1px solid #383838;
+  border-left: 4px solid #c52727;
+  border-radius: 6px;
+  background: #181818;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
+}
+
+.adminCandidateHeader {
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 16px;
+}
+
+.adminCandidateHeader h2 {
+  margin: 0;
+  font-size: 1.35rem;
+}
+
+.adminCandidateMeta {
+  display: grid;
+  gap: 10px;
+  margin: 0;
+}
+
+.adminCandidateMeta div {
+  display: grid;
+  grid-template-columns: 88px minmax(0, 1fr);
+  gap: 12px;
+}
+
+.adminCandidateMeta dt {
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  font-weight: 700;
+}
+
+.adminCandidateMeta dd {
+  margin: 0;
+  overflow-wrap: anywhere;
+}
+
+.adminLinkRow {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.adminCompareSection,
+.adminJsonSection {
+  display: grid;
+  gap: 10px;
+}
+
+.adminCompareSection h3,
+.adminJsonSection h3 {
+  margin: 0;
+  font-size: 1rem;
+}
+
+.adminCompareSection p,
+.adminCompareSection ul {
+  margin: 0;
+  color: #d9d9d4;
+}
+
+.adminCompareSection ul {
+  display: grid;
+  gap: 6px;
+  padding-left: 18px;
+}
+
+.adminJsonSection pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #050505;
+  color: #f2f2ef;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
 .textLink {
   color: #f2f2ef;
   font-weight: 700;
@@ -538,9 +656,18 @@
     flex-direction: column;
   }
 
+  .adminCandidateHeader {
+    flex-direction: column;
+  }
+
+  .adminCandidateMeta div {
+    grid-template-columns: 1fr;
+  }
+
   .primaryLink,
   .secondaryLink,
-  .clearDateButton {
+  .clearDateButton,
+  .adminStatusButton {
     width: 100%;
   }
 
