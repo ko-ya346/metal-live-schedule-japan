@@ -94,9 +94,9 @@ for (const candidate of candidateEvents) {
 
   const publishedEvent = events.find((event) => event.id === candidate.id);
 
-  if (candidate.reviewStatus === "ignored" && publishedEvent) {
+  if (candidate.reviewStatus === "review_needed" && publishedEvent) {
     warnings.push(
-      `candidateEvents:${candidate.id}: ignored candidate is already in published events`,
+      `candidateEvents:${candidate.id}: review_needed candidate is already in published events`,
     );
   }
 }
