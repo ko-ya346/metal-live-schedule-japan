@@ -96,6 +96,8 @@ When collecting candidate events, regularly check these preferred artists becaus
 - 人間椅子
 - アイリフドーパ
 
+Also collect reliable candidate events for visiting international metal, heavy rock, loud rock, metalcore, hardcore, and related heavy music artists. Do not limit collection to the preferred artist list.
+
 ## Discovery strategy
 
 Potential future feature:
