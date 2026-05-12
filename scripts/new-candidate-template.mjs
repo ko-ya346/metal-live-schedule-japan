@@ -13,9 +13,10 @@ console.log(`{
     sourceUrl: "https://example.com/source",
     sourceType: "manual",
     sourceName: "Source name",
+    confidence: "medium",
     eventStatus: "scheduled",
     reviewStatus: "review_needed",
-    notes: "",
+    reviewNotes: "",
     collectedAt: "${today}",
     reviewedAt: null,
 },`);

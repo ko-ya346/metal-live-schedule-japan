@@ -242,8 +242,12 @@ export function CandidatesReview({
                   <dd>{candidate.sourceName}</dd>
                 </div>
                 <div>
+                  <dt>信頼度</dt>
+                  <dd>{candidate.confidence}</dd>
+                </div>
+                <div>
                   <dt>メモ</dt>
-                  <dd>{candidate.notes || "なし"}</dd>
+                  <dd>{candidate.reviewNotes || "なし"}</dd>
                 </div>
               </dl>
 

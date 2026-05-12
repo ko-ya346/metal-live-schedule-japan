@@ -1,11 +1,12 @@
-import { candidateEvents } from "../src/data/candidates.ts";
+import { candidateEvents } from "../src/data/candidate_events.ts";
 import { crawlTargets } from "../src/data/crawlTargets.ts";
 import { events } from "../src/data/events.ts";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const eventStatuses = new Set(["scheduled", "cancelled", "postponed"]);
 const reviewStatuses = new Set(["review_needed", "ignored"]);
-const sourceTypes = new Set(["promoter", "venue", "band_official", "sns", "manual"]);
+const confidences = new Set(["high", "medium", "low"]);
+const sourceTypes = new Set(["promoter", "venue", "band_official", "ticket", "sns", "manual"]);
 const targetTypes = new Set(["promoter", "venue", "band_official", "sns"]);
 const priorities = new Set(["high", "medium", "low"]);
 const errors = [];
@@ -75,6 +76,10 @@ for (const candidate of candidateEvents) {
 
   if (!reviewStatuses.has(candidate.reviewStatus)) {
     errors.push(`candidateEvents:${candidate.id}: invalid reviewStatus`);
+  }
+
+  if (!confidences.has(candidate.confidence)) {
+    errors.push(`candidateEvents:${candidate.id}: invalid confidence`);
   }
 
   if (!sourceTypes.has(candidate.sourceType)) {

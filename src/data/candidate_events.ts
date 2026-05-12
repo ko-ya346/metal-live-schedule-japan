@@ -1,0 +1,198 @@
+import type { EventStatus } from "./events";
+
+export type CandidateEventStatus = "review_needed" | "ignored";
+export type CandidateEventConfidence = "high" | "medium" | "low";
+
+export type CandidateEventSourceType =
+    | "promoter"
+    | "venue"
+    | "band_official"
+    | "ticket"
+    | "sns"
+    | "manual";
+
+export type CandidateEvent = {
+    id: string;
+    artists: string[];
+    tourName: string | null;
+    // Use null when the date is not confirmed yet.
+    date: string | null;
+    prefecture: string | null;
+    venue: string | null;
+    genres: string[];
+    ticketUrl: string | null;
+    officialUrl: string | null;
+    sourceUrl: string;
+    sourceType: CandidateEventSourceType;
+    sourceName: string;
+    confidence: CandidateEventConfidence;
+    eventStatus: EventStatus;
+    reviewStatus: CandidateEventStatus;
+    reviewNotes: string;
+    collectedAt: string;
+    reviewedAt: string | null;
+};
+
+// Candidate events are review-only. They are never read by the public page.
+export const candidateEvents: CandidateEvent[] = [
+    {
+        id: "candidate-example-2026-tokyo",
+        artists: ["EXAMPLE BAND"],
+        tourName: null,
+        date: null,
+        prefecture: "東京都",
+        venue: null,
+        genres: ["Heavy Metal"],
+        ticketUrl: null,
+        officialUrl: null,
+        sourceUrl: "https://example.com/live",
+        sourceType: "manual",
+        sourceName: "Example source",
+        confidence: "low",
+        eventStatus: "scheduled",
+        reviewStatus: "ignored",
+        reviewNotes: "記入例。レビュー対象に出ないよう ignored のままにする。",
+        collectedAt: "2026-05-10",
+        reviewedAt: "2026-05-10",
+    },
+    {
+        id: "ningen-isu-2026-osaka",
+        artists: ["人間椅子"],
+        tourName: "還暦記念ツアー『猟奇新生』",
+        date: "2026-05-18",
+        prefecture: "大阪府",
+        venue: "心斎橋BIGCAT",
+        genres: ["Heavy Metal", "Hard Rock"],
+        ticketUrl: "https://eplus.jp/sf/detail/0056170001",
+        officialUrl: "https://ningen-isu.com/live_information/detail/32813",
+        sourceUrl: "https://ningen-isu.com/live_information/detail/32813",
+        sourceType: "band_official",
+        sourceName: "人間椅子倶楽部",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "公式スケジュールで日程・会場・ワンマンを確認。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+    {
+        id: "ningen-isu-2026-tokyo",
+        artists: ["人間椅子"],
+        tourName: "還暦記念ツアー『猟奇新生』",
+        date: "2026-05-26",
+        prefecture: "東京都",
+        venue: "Zepp DiverCity(TOKYO)",
+        genres: ["Heavy Metal", "Hard Rock"],
+        ticketUrl: "https://eplus.jp/sf/detail/0056170001",
+        officialUrl: "https://ningen-isu.com/",
+        sourceUrl: "https://eplus.jp/sf/detail/0056170001",
+        sourceType: "ticket",
+        sourceName: "eplus",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "eplusで日程・会場・出演を確認。公開時は人間椅子公式の詳細ページも確認したい。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+    {
+        id: "ningen-isu-2026-kawasaki-daikansai",
+        artists: ["人間椅子"],
+        tourName: "大冠祭2026",
+        date: "2026-09-22",
+        prefecture: "神奈川県",
+        venue: "CLUB CITTA' 川崎",
+        genres: ["Heavy Metal", "Hard Rock"],
+        ticketUrl: null,
+        officialUrl: "https://ningen-isu.com/news/detail/78816",
+        sourceUrl: "https://ningen-isu.com/",
+        sourceType: "band_official",
+        sourceName: "人間椅子倶楽部",
+        confidence: "medium",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "公式トップのNEWSで出演決定を確認。詳細ページ取得が不安定だったため、出演者・チケットURLは要確認。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+    {
+        id: "ailifdopa-2026-aichi-one-man-dungeon",
+        artists: ["アイリフドーパ"],
+        tourName: "ONE MAN DUNGEON",
+        date: "2026-08-08",
+        prefecture: "愛知県",
+        venue: "LiveHouse 栄R.A.D",
+        genres: ["Loud Rock", "Metalcore"],
+        ticketUrl: "https://eplus.jp/sf/detail/4523900001",
+        officialUrl: "https://eplus.jp/sf/detail/4523900001",
+        sourceUrl: "https://eplus.jp/sf/detail/4523900001",
+        sourceType: "ticket",
+        sourceName: "eplus",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "eplusで日程・会場・出演を確認。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+    {
+        id: "ailifdopa-2026-osaka-one-man-dungeon",
+        artists: ["アイリフドーパ"],
+        tourName: "ONE MAN DUNGEON",
+        date: "2026-08-09",
+        prefecture: "大阪府",
+        venue: "アメリカ村 DROP",
+        genres: ["Loud Rock", "Metalcore"],
+        ticketUrl: "https://eplus.jp/sf/detail/4523190001",
+        officialUrl: "https://eplus.jp/sf/detail/4523190001",
+        sourceUrl: "https://eplus.jp/sf/detail/4523190001",
+        sourceType: "ticket",
+        sourceName: "eplus",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "eplusで日程・会場・出演を確認。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+    {
+        id: "sex-machineguns-2026-saitama-summer-rock-festival",
+        artists: ["SEX MACHINEGUNS", "SUSSY"],
+        tourName: "Narciss Presents SAITAMA Summer Rock Festival 2026「浦和鋼鉄化計画」",
+        date: "2026-08-16",
+        prefecture: "埼玉県",
+        venue: "埼玉会館",
+        genres: ["Heavy Metal"],
+        ticketUrl: "https://eplus.jp/sf/detail/4516900001-P0030001",
+        officialUrl: "https://x.com/smgfire/status/2042796543053574651",
+        sourceUrl: "https://x.com/smgfire/status/2042796543053574651",
+        sourceType: "sns",
+        sourceName: "SEX MACHINEGUNS Official X",
+        confidence: "medium",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "公式X由来。X本文とeplus詳細を公開前に再確認したい。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+    {
+        id: "unlucky-morpheus-2026-tokyo-hell-or-heaven",
+        artists: ["Unlucky Morpheus"],
+        tourName: "One-man Tour 2026『HELL or HEAVEN』",
+        date: "2026-08-23",
+        prefecture: "東京都",
+        venue: "恵比寿ガーデンホール",
+        genres: ["Power Metal", "Symphonic Metal"],
+        ticketUrl: null,
+        officialUrl: "https://gardenplace.jp/event/detail/872",
+        sourceUrl: "https://gardenplace.jp/event/detail/872",
+        sourceType: "venue",
+        sourceName: "恵比寿ガーデンプレイス",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "会場公式ページで日程・会場・出演を確認。チケットURLは未確認。",
+        collectedAt: "2026-05-12",
+        reviewedAt: null,
+    },
+];

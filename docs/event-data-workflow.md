@@ -2,7 +2,7 @@
 
 このアプリは当面、手動メンテナンスで運用します。公開されるイベントデータは `src/data/events.ts` に置きます。
 
-収集したが未公開の情報は `src/data/candidates.ts` に置きます。候補イベントは公開ページには表示されません。人間が確認したものだけ `src/data/events.ts` に移します。
+収集したが未公開の情報は `src/data/candidate_events.ts` に置きます。候補イベントは公開ページには表示されません。人間が確認したものだけ `src/data/events.ts` に移します。
 
 ## 探す情報源
 
@@ -19,7 +19,7 @@
 ## 収集フロー
 
 1. `src/data/crawlTargets.ts` にある情報源を確認する。
-2. 気になる公演を `src/data/candidates.ts` に追加する。
+2. 気になる公演を `src/data/candidate_events.ts` に追加する。
 3. 確認が必要な候補は `reviewStatus: "review_needed"` にする。
 4. 対象外、重複、信頼しにくい候補は `reviewStatus: "ignored"` にする。
 5. 公開前に公式情報で詳細を確認する。
@@ -50,9 +50,10 @@ npm run candidates:new
     sourceUrl: "https://example.com/source",
     sourceType: "manual",
     sourceName: "Source name",
+    confidence: "medium",
     eventStatus: "scheduled",
     reviewStatus: "review_needed",
-    notes: "",
+    reviewNotes: "",
     collectedAt: "2026-05-10",
     reviewedAt: null,
 },

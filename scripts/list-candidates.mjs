@@ -1,4 +1,4 @@
-import { candidateEvents } from "../src/data/candidates.ts";
+import { candidateEvents } from "../src/data/candidate_events.ts";
 
 const statusArg = process.argv.find((arg) => arg.startsWith("--status="));
 const selectedStatus = statusArg?.replace("--status=", "");
