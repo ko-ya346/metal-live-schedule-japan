@@ -89,6 +89,13 @@ The project is currently semi-manual.
 
 AI-generated or crawled data must be reviewable before publishing.
 
+Keep candidate events in `src/data/candidate_events.ts` and do not publish them automatically.
+
+When collecting candidate events, regularly check these preferred artists because they are important watch targets for the project:
+- SEX MACHINEGUNS
+- 人間椅子
+- アイリフドーパ
+
 ## Discovery strategy
 
 Potential future feature:
