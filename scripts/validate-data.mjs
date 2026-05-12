@@ -4,7 +4,7 @@ import { events } from "../src/data/events.ts";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const eventStatuses = new Set(["scheduled", "cancelled", "postponed"]);
-const reviewStatuses = new Set(["review_needed", "ignored"]);
+const reviewStatuses = new Set(["review_needed", "published", "ignored"]);
 const confidences = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["promoter", "venue", "band_official", "ticket", "sns", "manual"]);
 const targetTypes = new Set(["promoter", "venue", "band_official", "sns"]);
@@ -97,6 +97,12 @@ for (const candidate of candidateEvents) {
   if (candidate.reviewStatus === "review_needed" && publishedEvent) {
     warnings.push(
       `candidateEvents:${candidate.id}: review_needed candidate is already in published events`,
+    );
+  }
+
+  if (candidate.reviewStatus === "published" && !publishedEvent) {
+    warnings.push(
+      `candidateEvents:${candidate.id}: published candidate is not found in published events`,
     );
   }
 }

@@ -1,6 +1,6 @@
 import type { EventStatus } from "./events";
 
-export type CandidateEventStatus = "review_needed" | "ignored";
+export type CandidateEventStatus = "review_needed" | "published" | "ignored";
 export type CandidateEventConfidence = "high" | "medium" | "low";
 
 export type CandidateEventSourceType =
@@ -70,7 +70,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "人間椅子倶楽部",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "公式スケジュールで日程・会場・ワンマンを確認。公開イベントへ追加済み。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",
@@ -90,7 +90,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "eplus",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "eplusで日程・会場・出演を確認。公開イベントへ追加済み。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",
@@ -110,7 +110,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "人間椅子倶楽部",
         confidence: "medium",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "公式トップのNEWSで出演決定を確認。公開イベントへ追加済み。出演者・チケットURLは今後も要確認。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",
@@ -130,7 +130,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "eplus",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "eplusで日程・会場・出演を確認。公開イベントへ追加済み。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",
@@ -150,7 +150,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "eplus",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "eplusで日程・会場・出演を確認。公開イベントへ追加済み。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",
@@ -170,7 +170,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "SEX MACHINEGUNS Official X",
         confidence: "medium",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "公式X由来。公開イベントへ追加済み。X本文とeplus詳細は今後も要確認。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",
@@ -190,7 +190,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "恵比寿ガーデンプレイス",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "ignored",
+        reviewStatus: "published",
         reviewNotes: "会場公式ページで日程・会場・出演を確認。公開イベントへ追加済み。チケットURLは未確認。",
         collectedAt: "2026-05-12",
         reviewedAt: "2026-05-12",

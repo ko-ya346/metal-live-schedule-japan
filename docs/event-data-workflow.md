@@ -21,10 +21,11 @@
 1. `src/data/crawlTargets.ts` にある情報源を確認する。
 2. 気になる公演を `src/data/candidate_events.ts` に追加する。
 3. 確認が必要な候補は `reviewStatus: "review_needed"` にする。
-4. 対象外、重複、信頼しにくい候補は `reviewStatus: "ignored"` にする。
-5. 公開前に公式情報で詳細を確認する。
-6. 確認できたイベントだけ `src/data/events.ts` にコピーする。
-7. `review_needed` から公開用データにコピーしたら、候補側は `ignored` に変更して重複確認用に残す。
+4. 公開イベントに移した候補は `reviewStatus: "published"` にする。
+5. 対象外、重複、信頼しにくい候補は `reviewStatus: "ignored"` にする。
+6. 公開前に公式情報で詳細を確認する。
+7. 確認できたイベントだけ `src/data/events.ts` にコピーする。
+8. `review_needed` から公開用データにコピーしたら、候補側は `published` に変更して重複確認用に残す。
 
 候補イベントはレビュー用の作業リストです。公開データの参照元にはしません。
 

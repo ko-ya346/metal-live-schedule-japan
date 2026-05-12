@@ -13,8 +13,15 @@ type CandidatesReviewProps = {
 
 const statusLabels: Record<CandidateEventStatus, string> = {
   review_needed: "要確認",
+  published: "公開済み",
   ignored: "対象外",
 };
+
+const reviewStatuses: CandidateEventStatus[] = [
+  "review_needed",
+  "published",
+  "ignored",
+];
 
 function formatCandidateDate(date: CandidateEvent["date"]) {
   return date ? formatEventDate(date as Event["date"]) : "日付未定";
@@ -125,7 +132,7 @@ export function CandidatesReview({
   return (
     <>
       <div className={styles.adminToolbar}>
-        {(["review_needed", "ignored"] as CandidateEventStatus[]).map((status) => (
+        {reviewStatuses.map((status) => (
           <button
             className={`${styles.adminStatusButton} ${
               selectedStatus === status ? styles.activeAdminStatusButton : ""
