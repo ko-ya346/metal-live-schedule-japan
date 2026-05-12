@@ -363,9 +363,23 @@
   background: #e33a3a;
 }
 
+.primaryLink:disabled,
+.secondaryLink:disabled,
+.adminStatusButton:disabled {
+  opacity: 0.5;
+  cursor: not-allowed;
+}
+
+.primaryLink:disabled:hover {
+  background: #c52727;
+}
+
 .secondaryLink {
   border: 1px solid #4a4a4a;
   color: #f2f2ef;
+  background: transparent;
+  font: inherit;
+  cursor: pointer;
 }
 
 .secondaryLink:hover {
@@ -477,6 +491,16 @@
   gap: 18px;
 }
 
+.adminCopyQueue {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  margin-bottom: 24px;
+  border: 1px solid #383838;
+  border-radius: 6px;
+  background: #101010;
+}
+
 .adminCandidateCard {
   display: grid;
   gap: 18px;
@@ -553,7 +577,47 @@
   padding-left: 18px;
 }
 
+.adminCompactList {
+  display: grid;
+  gap: 8px;
+  padding-left: 18px;
+  margin: 0;
+  color: #d9d9d4;
+}
+
+.adminCompactList li {
+  overflow-wrap: anywhere;
+}
+
+.adminTextButton {
+  margin-left: 10px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  color: #ff6b6b;
+  font: inherit;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adminMutedText {
+  margin: 0;
+  color: #b9b9b3;
+}
+
 .adminJsonSection pre {
+  overflow-x: auto;
+  margin: 0;
+  padding: 14px;
+  border: 1px solid #303030;
+  border-radius: 6px;
+  background: #050505;
+  color: #f2f2ef;
+  font-size: 0.86rem;
+  line-height: 1.6;
+}
+
+.adminQueueJson {
   overflow-x: auto;
   margin: 0;
   padding: 14px;

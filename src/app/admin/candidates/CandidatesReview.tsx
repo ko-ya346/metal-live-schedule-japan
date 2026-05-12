@@ -21,7 +21,7 @@ function formatCandidateDate(date: CandidateEvent["date"]) {
 }
 
 function formatEventObject(candidate: CandidateEvent) {
-  const eventObject = {
+  return {
     id: candidate.id,
     artists: candidate.artists,
     tourName: candidate.tourName ?? "TOUR NAME",
@@ -33,8 +33,6 @@ function formatEventObject(candidate: CandidateEvent) {
     officialUrl: candidate.officialUrl,
     status: candidate.eventStatus,
   };
-
-  return JSON.stringify(eventObject, null, 2);
 }
 
 function findRelatedPublishedEvents(candidate: CandidateEvent, events: Event[]) {
@@ -50,22 +48,78 @@ function findRelatedPublishedEvents(candidate: CandidateEvent, events: Event[]) 
     .slice(0, 5);
 }
 
+async function copyText(text: string) {
+  if (navigator.clipboard) {
+    await navigator.clipboard.writeText(text);
+    return;
+  }
+
+  const textarea = document.createElement("textarea");
+  textarea.value = text;
+  textarea.style.position = "fixed";
+  textarea.style.opacity = "0";
+  document.body.append(textarea);
+  textarea.select();
+  document.execCommand("copy");
+  textarea.remove();
+}
+
 export function CandidatesReview({
   candidates,
   publishedEvents,
 }: CandidatesReviewProps) {
   const [selectedStatus, setSelectedStatus] =
     useState<CandidateEventStatus>("review_needed");
-  const [copiedId, setCopiedId] = useState<string | null>(null);
+  const [copyCandidateIds, setCopyCandidateIds] = useState<string[]>([]);
+  const [ignoredCandidateIds, setIgnoredCandidateIds] = useState<string[]>([]);
+  const [copiedMessage, setCopiedMessage] = useState<string | null>(null);
   const filteredCandidates = useMemo(
     () =>
-      candidates.filter((candidate) => candidate.reviewStatus === selectedStatus),
-    [candidates, selectedStatus],
-  );
+      candidates.filter((candidate) => {
+        const isIgnoredInSession = ignoredCandidateIds.includes(candidate.id);
 
-  async function copyAsEvent(candidate: CandidateEvent) {
-    await navigator.clipboard.writeText(formatEventObject(candidate));
-    setCopiedId(candidate.id);
+        if (selectedStatus === "ignored") {
+          return candidate.reviewStatus === "ignored" || isIgnoredInSession;
+        }
+
+        return candidate.reviewStatus === selectedStatus && !isIgnoredInSession;
+      }),
+    [candidates, ignoredCandidateIds, selectedStatus],
+  );
+  const copyCandidates = copyCandidateIds
+    .map((id) => candidates.find((candidate) => candidate.id === id))
+    .filter((candidate): candidate is CandidateEvent => Boolean(candidate));
+  const copyTextValue = copyCandidates
+    .map((candidate) => JSON.stringify(formatEventObject(candidate), null, 2))
+    .join(",\n");
+
+  function addCopyCandidate(candidate: CandidateEvent) {
+    setCopyCandidateIds((currentIds) => {
+      if (currentIds.includes(candidate.id)) {
+        return currentIds;
+      }
+
+      return [...currentIds, candidate.id];
+    });
+    setCopiedMessage(null);
+  }
+
+  function ignoreCandidate(candidate: CandidateEvent) {
+    setIgnoredCandidateIds((currentIds) => {
+      if (currentIds.includes(candidate.id)) {
+        return currentIds;
+      }
+
+      return [...currentIds, candidate.id];
+    });
+    setCopyCandidateIds((currentIds) =>
+      currentIds.filter((id) => id !== candidate.id),
+    );
+  }
+
+  async function copySelectedCandidates() {
+    await copyText(copyTextValue);
+    setCopiedMessage(`${copyCandidates.length}件コピーしました`);
   }
 
   return (
@@ -81,16 +135,74 @@ export function CandidatesReview({
             onClick={() => setSelectedStatus(status)}
           >
             {statusLabels[status]} (
-            {candidates.filter((candidate) => candidate.reviewStatus === status).length}
+            {
+              candidates.filter((candidate) => {
+                const isIgnoredInSession = ignoredCandidateIds.includes(candidate.id);
+
+                if (status === "ignored") {
+                  return candidate.reviewStatus === "ignored" || isIgnoredInSession;
+                }
+
+                return candidate.reviewStatus === status && !isIgnoredInSession;
+              }).length
+            }
             )
           </button>
         ))}
       </div>
 
+      <section className={styles.adminCopyQueue}>
+        <div className={styles.adminCandidateHeader}>
+          <div>
+            <h2>コピー対象</h2>
+            <p className={styles.summary}>
+              `src/data/events.ts` に貼り付ける候補をここに集めます。
+            </p>
+          </div>
+          <button
+            className={styles.primaryLink}
+            type="button"
+            onClick={copySelectedCandidates}
+            disabled={copyCandidates.length === 0}
+          >
+            まとめてコピー
+          </button>
+        </div>
+
+        {copyCandidates.length === 0 ? (
+          <p className={styles.adminMutedText}>まだコピー対象はありません。</p>
+        ) : (
+          <>
+            <ul className={styles.adminCompactList}>
+              {copyCandidates.map((candidate) => (
+                <li key={candidate.id}>
+                  {candidate.date ?? "日付未定"} / {candidate.artists.join(" / ")}
+                  <button
+                    className={styles.adminTextButton}
+                    type="button"
+                    onClick={() =>
+                      setCopyCandidateIds((currentIds) =>
+                        currentIds.filter((id) => id !== candidate.id),
+                      )
+                    }
+                  >
+                    外す
+                  </button>
+                </li>
+              ))}
+            </ul>
+            <pre className={styles.adminQueueJson}>{copyTextValue}</pre>
+          </>
+        )}
+        {copiedMessage && <p className={styles.adminMutedText}>{copiedMessage}</p>}
+      </section>
+
       <div className={styles.adminCandidateList}>
         {filteredCandidates.map((candidate) => {
           const relatedEvents = findRelatedPublishedEvents(candidate, publishedEvents);
-          const eventObject = formatEventObject(candidate);
+          const eventObject = JSON.stringify(formatEventObject(candidate), null, 2);
+          const isCopyCandidate = copyCandidateIds.includes(candidate.id);
+          const isIgnoredInSession = ignoredCandidateIds.includes(candidate.id);
 
           return (
             <article className={styles.adminCandidateCard} key={candidate.id}>
@@ -109,9 +221,10 @@ export function CandidatesReview({
                 <button
                   className={styles.primaryLink}
                   type="button"
-                  onClick={() => copyAsEvent(candidate)}
+                  onClick={() => addCopyCandidate(candidate)}
+                  disabled={isCopyCandidate || isIgnoredInSession}
                 >
-                  {copiedId === candidate.id ? "Copied" : "copy as event"}
+                  {isCopyCandidate ? "追加済み" : "copy as event"}
                 </button>
               </div>
 
@@ -163,6 +276,14 @@ export function CandidatesReview({
                     チケットURL
                   </a>
                 )}
+                <button
+                  className={styles.secondaryLink}
+                  type="button"
+                  onClick={() => ignoreCandidate(candidate)}
+                  disabled={isIgnoredInSession}
+                >
+                  ignore
+                </button>
               </div>
 
               <section className={styles.adminCompareSection}>
