@@ -14,7 +14,7 @@ console.log(`{
     sourceType: "manual",
     sourceName: "Source name",
     eventStatus: "scheduled",
-    reviewStatus: "new",
+    reviewStatus: "review_needed",
     notes: "",
     collectedAt: "${today}",
     reviewedAt: null,

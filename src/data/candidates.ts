@@ -1,10 +1,8 @@
 import type { EventStatus } from "./events";
 
 export type CandidateEventStatus =
-    | "new"
-    | "needs_review"
-    | "approved"
-    | "rejected";
+    | "review_needed"
+    | "ignored";
 
 export type CandidateEventSourceType =
     | "promoter"
@@ -50,8 +48,8 @@ export const candidateEvents: CandidateEvent[] = [
         sourceType: "manual",
         sourceName: "Example source",
         eventStatus: "scheduled",
-        reviewStatus: "rejected",
-        notes: "記入例。レビュー対象に出ないよう rejected のままにする。",
+        reviewStatus: "ignored",
+        notes: "記入例。レビュー対象に出ないよう ignored のままにする。",
         collectedAt: "2026-05-10",
         reviewedAt: "2026-05-10",
     },
@@ -71,7 +69,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceType: "band_official",
         sourceName: "NEMOPHILA Official Website",
         eventStatus: "scheduled",
-        reviewStatus: "new",
+        reviewStatus: "review_needed",
         notes: "公式サイトでゲストバンドまで確認。公開前に日本語ページまたはチケットページも確認したい。",
         collectedAt: "2026-05-10",
         reviewedAt: null,
@@ -92,7 +90,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceType: "band_official",
         sourceName: "NEMOPHILA Official Website",
         eventStatus: "scheduled",
-        reviewStatus: "new",
+        reviewStatus: "review_needed",
         notes: "公式サイトでゲストバンドまで確認。公開前に日本語ページまたはチケットページも確認したい。",
         collectedAt: "2026-05-10",
         reviewedAt: null,
@@ -113,7 +111,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceType: "band_official",
         sourceName: "NEMOPHILA Official Website",
         eventStatus: "scheduled",
-        reviewStatus: "new",
+        reviewStatus: "review_needed",
         notes: "NEMOPHILA公式で出演確認。主催または会場ページも公開前に確認したい。",
         collectedAt: "2026-05-10",
         reviewedAt: null,
@@ -132,7 +130,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceType: "band_official",
         sourceName: "Victor Entertainment LOVEBITES NEWS",
         eventStatus: "scheduled",
-        reviewStatus: "new",
+        reviewStatus: "review_needed",
         notes: "公式ニュースで日程確認。公開前にLOVEBITES公式サイトまたはチケット詳細ページも確認したい。",
         collectedAt: "2026-05-10",
         reviewedAt: null,
@@ -151,7 +149,7 @@ export const candidateEvents: CandidateEvent[] = [
         sourceType: "band_official",
         sourceName: "Victor Entertainment LOVEBITES NEWS",
         eventStatus: "scheduled",
-        reviewStatus: "new",
+        reviewStatus: "review_needed",
         notes: "公式ニュースで日程確認。公開前にLOVEBITES公式サイトまたはチケット詳細ページも確認したい。",
         collectedAt: "2026-05-10",
         reviewedAt: null,

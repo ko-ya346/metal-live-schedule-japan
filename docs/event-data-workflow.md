@@ -20,12 +20,11 @@
 
 1. `src/data/crawlTargets.ts` にある情報源を確認する。
 2. 気になる公演を `src/data/candidates.ts` に追加する。
-3. 未確認の候補は `reviewStatus: "new"` にする。
-4. 情報が足りない、または不確かな候補は `reviewStatus: "needs_review"` にする。
+3. 確認が必要な候補は `reviewStatus: "review_needed"` にする。
+4. 対象外、重複、信頼しにくい候補は `reviewStatus: "ignored"` にする。
 5. 公開前に公式情報で詳細を確認する。
 6. 確認できたイベントだけ `src/data/events.ts` にコピーする。
-7. 公開または掲載判断が済んだ候補は `reviewStatus: "approved"` にする。
-8. 対象外または信頼できない候補は `reviewStatus: "rejected"` にする。
+7. `review_needed` から公開用データにコピーしたら、候補側は `ignored` に変更して重複確認用に残す。
 
 候補イベントはレビュー用の作業リストです。公開データの参照元にはしません。
 
@@ -52,7 +51,7 @@ npm run candidates:new
     sourceType: "manual",
     sourceName: "Source name",
     eventStatus: "scheduled",
-    reviewStatus: "new",
+    reviewStatus: "review_needed",
     notes: "",
     collectedAt: "2026-05-10",
     reviewedAt: null,
@@ -63,11 +62,23 @@ npm run candidates:new
 
 ```bash
 npm run candidates:list
-npm run candidates:list -- --status=new
+npm run candidates:list -- --status=review_needed
 npm run data:validate
 ```
 
-`npm run data:validate` は、公開イベント、候補イベント、収集対象をチェックします。`approved` の候補が公開イベントに存在しない場合は警告します。
+`npm run data:validate` は、公開イベント、候補イベント、収集対象をチェックします。
+
+## 確認用ページ
+
+候補イベントは `/admin/candidates` でも確認できます。
+
+- 候補イベント一覧を見る
+- 元URL、公式URL、チケットURLを開く
+- 公開済みイベントと見比べる
+- 公開イベント用のJSONを確認する
+- `copy as event` で公開イベント用データをコピーする
+
+このページは保存機能を持ちません。公開する場合は、コピーした内容を人間が確認して `src/data/events.ts` に貼り付けます。
 
 ## イベントを追加する
 
