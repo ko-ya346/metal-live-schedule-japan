@@ -104,6 +104,82 @@ Potential future feature:
 - discover related bands from co-performing events
 - manually approve newly discovered bands before enabling crawling
 
+## Event coverage policy
+
+The goal of this project is not perfect global coverage.
+
+Current priority:
+- achieve high coverage for metal/heavy live events in Japan
+- especially within the next 3 months
+
+Expected coverage quality:
+- next 3 months: high confidence / high coverage
+- 3-6 months ahead: major tours and announced events only
+- past 6 months: not guaranteed
+
+## Collection priorities
+
+Priority order for event collection:
+
+1. Official promoter pages
+2. Official venue schedules
+3. Official band websites
+4. Official ticket pages
+5. Official SNS accounts
+6. Related/co-performing bands
+
+The project should support:
+- international tours
+- domestic bands
+- independently organized events
+- small venue events
+
+Do not rely only on major promoters.
+
+## Discovery strategy details
+
+The system may discover new bands from:
+- co-performing artists
+- venue schedules
+- event flyers/pages
+
+However:
+- newly discovered bands should be treated as candidate crawl targets
+- do not aggressively expand crawling automatically
+- prefer gradual/manual approval
+
+## Publishing policy
+
+Collected events can be published quickly if:
+- source is official or highly reliable
+- date and venue are clearly confirmed
+
+Minor uncertainty is acceptable for early publication.
+
+## Important philosophy
+
+Coverage and freshness are more important than perfect metadata.
+
+This project values:
+- reducing missed events
+- fast updates
+- practical usability for metal fans
+
+over:
+- perfect normalization
+- enterprise-grade data quality
+
+## Operational simplicity
+
+Prefer simple and maintainable solutions.
+
+Avoid:
+- large crawler frameworks
+- over-engineered pipelines
+- unnecessary abstractions
+
+The project is currently operated by one person.
+
 ## Important
 
 Keep implementations small and understandable.
