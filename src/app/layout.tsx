@@ -14,8 +14,9 @@ export const metadata: Metadata = {
     canonical: "/",
   },
   icons: {
-    icon: [{ url: "/images/favicon.png", type: "image/png" }],
-    apple: [{ url: "/images/favicon.png", type: "image/png" }],
+    icon: [{ url: "/images/favicon-20260513.png", type: "image/png" }],
+    shortcut: [{ url: "/images/favicon-20260513.png", type: "image/png" }],
+    apple: [{ url: "/images/favicon-20260513.png", type: "image/png" }],
   },
   openGraph: {
     title: "日本のメタルライブ情報 | Metal Live Schedule",
