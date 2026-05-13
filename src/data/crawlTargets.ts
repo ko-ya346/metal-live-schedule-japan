@@ -47,7 +47,7 @@ export const crawlTargets: CrawlTarget[] = [
         enabled: true,
         priority: "medium",
         notes: "会場スケジュールから国内メタル公演を見つけるために使う。",
-        lastCheckedAt: null,
+        lastCheckedAt: "2026-05-13",
     },
     {
         id: "smash",
@@ -68,5 +68,15 @@ export const crawlTargets: CrawlTarget[] = [
         priority: "high",
         notes: "Evoken系の来日メタル、国内メタル公演の候補確認に使う。",
         lastCheckedAt: "2026-05-12",
+    },
+    {
+        id: "shinjuku-antiknock",
+        name: "SHINJUKU ANTIKNOCK",
+        type: "venue",
+        url: "https://www.antiknock.net/",
+        enabled: true,
+        priority: "high",
+        notes: "小規模な国内メタル、ハードコア、ラウド系公演を厚めに確認する。",
+        lastCheckedAt: "2026-05-13",
     },
 ];
