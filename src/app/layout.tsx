@@ -6,6 +6,10 @@ export const metadata: Metadata = {
   title: "Metal Live Schedule | 日本のヘヴィメタルライブ予定",
   description:
     "日本国内のヘヴィメタルライブ予定を日付順に確認できるイベントカレンダーです。都道府県とジャンルで絞り込みできます。",
+  icons: {
+    icon: [{ url: "/images/favicon.png", type: "image/png" }],
+    apple: [{ url: "/images/favicon.png", type: "image/png" }],
+  },
   openGraph: {
     title: "Metal Live Schedule | 日本のヘヴィメタルライブ予定",
     description:
