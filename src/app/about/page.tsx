@@ -3,9 +3,18 @@ import Link from "next/link";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
-  title: "About | Metal Live Schedule",
+  title: "このサイトについて",
   description:
     "Metal Live Schedule は、日本国内のヘヴィメタルライブ情報を見やすく、検索しやすくするためのサイトです。",
+  alternates: {
+    canonical: "/about",
+  },
+  openGraph: {
+    title: "このサイトについて | Metal Live Schedule",
+    description:
+      "Metal Live Schedule の目的、掲載方針、利用時の注意事項をまとめています。",
+    url: "/about",
+  },
 };
 
 export default function AboutPage() {

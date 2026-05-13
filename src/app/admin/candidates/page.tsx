@@ -7,6 +7,10 @@ import { CandidatesReview } from "./CandidatesReview";
 export const metadata: Metadata = {
   title: "候補イベント確認 | Metal Live Schedule",
   description: "公開前の候補イベントを確認する管理用ページです。",
+  robots: {
+    index: false,
+    follow: false,
+  },
 };
 
 export default function AdminCandidatesPage() {

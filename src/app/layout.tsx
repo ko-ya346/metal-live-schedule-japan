@@ -1,28 +1,34 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import styles from "./page.module.css";
+import { siteDescription, siteName, siteUrl } from "./site";
 
 export const metadata: Metadata = {
-  title: "Metal Live Schedule | 日本のヘヴィメタルライブ予定",
-  description:
-    "日本国内のヘヴィメタルライブ予定を日付順に確認できるイベントカレンダーです。都道府県とジャンルで絞り込みできます。",
+  metadataBase: new URL(siteUrl),
+  title: {
+    default: "日本のメタルライブ情報 | Metal Live Schedule",
+    template: `%s | ${siteName}`,
+  },
+  description: siteDescription,
+  alternates: {
+    canonical: "/",
+  },
   icons: {
     icon: [{ url: "/images/favicon.png", type: "image/png" }],
     apple: [{ url: "/images/favicon.png", type: "image/png" }],
   },
   openGraph: {
-    title: "Metal Live Schedule | 日本のヘヴィメタルライブ予定",
-    description:
-      "日本国内のヘヴィメタルライブ予定を日付順に確認できるイベントカレンダーです。",
+    title: "日本のメタルライブ情報 | Metal Live Schedule",
+    description: siteDescription,
+    url: "/",
     type: "website",
     locale: "ja_JP",
-    siteName: "Metal Live Schedule",
+    siteName,
   },
   twitter: {
     card: "summary",
-    title: "Metal Live Schedule | 日本のヘヴィメタルライブ予定",
-    description:
-      "日本国内のヘヴィメタルライブ予定を日付順に確認できるイベントカレンダーです。",
+    title: "日本のメタルライブ情報 | Metal Live Schedule",
+    description: siteDescription,
   },
 };
 
