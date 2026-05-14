@@ -23,6 +23,23 @@ Japan metal live events calndar with filters
 [eplus](https://eplus.jp/sf/live/metal-core)  
 [metal100](https://metal100.com/tourdate/)
 
+# ローカル管理画面
+
+候補イベントはローカル開発サーバーで `/admin/candidates` を開くと確認できます。
+
+- 候補の出演者、日付、会場、URL、メモをブラウザで編集できます。
+- `保存` は `src/data/candidate_events.ts` を更新します。
+- `ignore` は候補を `reviewStatus: "ignored"` にします。
+- `公開する` は `src/data/events.ts` にイベントを追加し、候補を `published` にします。
+- 本番環境では認証なしのファイル書き込みを避けるため、管理APIの書き込みは無効です。
+
+操作後は以下を確認します。
+
+```bash
+npm run data:validate
+npm run build
+```
+
 
 This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
 

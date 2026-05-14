@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { CandidateEvent, CandidateEventStatus } from "../../../data/candidates";
 import type { Event } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
@@ -22,30 +22,6 @@ const reviewStatuses: CandidateEventStatus[] = [
   "published",
   "ignored",
 ];
-const selectedCandidateIdsStorageKey = "metal-live-selected-candidate-ids";
-const ignoredCandidateIdsStorageKey = "metal-live-ignored-candidate-ids";
-
-function loadStoredIds(storageKey: string) {
-  if (typeof window === "undefined") {
-    return [];
-  }
-
-  try {
-    const storedValue = window.localStorage.getItem(storageKey);
-    if (!storedValue) {
-      return [];
-    }
-
-    const parsedValue = JSON.parse(storedValue);
-    if (!Array.isArray(parsedValue)) {
-      return [];
-    }
-
-    return parsedValue.filter((value): value is string => typeof value === "string");
-  } catch {
-    return [];
-  }
-}
 
 function formatCandidateDate(date: CandidateEvent["date"]) {
   return date ? formatEventDate(date as Event["date"]) : "日付未定";
@@ -79,20 +55,43 @@ function findRelatedPublishedEvents(candidate: CandidateEvent, events: Event[]) 
     .slice(0, 5);
 }
 
-async function copyText(text: string) {
-  if (navigator.clipboard) {
-    await navigator.clipboard.writeText(text);
-    return;
+function createCandidateMap(candidates: CandidateEvent[]) {
+  return Object.fromEntries(candidates.map((candidate) => [candidate.id, candidate]));
+}
+
+function listToText(values: string[]) {
+  return values.join("\n");
+}
+
+function textToList(value: string) {
+  return value
+    .split(/\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+async function postCandidateAction(
+  action: "save" | "ignore" | "publish",
+  candidate: CandidateEvent,
+) {
+  const response = await fetch("/api/admin/candidates", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action, candidate }),
+  });
+
+  const body = (await response.json()) as {
+    candidate?: CandidateEvent;
+    error?: string;
+  };
+
+  if (!response.ok || !body.candidate) {
+    throw new Error(body.error ?? "候補の更新に失敗しました");
   }
 
-  const textarea = document.createElement("textarea");
-  textarea.value = text;
-  textarea.style.position = "fixed";
-  textarea.style.opacity = "0";
-  document.body.append(textarea);
-  textarea.select();
-  document.execCommand("copy");
-  textarea.remove();
+  return body.candidate;
 }
 
 export function CandidatesReview({
@@ -101,82 +100,46 @@ export function CandidatesReview({
 }: CandidatesReviewProps) {
   const [selectedStatus, setSelectedStatus] =
     useState<CandidateEventStatus>("review_needed");
-  const [copyCandidateIds, setCopyCandidateIds] = useState<string[]>(() =>
-    loadStoredIds(selectedCandidateIdsStorageKey),
+  const [editableCandidates, setEditableCandidates] = useState<
+    Record<string, CandidateEvent>
+  >(() => createCandidateMap(candidates));
+  const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const candidateList = useMemo(
+    () => Object.values(editableCandidates),
+    [editableCandidates],
   );
-  const [ignoredCandidateIds, setIgnoredCandidateIds] = useState<string[]>(() =>
-    loadStoredIds(ignoredCandidateIdsStorageKey),
-  );
-  const [copiedMessage, setCopiedMessage] = useState<string | null>(null);
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      selectedCandidateIdsStorageKey,
-      JSON.stringify(copyCandidateIds),
-    );
-  }, [copyCandidateIds]);
-
-  useEffect(() => {
-    window.localStorage.setItem(
-      ignoredCandidateIdsStorageKey,
-      JSON.stringify(ignoredCandidateIds),
-    );
-  }, [ignoredCandidateIds]);
-
   const filteredCandidates = useMemo(
     () =>
-      candidates.filter((candidate) => {
-        const isIgnoredInSession = ignoredCandidateIds.includes(candidate.id);
-
-        if (selectedStatus === "ignored") {
-          return candidate.reviewStatus === "ignored" || isIgnoredInSession;
-        }
-
-        return candidate.reviewStatus === selectedStatus && !isIgnoredInSession;
-      }),
-    [candidates, ignoredCandidateIds, selectedStatus],
+      candidateList.filter((candidate) => candidate.reviewStatus === selectedStatus),
+    [candidateList, selectedStatus],
   );
-  const copyCandidates = copyCandidateIds
-    .map((id) => candidates.find((candidate) => candidate.id === id))
-    .filter((candidate): candidate is CandidateEvent => Boolean(candidate));
-  const copyTextValue = copyCandidates
-    .map((candidate) => JSON.stringify(formatEventObject(candidate), null, 2))
-    .join(",\n");
-  const selectedCandidateIdsText = JSON.stringify(copyCandidateIds, null, 2);
-  const ignoredCandidateIdsText = JSON.stringify(ignoredCandidateIds, null, 2);
 
-  function addCopyCandidate(candidate: CandidateEvent) {
-    setCopyCandidateIds((currentIds) => {
-      if (currentIds.includes(candidate.id)) {
-        return currentIds;
-      }
-
-      return [...currentIds, candidate.id];
-    });
-    setCopiedMessage(null);
+  function updateCandidate(id: string, nextCandidate: CandidateEvent) {
+    setEditableCandidates((currentCandidates) => ({
+      ...currentCandidates,
+      [id]: nextCandidate,
+    }));
   }
 
-  function ignoreCandidate(candidate: CandidateEvent) {
-    setIgnoredCandidateIds((currentIds) => {
-      if (currentIds.includes(candidate.id)) {
-        return currentIds;
-      }
+  async function runCandidateAction(
+    action: "save" | "ignore" | "publish",
+    candidate: CandidateEvent,
+  ) {
+    setStatusMessage(null);
 
-      return [...currentIds, candidate.id];
-    });
-    setCopyCandidateIds((currentIds) =>
-      currentIds.filter((id) => id !== candidate.id),
-    );
-  }
-
-  async function copySelectedCandidateIds() {
-    await copyText(selectedCandidateIdsText);
-    setCopiedMessage(`公開するIDを${copyCandidateIds.length}件コピーしました`);
-  }
-
-  async function copyIgnoredCandidateIds() {
-    await copyText(ignoredCandidateIdsText);
-    setCopiedMessage(`ignoreしたIDを${ignoredCandidateIds.length}件コピーしました`);
+    try {
+      const nextCandidate = await postCandidateAction(action, candidate);
+      updateCandidate(nextCandidate.id, nextCandidate);
+      setStatusMessage(
+        action === "publish"
+          ? `${candidate.id} を公開しました`
+          : action === "ignore"
+            ? `${candidate.id} を対象外にしました`
+            : `${candidate.id} を保存しました`,
+      );
+    } catch (error) {
+      setStatusMessage(error instanceof Error ? error.message : "更新に失敗しました");
+    }
   }
 
   return (
@@ -192,17 +155,7 @@ export function CandidatesReview({
             onClick={() => setSelectedStatus(status)}
           >
             {statusLabels[status]} (
-            {
-              candidates.filter((candidate) => {
-                const isIgnoredInSession = ignoredCandidateIds.includes(candidate.id);
-
-                if (status === "ignored") {
-                  return candidate.reviewStatus === "ignored" || isIgnoredInSession;
-                }
-
-                return candidate.reviewStatus === status && !isIgnoredInSession;
-              }).length
-            }
+            {candidateList.filter((candidate) => candidate.reviewStatus === status).length}
             )
           </button>
         ))}
@@ -211,81 +164,24 @@ export function CandidatesReview({
       <section className={styles.adminCopyQueue}>
         <div className={styles.adminCandidateHeader}>
           <div>
-            <h2>コピー対象</h2>
+            <h2>ローカル管理</h2>
             <p className={styles.summary}>
-              公開したい候補IDをここに集めます。このID一覧を貼ってもらえれば、公開リストへ追加します。
+              この画面の編集、ignore、公開はローカル開発サーバー上のデータファイルへ保存します。
             </p>
           </div>
-          <button
-            className={styles.primaryLink}
-            type="button"
-            onClick={copySelectedCandidateIds}
-            disabled={copyCandidateIds.length === 0}
-          >
-            IDをまとめてコピー
-          </button>
         </div>
-
-        {copyCandidates.length === 0 ? (
-          <p className={styles.adminMutedText}>まだ公開するIDはありません。</p>
-        ) : (
-          <>
-            <ul className={styles.adminCompactList}>
-              {copyCandidates.map((candidate) => (
-                <li key={candidate.id}>
-                  <code>{candidate.id}</code> / {candidate.date ?? "日付未定"} /{" "}
-                  {candidate.artists.join(" / ")}
-                  <button
-                    className={styles.adminTextButton}
-                    type="button"
-                    onClick={() =>
-                      setCopyCandidateIds((currentIds) =>
-                        currentIds.filter((id) => id !== candidate.id),
-                      )
-                    }
-                  >
-                    外す
-                  </button>
-                </li>
-              ))}
-            </ul>
-            <pre className={styles.adminQueueJson}>{selectedCandidateIdsText}</pre>
-            <details className={styles.adminDetails}>
-              <summary>イベントJSONも確認する</summary>
-              <pre className={styles.adminQueueJson}>{copyTextValue}</pre>
-            </details>
-          </>
-        )}
-
-        {ignoredCandidateIds.length > 0 && (
-          <div className={styles.adminIgnoredIds}>
-            <div className={styles.adminCandidateHeader}>
-              <div>
-                <h3>ignoreしたID</h3>
-                <p className={styles.adminMutedText}>
-                  ブラウザに保存中です。必要ならこの一覧も貼ってください。
-                </p>
-              </div>
-              <button
-                className={styles.secondaryLink}
-                type="button"
-                onClick={copyIgnoredCandidateIds}
-              >
-                ignore IDをコピー
-              </button>
-            </div>
-            <pre className={styles.adminQueueJson}>{ignoredCandidateIdsText}</pre>
-          </div>
-        )}
-        {copiedMessage && <p className={styles.adminMutedText}>{copiedMessage}</p>}
+        <p className={styles.adminMutedText}>
+          本番環境では書き込みを無効にしています。操作後は `npm run build` で確認してください。
+        </p>
+        {statusMessage && <p className={styles.adminMutedText}>{statusMessage}</p>}
       </section>
 
       <div className={styles.adminCandidateList}>
         {filteredCandidates.map((candidate) => {
           const relatedEvents = findRelatedPublishedEvents(candidate, publishedEvents);
           const eventObject = JSON.stringify(formatEventObject(candidate), null, 2);
-          const isCopyCandidate = copyCandidateIds.includes(candidate.id);
-          const isIgnoredInSession = ignoredCandidateIds.includes(candidate.id);
+          const isPublished = candidate.reviewStatus === "published";
+          const isIgnored = candidate.reviewStatus === "ignored";
 
           return (
             <article className={styles.adminCandidateCard} key={candidate.id}>
@@ -303,26 +199,121 @@ export function CandidatesReview({
                       .join(" / ") || "会場未定"}
                   </p>
                 </div>
+              </div>
 
-                <button
-                  className={styles.primaryLink}
-                  type="button"
-                  onClick={() => addCopyCandidate(candidate)}
-                  disabled={isCopyCandidate || isIgnoredInSession}
-                >
-                  {isCopyCandidate ? "追加済み" : "公開IDに追加"}
-                </button>
+              <div className={styles.adminEditGrid}>
+                <label>
+                  アーティスト
+                  <textarea
+                    value={listToText(candidate.artists)}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        artists: textToList(event.target.value),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  ツアー/イベント名
+                  <input
+                    value={candidate.tourName ?? ""}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        tourName: event.target.value || null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  日付
+                  <input
+                    placeholder="YYYY-MM-DD"
+                    value={candidate.date ?? ""}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        date: event.target.value || null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  都道府県
+                  <input
+                    value={candidate.prefecture ?? ""}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        prefecture: event.target.value || null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  会場
+                  <input
+                    value={candidate.venue ?? ""}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        venue: event.target.value || null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  ジャンル
+                  <textarea
+                    value={listToText(candidate.genres)}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        genres: textToList(event.target.value),
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  チケットURL
+                  <input
+                    value={candidate.ticketUrl ?? ""}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        ticketUrl: event.target.value || null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  公式URL
+                  <input
+                    value={candidate.officialUrl ?? ""}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        officialUrl: event.target.value || null,
+                      })
+                    }
+                  />
+                </label>
+                <label>
+                  メモ
+                  <textarea
+                    value={candidate.reviewNotes}
+                    onChange={(event) =>
+                      updateCandidate(candidate.id, {
+                        ...candidate,
+                        reviewNotes: event.target.value,
+                      })
+                    }
+                  />
+                </label>
               </div>
 
               <dl className={styles.adminCandidateMeta}>
-                <div>
-                  <dt>ツアー</dt>
-                  <dd>{candidate.tourName ?? "未定"}</dd>
-                </div>
-                <div>
-                  <dt>ジャンル</dt>
-                  <dd>{candidate.genres.join(", ")}</dd>
-                </div>
                 <div>
                   <dt>情報源</dt>
                   <dd>{candidate.sourceName}</dd>
@@ -331,13 +322,32 @@ export function CandidatesReview({
                   <dt>信頼度</dt>
                   <dd>{candidate.confidence}</dd>
                 </div>
-                <div>
-                  <dt>メモ</dt>
-                  <dd>{candidate.reviewNotes || "なし"}</dd>
-                </div>
               </dl>
 
               <div className={styles.adminLinkRow}>
+                <button
+                  className={styles.secondaryLink}
+                  type="button"
+                  onClick={() => runCandidateAction("save", candidate)}
+                >
+                  保存
+                </button>
+                <button
+                  className={styles.secondaryLink}
+                  type="button"
+                  onClick={() => runCandidateAction("ignore", candidate)}
+                  disabled={isIgnored}
+                >
+                  ignore
+                </button>
+                <button
+                  className={styles.primaryLink}
+                  type="button"
+                  onClick={() => runCandidateAction("publish", candidate)}
+                  disabled={isPublished || isIgnored}
+                >
+                  公開する
+                </button>
                 <a
                   className={styles.secondaryLink}
                   href={candidate.sourceUrl}
@@ -366,14 +376,6 @@ export function CandidatesReview({
                     チケットURL
                   </a>
                 )}
-                <button
-                  className={styles.secondaryLink}
-                  type="button"
-                  onClick={() => ignoreCandidate(candidate)}
-                  disabled={isIgnoredInSession}
-                >
-                  ignore
-                </button>
               </div>
 
               <section className={styles.adminCompareSection}>
