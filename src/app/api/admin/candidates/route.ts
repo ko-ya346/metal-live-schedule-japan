@@ -24,15 +24,67 @@ function isLocalWriteAllowed() {
   return process.env.NODE_ENV !== "production";
 }
 
-function indentJson(value: unknown, spaces = 8) {
-  return JSON.stringify(value, null, 4)
-    .split("\n")
-    .map((line) => `${" ".repeat(spaces)}${line}`)
-    .join("\n");
+function formatValue(value: unknown, indentLevel: number): string {
+  if (value === null) {
+    return "null";
+  }
+
+  if (Array.isArray(value)) {
+    if (value.length === 0) {
+      return "[]";
+    }
+
+    const indent = " ".repeat(indentLevel);
+    const childIndent = " ".repeat(indentLevel + 4);
+    const items = value
+      .map((item) => `${childIndent}${formatValue(item, indentLevel + 4)},`)
+      .join("\n");
+
+    return `[\n${items}\n${indent}]`;
+  }
+
+  if (typeof value === "string") {
+    return JSON.stringify(value);
+  }
+
+  return String(value);
+}
+
+function formatObject(
+  object: Record<string, unknown>,
+  keys: string[],
+  indentLevel = 4,
+) {
+  const indent = " ".repeat(indentLevel);
+  const childIndent = " ".repeat(indentLevel + 4);
+  const lines = keys.map(
+    (key) => `${childIndent}${key}: ${formatValue(object[key], indentLevel + 4)},`,
+  );
+
+  return `${indent}{\n${lines.join("\n")}\n${indent}}`;
 }
 
 function formatCandidateObject(candidate: CandidateEvent) {
-  return `${indentJson(candidate)},`;
+  return `${formatObject(candidate, [
+    "id",
+    "artists",
+    "tourName",
+    "date",
+    "prefecture",
+    "venue",
+    "genres",
+    "ticketUrl",
+    "officialUrl",
+    "sourceUrl",
+    "sourceType",
+    "sourceName",
+    "confidence",
+    "eventStatus",
+    "reviewStatus",
+    "reviewNotes",
+    "collectedAt",
+    "reviewedAt",
+  ])},`;
 }
 
 function formatEventObject(candidate: CandidateEvent): Event {
@@ -137,10 +189,21 @@ async function appendEventFile(candidate: CandidateEvent) {
     throw new Error("events array end not found");
   }
 
-  const nextContent = `${fileContent.slice(0, insertIndex)}    ${indentJson(
+  const nextContent = `${fileContent.slice(0, insertIndex)}${formatObject(
     eventObject,
-    4,
-  ).trimStart()},\n${fileContent.slice(insertIndex)}`;
+    [
+      "id",
+      "artists",
+      "tourName",
+      "date",
+      "prefecture",
+      "venue",
+      "genres",
+      "ticketUrl",
+      "officialUrl",
+      "status",
+    ],
+  )},\n${fileContent.slice(insertIndex)}`;
 
   await writeFile(eventsPath, nextContent);
 }
