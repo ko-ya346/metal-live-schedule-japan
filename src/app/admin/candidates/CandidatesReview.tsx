@@ -27,21 +27,6 @@ function formatCandidateDate(date: CandidateEvent["date"]) {
   return date ? formatEventDate(date as Event["date"]) : "日付未定";
 }
 
-function formatEventObject(candidate: CandidateEvent) {
-  return {
-    id: candidate.id,
-    artists: candidate.artists,
-    tourName: candidate.tourName ?? "TOUR NAME",
-    date: candidate.date ?? "YYYY-MM-DD",
-    prefecture: candidate.prefecture ?? "都道府県",
-    venue: candidate.venue ?? "会場名",
-    genres: candidate.genres,
-    ticketUrl: candidate.ticketUrl,
-    officialUrl: candidate.officialUrl,
-    status: candidate.eventStatus,
-  };
-}
-
 function findRelatedPublishedEvents(candidate: CandidateEvent, events: Event[]) {
   return events
     .filter((event) => {
@@ -179,7 +164,6 @@ export function CandidatesReview({
       <div className={styles.adminCandidateList}>
         {filteredCandidates.map((candidate) => {
           const relatedEvents = findRelatedPublishedEvents(candidate, publishedEvents);
-          const eventObject = JSON.stringify(formatEventObject(candidate), null, 2);
           const isPublished = candidate.reviewStatus === "published";
           const isIgnored = candidate.reviewStatus === "ignored";
 
@@ -393,10 +377,6 @@ export function CandidatesReview({
                 )}
               </section>
 
-              <section className={styles.adminJsonSection}>
-                <h3>コピー用JSON</h3>
-                <pre>{eventObject}</pre>
-              </section>
             </article>
           );
         })}
