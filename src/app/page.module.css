@@ -524,6 +524,13 @@
   font-size: 1.35rem;
 }
 
+.adminCandidateId {
+  margin: 8px 0 0;
+  color: #b9b9b3;
+  font-size: 0.86rem;
+  overflow-wrap: anywhere;
+}
+
 .adminCandidateMeta {
   display: grid;
   gap: 10px;
@@ -603,6 +610,30 @@
 .adminMutedText {
   margin: 0;
   color: #b9b9b3;
+}
+
+.adminDetails {
+  display: grid;
+  gap: 10px;
+}
+
+.adminDetails summary {
+  width: fit-content;
+  color: #f2f2ef;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.adminIgnoredIds {
+  display: grid;
+  gap: 10px;
+  padding-top: 14px;
+  border-top: 1px solid #303030;
+}
+
+.adminIgnoredIds h3 {
+  margin: 0;
+  font-size: 1rem;
 }
 
 .adminJsonSection pre {
