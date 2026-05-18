@@ -24,10 +24,13 @@ function formatEventCount(count: number) {
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
+  const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<EventDate | null>(null);
   const [visibleMonth, setVisibleMonth] = useState(getCurrentMonthKey);
   const hasActiveFilters =
-    selectedPrefecture !== ALL_FILTER_VALUE || selectedGenre !== ALL_FILTER_VALUE;
+    selectedPrefecture !== ALL_FILTER_VALUE ||
+    selectedGenre !== ALL_FILTER_VALUE ||
+    searchQuery.trim() !== "";
 
   const filterGenres = getEventGenres(events);
   const filterPrefectures = getEventPrefectures(events);
@@ -37,6 +40,7 @@ export default function Page() {
     sortedEvents,
     selectedPrefecture,
     selectedGenre,
+    searchQuery,
   );
   const selectedDateEvents = selectedDate
     ? filteredEvents.filter((event) => event.date === selectedDate)
@@ -51,6 +55,7 @@ export default function Page() {
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
     setSelectedGenre(ALL_FILTER_VALUE);
+    setSearchQuery("");
   }
 
   return (
@@ -66,9 +71,11 @@ export default function Page() {
         prefectures={filterPrefectures}
         selectedGenre={selectedGenre}
         selectedPrefecture={selectedPrefecture}
+        searchQuery={searchQuery}
         canReset={hasActiveFilters}
         onGenreChange={setSelectedGenre}
         onPrefectureChange={setSelectedPrefecture}
+        onSearchQueryChange={setSearchQuery}
         onReset={resetFilters}
       />
 

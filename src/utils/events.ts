@@ -53,15 +53,31 @@ export function filterEvents(
   eventList: Event[],
   selectedPrefecture: string,
   selectedGenre: string,
+  searchQuery = "",
 ) {
+  const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
+
   return eventList.filter((event) => {
     const matchesPrefecture =
       selectedPrefecture === ALL_FILTER_VALUE ||
       event.prefecture === selectedPrefecture;
     const matchesGenre =
       selectedGenre === ALL_FILTER_VALUE || event.genres.includes(selectedGenre);
+    const searchableText = [
+      ...event.artists,
+      event.tourName,
+      event.prefecture,
+      event.venue,
+      ...event.genres,
+    ]
+      .filter(Boolean)
+      .join(" ")
+      .toLocaleLowerCase();
+    const matchesSearch =
+      normalizedSearchQuery === "" ||
+      searchableText.includes(normalizedSearchQuery);
 
-    return matchesPrefecture && matchesGenre;
+    return matchesPrefecture && matchesGenre && matchesSearch;
   });
 }
 

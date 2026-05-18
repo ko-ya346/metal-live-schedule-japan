@@ -6,9 +6,11 @@ type EventFiltersProps = {
   prefectures: string[];
   selectedGenre: string;
   selectedPrefecture: string;
+  searchQuery: string;
   canReset: boolean;
   onGenreChange: (genre: string) => void;
   onPrefectureChange: (prefecture: string) => void;
+  onSearchQueryChange: (query: string) => void;
   onReset: () => void;
 };
 
@@ -17,13 +19,25 @@ export function EventFilters({
   prefectures,
   selectedGenre,
   selectedPrefecture,
+  searchQuery,
   canReset,
   onGenreChange,
   onPrefectureChange,
+  onSearchQueryChange,
   onReset,
 }: EventFiltersProps) {
   return (
     <section className={styles.filters} aria-label="ライブの絞り込み">
+      <label className={`${styles.filterField} ${styles.searchField}`}>
+        <span>キーワード検索</span>
+        <input
+          type="search"
+          value={searchQuery}
+          onChange={(event) => onSearchQueryChange(event.target.value)}
+          placeholder="アーティスト、会場、ライブ名など"
+        />
+      </label>
+
       <label className={styles.filterField}>
         <span>都道府県</span>
         <select
