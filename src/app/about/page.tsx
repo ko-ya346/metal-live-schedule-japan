@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { xReportUrl } from "../../utils/contact";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
@@ -48,6 +49,21 @@ export default function AboutPage() {
           <p>
             公演日程、会場、出演者、チケット情報は変更される場合があります。来場前に必ず公式サイトや主催者の情報をご確認ください。
           </p>
+        </section>
+
+        <section className={styles.infoSection}>
+          <h2>情報提供</h2>
+          <p>
+            掲載漏れや修正が必要な情報を見つけた場合は、アーティスト名、公演日、会場名、確認できる公式URLを添えて X から送ってください。
+          </p>
+          <a
+            className={styles.primaryLink}
+            href={xReportUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            掲載漏れ・修正依頼を送る
+          </a>
         </section>
       </div>
 

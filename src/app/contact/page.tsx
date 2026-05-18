@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { xProfileUrl, xReportUrl } from "../../utils/contact";
 import styles from "../page.module.css";
-
-const xProfileUrl = "https://x.com/ko_ya346";
 
 export const metadata: Metadata = {
   title: "お問い合わせ",
@@ -43,6 +42,14 @@ export default function ContactPage() {
             rel="noreferrer"
           >
             X で連絡する
+          </a>
+          <a
+            className={styles.secondaryLink}
+            href={xReportUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            掲載漏れ・修正依頼を送る
           </a>
         </section>
       </div>

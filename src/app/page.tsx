@@ -11,6 +11,7 @@ import {
   groupEventsByDate,
   sortEventsByDate,
 } from "../utils/events";
+import { xReportUrl } from "../utils/contact";
 import { getCurrentMonthKey, isPastEventDate } from "../utils/date";
 import { EventCalendar } from "./EventCalendar";
 import { EventDateGroup } from "./EventDateGroup";
@@ -65,6 +66,23 @@ export default function Page() {
         <h1>Metal Live Schedule</h1>
         <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
       </header>
+
+      <section className={styles.feedbackBanner}>
+        <div>
+          <h2>掲載漏れ・修正依頼</h2>
+          <p>
+            載っていないライブや変更情報があれば、公式URLつきで教えてください。
+          </p>
+        </div>
+        <a
+          className={styles.primaryLink}
+          href={xReportUrl}
+          target="_blank"
+          rel="noreferrer"
+        >
+          Xで送る
+        </a>
+      </section>
 
       <EventFilters
         genres={filterGenres}

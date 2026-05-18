@@ -39,6 +39,31 @@
   color: #b9b9b3;
 }
 
+.feedbackBanner {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 16px;
+  padding: 16px;
+  margin-bottom: 20px;
+  border: 1px solid #383838;
+  border-left: 4px solid #c52727;
+  border-radius: 6px;
+  background: #181818;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.36);
+}
+
+.feedbackBanner h2 {
+  margin: 0 0 6px;
+  font-size: 1rem;
+}
+
+.feedbackBanner p {
+  margin: 0;
+  color: #d9d9d4;
+  line-height: 1.6;
+}
+
 .filters {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
@@ -709,6 +734,11 @@
   .filters,
   .eventCard {
     grid-template-columns: 1fr;
+  }
+
+  .feedbackBanner {
+    align-items: stretch;
+    flex-direction: column;
   }
 
   .calendarHeader {
