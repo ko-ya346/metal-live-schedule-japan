@@ -59,6 +59,12 @@ for (const event of events) {
       errors.push(`events:${event.id}: invalid ${field}`);
     }
   }
+
+  for (const field of ["candidateCreatedAt", "publishedAt"]) {
+    if (event[field] !== undefined && !datePattern.test(event[field])) {
+      errors.push(`events:${event.id}: ${field} must be YYYY-MM-DD`);
+    }
+  }
 }
 
 for (const candidate of candidateEvents) {

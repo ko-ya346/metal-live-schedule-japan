@@ -20,6 +20,15 @@ type AdminCandidateRequest = {
   candidate: CandidateEvent;
 };
 
+function getTodayInJapan() {
+  return new Intl.DateTimeFormat("sv-SE", {
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+    month: "2-digit",
+    day: "2-digit",
+  }).format(new Date());
+}
+
 function isLocalWriteAllowed() {
   return process.env.NODE_ENV !== "production";
 }
@@ -99,6 +108,8 @@ function formatEventObject(candidate: CandidateEvent): Event {
     ticketUrl: candidate.ticketUrl,
     officialUrl: candidate.officialUrl,
     status: candidate.eventStatus,
+    candidateCreatedAt: candidate.collectedAt,
+    publishedAt: getTodayInJapan(),
   };
 }
 
@@ -202,6 +213,8 @@ async function appendEventFile(candidate: CandidateEvent) {
       "ticketUrl",
       "officialUrl",
       "status",
+      "candidateCreatedAt",
+      "publishedAt",
     ],
   )},\n${fileContent.slice(insertIndex)}`;
 
@@ -215,10 +228,7 @@ function normalizeCandidate(candidate: CandidateEvent, action: AdminAction) {
     throw new Error(`candidate not found: ${candidate.id}`);
   }
 
-  const reviewedAt =
-    action === "save"
-      ? candidate.reviewedAt
-      : new Date().toISOString().slice(0, 10);
+  const reviewedAt = action === "save" ? candidate.reviewedAt : getTodayInJapan();
 
   return {
     ...currentCandidate,

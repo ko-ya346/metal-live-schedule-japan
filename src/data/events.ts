@@ -16,6 +16,9 @@ export type Event = {
     // Artist, venue, or organizer event page used to verify event details.
     officialUrl: string | null;
     status: EventStatus;
+    // Operational dates. Existing older events may not have these yet.
+    candidateCreatedAt?: string;
+    publishedAt?: string;
 };
 
 const sampleEvents: Event[] = [
