@@ -86,7 +86,8 @@
 
 .filterField select {
   width: 100%;
-  padding: 10px 12px;
+  min-height: 42px;
+  padding: 10px 16px;
   border: 1px solid #3a3a3a;
   border-radius: 6px;
   background: #050505;
@@ -100,7 +101,9 @@
 
 .searchField input {
   width: 100%;
-  padding: 10px 12px;
+  box-sizing: border-box;
+  min-height: 42px;
+  padding: 10px 16px;
   border: 1px solid #3a3a3a;
   border-radius: 6px;
   background: #050505;
@@ -448,6 +451,7 @@
 .secondaryLink {
   display: inline-flex;
   align-items: center;
+  box-sizing: border-box;
   justify-content: center;
   min-height: 40px;
   padding: 0 16px;
