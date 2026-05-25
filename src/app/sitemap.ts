@@ -1,10 +1,11 @@
 import type { MetadataRoute } from "next";
+import { events } from "../data/events";
 import { siteUrl } from "./site";
 
 export default function sitemap(): MetadataRoute.Sitemap {
   const now = new Date();
 
-  return [
+  const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
       lastModified: now,
@@ -24,4 +25,13 @@ export default function sitemap(): MetadataRoute.Sitemap {
       priority: 0.4,
     },
   ];
+
+  const eventPages: MetadataRoute.Sitemap = events.map((event) => ({
+    url: `${siteUrl}/events/${event.id}`,
+    lastModified: now,
+    changeFrequency: "weekly",
+    priority: 0.7,
+  }));
+
+  return [...staticPages, ...eventPages];
 }

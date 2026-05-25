@@ -1,48 +1,19 @@
 import type { Event } from "../data/events";
+import Link from "next/link";
 import { isPastEventDate } from "../utils/date";
+import {
+  formatArtists,
+  formatEventStatus,
+  formatYoutubeLinkLabel,
+  getSetlistSearchUrl,
+  getYoutubeSearchUrl,
+} from "../utils/eventLinks";
 import styles from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
 
 type EventCardProps = {
   event: Event;
 };
-
-function formatEventStatus(status: Event["status"]) {
-  if (status === "cancelled") {
-    return "中止";
-  }
-
-  if (status === "postponed") {
-    return "延期";
-  }
-
-  return "開催予定";
-}
-
-function formatArtists(artists: Event["artists"]) {
-  return artists.join(" / ");
-}
-
-function getSetlistSearchUrl(artists: Event["artists"]) {
-  const headliner = artists[0];
-  const query = encodeURIComponent(headliner);
-
-  return `https://www.setlist.fm/search?query=${query}`;
-}
-
-function getYoutubeSearchUrl(artist: string) {
-  const query = encodeURIComponent(artist);
-
-  return `https://www.youtube.com/results?search_query=${query}`;
-}
-
-function formatYoutubeLinkLabel(artist: string, artistCount: number) {
-  if (artistCount === 1) {
-    return "YouTubeで探す";
-  }
-
-  return `${artist}を探す`;
-}
 
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
@@ -71,7 +42,11 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <article className={styles.eventCard}>
       <div>
-        <p className={styles.artist}>{formatArtists(event.artists)}</p>
+        <p className={styles.artist}>
+          <Link className={styles.eventTitleLink} href={`/events/${event.id}`}>
+            {formatArtists(event.artists)}
+          </Link>
+        </p>
         <p className={styles.tourName}>{event.tourName}</p>
       </div>
 
@@ -93,6 +68,9 @@ export function EventCard({ event }: EventCardProps) {
       </dl>
 
       <div className={styles.eventLinks}>
+        <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
+          詳細
+        </Link>
         {event.ticketUrl && (
           <a
             className={styles.primaryLink}

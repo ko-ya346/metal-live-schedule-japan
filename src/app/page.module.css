@@ -353,6 +353,17 @@
   overflow-wrap: anywhere;
 }
 
+.eventTitleLink {
+  color: inherit;
+  text-decoration-color: #ff6b6b;
+  text-decoration-thickness: 2px;
+  text-underline-offset: 4px;
+}
+
+.eventTitleLink:hover {
+  color: #ff6b6b;
+}
+
 .tourName {
   margin: 6px 0 0;
   color: #b9b9b3;
@@ -389,6 +400,48 @@
   flex-wrap: wrap;
   gap: 8px;
   justify-content: flex-end;
+}
+
+.eventDetail {
+  display: grid;
+  gap: 22px;
+  padding: 22px;
+  margin-bottom: 24px;
+  border: 1px solid #383838;
+  border-left: 4px solid #c52727;
+  border-radius: 6px;
+  background: #181818;
+  box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
+}
+
+.eventDetailMeta {
+  display: grid;
+  gap: 14px;
+  margin: 0;
+}
+
+.eventDetailMeta div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.eventDetailMeta dt {
+  color: #ff6b6b;
+  font-size: 0.84rem;
+  font-weight: 700;
+}
+
+.eventDetailMeta dd {
+  margin: 0;
+  color: #f2f2ef;
+  overflow-wrap: anywhere;
+}
+
+.eventDetailLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
 }
 
 .primaryLink,
@@ -783,6 +836,10 @@
     grid-template-columns: 1fr;
   }
 
+  .eventDetailMeta div {
+    grid-template-columns: 1fr;
+  }
+
   .adminEditGrid {
     grid-template-columns: 1fr;
   }
@@ -796,6 +853,10 @@
 
   .youtubeArtistLinks {
     position: static;
+    width: 100%;
+  }
+
+  .youtubeDetails {
     width: 100%;
   }
 
