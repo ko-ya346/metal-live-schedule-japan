@@ -277,10 +277,15 @@
   gap: 28px;
 }
 
+.recentSection,
 .selectedDateSection,
 .upcomingSection {
   display: grid;
   gap: 14px;
+}
+
+.recentSection {
+  margin-bottom: 34px;
 }
 
 .selectedDateSection {

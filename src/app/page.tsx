@@ -14,12 +14,28 @@ import {
 import { xReportUrl } from "../utils/contact";
 import { getCurrentMonthKey, isPastEventDate } from "../utils/date";
 import { EventCalendar } from "./EventCalendar";
+import { EventCard } from "./EventCard";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
 import styles from "./page.module.css";
 
 function formatEventCount(count: number) {
   return `${count}件のライブが見つかりました`;
+}
+
+function getRecentlyPublishedEvents(eventList: typeof events) {
+  return eventList
+    .filter((event) => event.publishedAt)
+    .sort((a, b) => {
+      const publishedDiff = b.publishedAt!.localeCompare(a.publishedAt!);
+
+      if (publishedDiff !== 0) {
+        return publishedDiff;
+      }
+
+      return a.date.localeCompare(b.date);
+    })
+    .slice(0, 5);
 }
 
 export default function Page() {
@@ -35,6 +51,7 @@ export default function Page() {
 
   const filterGenres = getEventGenres(events);
   const filterPrefectures = getEventPrefectures(events);
+  const recentlyPublishedEvents = getRecentlyPublishedEvents(events);
 
   const sortedEvents = sortEventsByDate(events);
   const filteredEvents = filterEvents(
@@ -104,6 +121,17 @@ export default function Page() {
         onMonthChange={setVisibleMonth}
         onDateSelect={setSelectedDate}
       />
+
+      {recentlyPublishedEvents.length > 0 && (
+        <section className={styles.recentSection}>
+          <h2 className={styles.sectionTitle}>最近追加したライブ</h2>
+          <div className={styles.eventList}>
+            {recentlyPublishedEvents.map((event) => (
+              <EventCard event={event} key={event.id} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {selectedDate && (
         <section className={styles.selectedDateSection}>
