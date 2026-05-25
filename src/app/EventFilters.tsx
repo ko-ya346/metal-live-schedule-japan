@@ -1,4 +1,8 @@
-import { ALL_FILTER_VALUE } from "../utils/events";
+import {
+  ALL_FILTER_VALUE,
+  DATE_RANGE_ALL_VALUE,
+  type DateRangeFilter,
+} from "../utils/events";
 import styles from "./page.module.css";
 
 type EventFiltersProps = {
@@ -6,10 +10,12 @@ type EventFiltersProps = {
   prefectures: string[];
   selectedGenre: string;
   selectedPrefecture: string;
+  selectedDateRange: DateRangeFilter;
   searchQuery: string;
   canReset: boolean;
   onGenreChange: (genre: string) => void;
   onPrefectureChange: (prefecture: string) => void;
+  onDateRangeChange: (dateRange: DateRangeFilter) => void;
   onSearchQueryChange: (query: string) => void;
   onReset: () => void;
 };
@@ -19,10 +25,12 @@ export function EventFilters({
   prefectures,
   selectedGenre,
   selectedPrefecture,
+  selectedDateRange,
   searchQuery,
   canReset,
   onGenreChange,
   onPrefectureChange,
+  onDateRangeChange,
   onSearchQueryChange,
   onReset,
 }: EventFiltersProps) {
@@ -50,6 +58,20 @@ export function EventFilters({
               {prefecture}
             </option>
           ))}
+        </select>
+      </label>
+
+      <label className={styles.filterField}>
+        <span>期間</span>
+        <select
+          value={selectedDateRange}
+          onChange={(event) =>
+            onDateRangeChange(event.target.value as DateRangeFilter)
+          }
+        >
+          <option value={DATE_RANGE_ALL_VALUE}>すべての期間</option>
+          <option value="thisWeek">今週</option>
+          <option value="thisMonth">今月</option>
         </select>
       </label>
 

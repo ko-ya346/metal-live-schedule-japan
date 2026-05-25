@@ -1,7 +1,14 @@
 import type { Event, EventDate } from "../data/events";
-import { getEventDateTime } from "./date";
+import {
+  getEventDateTime,
+  isEventDateInCurrentMonth,
+  isEventDateInCurrentWeek,
+} from "./date";
 
 export const ALL_FILTER_VALUE = "all";
+export const DATE_RANGE_ALL_VALUE = "all";
+
+export type DateRangeFilter = "all" | "thisWeek" | "thisMonth";
 
 type EventGroupsByDate = Record<string, Event[]>;
 
@@ -53,6 +60,7 @@ export function filterEvents(
   eventList: Event[],
   selectedPrefecture: string,
   selectedGenre: string,
+  selectedDateRange: DateRangeFilter = DATE_RANGE_ALL_VALUE,
   searchQuery = "",
 ) {
   const normalizedSearchQuery = searchQuery.trim().toLocaleLowerCase();
@@ -76,8 +84,14 @@ export function filterEvents(
     const matchesSearch =
       normalizedSearchQuery === "" ||
       searchableText.includes(normalizedSearchQuery);
+    const matchesDateRange =
+      selectedDateRange === DATE_RANGE_ALL_VALUE ||
+      (selectedDateRange === "thisWeek" &&
+        isEventDateInCurrentWeek(event.date)) ||
+      (selectedDateRange === "thisMonth" &&
+        isEventDateInCurrentMonth(event.date));
 
-    return matchesPrefecture && matchesGenre && matchesSearch;
+    return matchesPrefecture && matchesGenre && matchesSearch && matchesDateRange;
   });
 }
 

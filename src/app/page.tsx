@@ -4,6 +4,8 @@ import type { EventDate } from "../data/events";
 import { events } from "../data/events";
 import {
   ALL_FILTER_VALUE,
+  DATE_RANGE_ALL_VALUE,
+  type DateRangeFilter,
   filterEvents,
   getEventGenres,
   getGroupedEventDates,
@@ -41,12 +43,15 @@ function getRecentlyPublishedEvents(eventList: typeof events) {
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
+  const [selectedDateRange, setSelectedDateRange] =
+    useState<DateRangeFilter>(DATE_RANGE_ALL_VALUE);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<EventDate | null>(null);
   const [visibleMonth, setVisibleMonth] = useState(getCurrentMonthKey);
   const hasActiveFilters =
     selectedPrefecture !== ALL_FILTER_VALUE ||
     selectedGenre !== ALL_FILTER_VALUE ||
+    selectedDateRange !== DATE_RANGE_ALL_VALUE ||
     searchQuery.trim() !== "";
 
   const filterGenres = getEventGenres(events);
@@ -58,6 +63,7 @@ export default function Page() {
     sortedEvents,
     selectedPrefecture,
     selectedGenre,
+    selectedDateRange,
     searchQuery,
   );
   const selectedDateEvents = selectedDate
@@ -73,6 +79,7 @@ export default function Page() {
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
     setSelectedGenre(ALL_FILTER_VALUE);
+    setSelectedDateRange(DATE_RANGE_ALL_VALUE);
     setSearchQuery("");
   }
 
@@ -106,10 +113,12 @@ export default function Page() {
         prefectures={filterPrefectures}
         selectedGenre={selectedGenre}
         selectedPrefecture={selectedPrefecture}
+        selectedDateRange={selectedDateRange}
         searchQuery={searchQuery}
         canReset={hasActiveFilters}
         onGenreChange={setSelectedGenre}
         onPrefectureChange={setSelectedPrefecture}
+        onDateRangeChange={setSelectedDateRange}
         onSearchQueryChange={setSearchQuery}
         onReset={resetFilters}
       />

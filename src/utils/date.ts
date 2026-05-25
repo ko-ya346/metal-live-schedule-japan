@@ -18,19 +18,45 @@ function parseEventDate(date: EventDate) {
   return new Date(Number(year), Number(month) - 1, Number(day));
 }
 
+function getTodayDate() {
+  const today = new Date();
+
+  return new Date(today.getFullYear(), today.getMonth(), today.getDate());
+}
+
 export function getEventDateTime(date: EventDate) {
   return parseEventDate(date).getTime();
 }
 
 export function isPastEventDate(date: EventDate) {
-  const today = new Date();
-  const todayDateTime = new Date(
-    today.getFullYear(),
-    today.getMonth(),
-    today.getDate(),
-  ).getTime();
+  const todayDateTime = getTodayDate().getTime();
 
   return getEventDateTime(date) < todayDateTime;
+}
+
+export function isEventDateInCurrentWeek(date: EventDate) {
+  const today = getTodayDate();
+  const weekStart = new Date(today);
+  weekStart.setDate(today.getDate() - today.getDay());
+
+  const weekEnd = new Date(weekStart);
+  weekEnd.setDate(weekStart.getDate() + 6);
+
+  const eventDateTime = getEventDateTime(date);
+
+  return (
+    weekStart.getTime() <= eventDateTime && eventDateTime <= weekEnd.getTime()
+  );
+}
+
+export function isEventDateInCurrentMonth(date: EventDate) {
+  const today = getTodayDate();
+  const eventDate = parseEventDate(date);
+
+  return (
+    eventDate.getFullYear() === today.getFullYear() &&
+    eventDate.getMonth() === today.getMonth()
+  );
 }
 
 export function formatEventDate(date: EventDate) {
