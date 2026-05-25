@@ -104,7 +104,7 @@ export default function Page() {
           target="_blank"
           rel="noreferrer"
         >
-          Xで送る
+          Xで連絡する
         </a>
       </section>
 
