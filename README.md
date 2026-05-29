@@ -1,31 +1,45 @@
-# metal-live-schedule
-Japan metal live events calndar with filters
+# Metal Live Schedule Japan
 
-# 要件
-- カレンダーで見る
-- 地域/ジャンルで絞り込み可能
-- チケットURL に飛べる
+日本国内のヘヴィメタル、ラウドロック、メタルコア、ハードコアのライブ予定を探しやすくするための小さなイベントカレンダーです。
 
-# イベント型
-- id
-- artist
-- tourName
-- date
-- prefecture
-- venue # 会場
-- genres
-- ticketUrl
-- officialUrl
-- status
+## 目的
 
-# 参考サイト
-[heavy-metal-tour](https://heavy-metal-tour.com/live)  
-[eplus](https://eplus.jp/sf/live/metal-core)  
-[metal100](https://metal100.com/tourdate/)
+- 来日アーティストを中心に、国内バンドのライブも見つけやすくする
+- 日付、地域、ジャンルでライブ情報を探せるようにする
+- 手作業で確認しながら、公開前の候補イベントを管理しやすくする
 
-# ローカル管理画面
+## 主な機能
 
-候補イベントはローカル開発サーバーで `/admin/candidates` を開くと確認できます。
+- 月間カレンダー表示
+- イベント一覧
+- 日付順ソート
+- 地域/ジャンル/期間/キーワードでの絞り込み
+- イベント詳細ページ
+- 候補イベント確認用のローカル管理画面
+
+## イベントデータ
+
+公開イベントは `src/data/events.ts` で管理します。
+
+主な項目:
+
+- `id`
+- `artists`
+- `tourName`
+- `date`
+- `prefecture`
+- `venue`
+- `genres`
+- `ticketUrl`
+- `officialUrl`
+- `status`
+- `publishedAt`
+
+候補イベントは `src/data/candidate_events.ts` に置き、確認後に公開イベントへ移します。
+
+## ローカル管理画面
+
+開発サーバーで `/admin/candidates` を開くと、候補イベントを確認できます。
 
 - 候補の出演者、日付、会場、URL、メモをブラウザで編集できます。
 - `保存` は `src/data/candidate_events.ts` を更新します。
@@ -33,47 +47,21 @@ Japan metal live events calndar with filters
 - `公開する` は `src/data/events.ts` にイベントを追加し、候補を `published` にします。
 - 本番環境では認証なしのファイル書き込みを避けるため、管理APIの書き込みは無効です。
 
-操作後は以下を確認します。
+## ローカル確認
+
+```bash
+npm run dev
+```
+
+データ編集後は以下を確認します。
 
 ```bash
 npm run data:validate
 npm run build
 ```
 
+## 参考サイト
 
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
-
-## Getting Started
-
-First, run the development server:
-
-```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+- [heavy-metal-tour](https://heavy-metal-tour.com/live)
+- [eplus](https://eplus.jp/sf/live/metal-core)
+- [metal100](https://metal100.com/tourdate/)

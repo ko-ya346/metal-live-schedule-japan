@@ -1,17 +1,22 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import styles from "./page.module.css";
-import { siteDescription, siteName, siteUrl } from "./site";
+import { siteDescription, siteName, siteTitle, siteUrl } from "./site";
 
 export const metadata: Metadata = {
   metadataBase: new URL(siteUrl),
   title: {
-    default: "日本のメタルライブ情報 | Metal Live Schedule",
+    default: siteTitle,
     template: `%s | ${siteName}`,
   },
+  applicationName: siteName,
   description: siteDescription,
   alternates: {
     canonical: "/",
+  },
+  robots: {
+    index: true,
+    follow: true,
   },
   icons: {
     icon: [{ url: "/images/favicon-20260513.png", type: "image/png" }],
@@ -19,7 +24,7 @@ export const metadata: Metadata = {
     apple: [{ url: "/images/favicon-20260513.png", type: "image/png" }],
   },
   openGraph: {
-    title: "日本のメタルライブ情報 | Metal Live Schedule",
+    title: siteTitle,
     description: siteDescription,
     url: "/",
     type: "website",
@@ -28,9 +33,19 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary",
-    title: "日本のメタルライブ情報 | Metal Live Schedule",
+    title: siteTitle,
     description: siteDescription,
   },
+};
+
+const websiteStructuredData = {
+  "@context": "https://schema.org",
+  "@type": "WebSite",
+  name: siteName,
+  alternateName: ["Metal Live Schedule", "日本のメタルライブ情報"],
+  url: siteUrl,
+  description: siteDescription,
+  inLanguage: "ja",
 };
 
 export const viewport: Viewport = {
@@ -46,6 +61,12 @@ export default function RootLayout({
   return (
     <html lang="ja">
       <body className={styles.siteBody}>
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify(websiteStructuredData),
+          }}
+        />
         {children}
         <footer className={styles.siteFooter}>
           <nav className={styles.footerNav} aria-label="フッターナビゲーション">
