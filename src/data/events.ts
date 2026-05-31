@@ -38,18 +38,7 @@ const sampleEvents: Event[] = [
 
 // Replace this array when adding real events. Keep the Event shape above unchanged.
 const realEvents: Event[] = [
-    {
-        id: "bridear-2026-tokyo",
-        artists: ["BRIDEAR"],
-        tourName: "Still Burning",
-        date: "2026-04-29",
-        prefecture: "東京都",
-        venue: "渋谷Star Lounge",
-        genres: ["Heavy Metal", "Power Metal"],
-        ticketUrl: "https://www.creativeman.co.jp/event/bridear-still-burning/",
-        officialUrl: "https://www.creativeman.co.jp/event/bridear-still-burning/",
-        status: "scheduled",
-    },
+
     {
         id: "helloween-2026-osaka",
         artists: ["HELLOWEEN"],
@@ -909,51 +898,8 @@ const realEvents: Event[] = [
         officialUrl: "https://zirco-tokyo.jp/schedule/detail/44717",
         status: "scheduled",
     },
-    {
-        id: "zirco-the-mixing-vol5-2026-tokyo",
-        artists: [
-            "unRAiN",
-            "ZMAN.",
-            "Days,near LAND",
-            "CrossSign",
-            "遊飛ノドカ",
-            "Nuz",
-            "Noctivix",
-        ],
-        tourName: "Zirco Tokyo Presents THE MIXING -DON'T MIX,IT'S DANGEROUS-VOL.5-",
-        date: "2026-05-19",
-        prefecture: "東京都",
-        venue: "Zirco Tokyo",
-        genres: [
-            "Loud Rock",
-            "Heavy Rock",
-        ],
-        ticketUrl: "https://ticketdive.com/event/THEMIXING_VOL5_ZircoTokyo10thAnniversary",
-        officialUrl: "https://zirco-tokyo.jp/schedule/detail/45443",
-        status: "scheduled",
-    },
-    {
-        id: "rock-idol-resurrection-vol1-2026-tokyo",
-        artists: [
-            "DIZZYREVERSE",
-            "花魁道中",
-            "闇雲-yamikumo-",
-            "MAZE",
-            "GANGDEMIC",
-            "LADYBABY",
-        ],
-        tourName: "ROCK IDOL RESURRECTION vol.1",
-        date: "2026-05-19",
-        prefecture: "東京都",
-        venue: "大塚Deepa",
-        genres: [
-            "Loud Rock",
-            "Rock Idol",
-        ],
-        ticketUrl: "https://ticketdive.com/event/SAtnB6KuEu4C0QDaVJFv",
-        officialUrl: "https://otsukadeepa.jp/schedule/detail/52161",
-        status: "scheduled",
-    },
+
+
     {
         id: "bad-childhood-habits-return-to-childhood-2026-tokyo",
         artists: [
@@ -1958,7 +1904,97 @@ const realEvents: Event[] = [
         candidateCreatedAt: "2026-05-31",
         publishedAt: "2026-05-31",
     },
+    {
+        id: "zirco-the-mixing-vol5-2026-tokyo",
+        artists: [
+            "unRAiN",
+            "ZMAN.",
+            "Days,near LAND",
+            "CrossSign",
+            "遊飛ノドカ",
+            "Nuz",
+            "Noctivix",
+        ],
+        tourName: "Zirco Tokyo Presents THE MIXING -DON'T MIX,IT'S DANGEROUS-VOL.5-",
+        date: "2026-05-19",
+        prefecture: "東京都",
+        venue: "Zirco Tokyo",
+        genres: [
+            "Loud Rock",
+            "Heavy Rock",
+        ],
+        ticketUrl: "https://ticketdive.com/event/THEMIXING_VOL5_ZircoTokyo10thAnniversary",
+        officialUrl: "https://zirco-tokyo.jp/schedule/detail/45443",
+        status: "scheduled",
+        candidateCreatedAt: "2026-05-14",
+        publishedAt: "2026-05-31",
+    },
+    {
+        id: "rock-idol-resurrection-vol1-2026-tokyo",
+        artists: [
+            "DIZZYREVERSE",
+            "花魁道中",
+            "闇雲-yamikumo-",
+            "MAZE",
+            "GANGDEMIC",
+            "LADYBABY",
+        ],
+        tourName: "ROCK IDOL RESURRECTION vol.1",
+        date: "2026-05-19",
+        prefecture: "東京都",
+        venue: "大塚Deepa",
+        genres: [
+            "Loud Rock",
+            "Rock Idol",
+        ],
+        ticketUrl: "https://ticketdive.com/event/SAtnB6KuEu4C0QDaVJFv",
+        officialUrl: "https://otsukadeepa.jp/schedule/detail/52161",
+        status: "scheduled",
+        candidateCreatedAt: "2026-05-14",
+        publishedAt: "2026-05-31",
+    },
+    {
+        id: "summer-sonic-2026-tokyo-day2-pacific-heavy",
+        artists: [
+            "Paledusk",
+            "花冷え。",
+        ],
+        tourName: "SUMMER SONIC 2026",
+        date: "2026-08-15",
+        prefecture: "千葉県",
+        venue: "ZOZOマリンスタジアム＆幕張メッセ",
+        genres: [
+            "Loud Rock",
+            "Metalcore",
+        ],
+        ticketUrl: "https://summersonic.com/tickets/tokyo/",
+        officialUrl: "https://www.summersonic.com/lineup/tokyo-day2/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-05-31",
+        publishedAt: "2026-05-31",
+    },
+    {
+        id: "bridear-2026-tokyo",
+        artists: [
+            "BRIDEAR",
+        ],
+        tourName: "Still Burning",
+        date: "2026-04-29",
+        prefecture: "東京都",
+        venue: "渋谷Star Lounge",
+        genres: [
+            "Heavy Metal",
+            "Power Metal",
+        ],
+        ticketUrl: "https://www.creativeman.co.jp/event/bridear-still-burning/",
+        officialUrl: "https://www.creativeman.co.jp/event/bridear-still-burning/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-05-31",
+        publishedAt: "2026-05-31",
+    },
 ];
+
+export const publishedEvents = realEvents;
 
 export const events =
     process.env.NODE_ENV === "production"

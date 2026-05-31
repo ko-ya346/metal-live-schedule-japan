@@ -84,6 +84,7 @@
   font-weight: 700;
 }
 
+.filterField input,
 .filterField select {
   width: 100%;
   min-height: 42px;
@@ -115,6 +116,7 @@
   color: #777777;
 }
 
+.filterField input:focus,
 .filterField select:focus,
 .searchField input:focus {
   border-color: #ff6b6b;
@@ -680,6 +682,7 @@
 }
 
 .adminEditGrid input,
+.adminEditGrid select,
 .adminEditGrid textarea {
   width: 100%;
   border: 1px solid #303030;
@@ -691,7 +694,8 @@
   font-weight: 400;
 }
 
-.adminEditGrid input {
+.adminEditGrid input,
+.adminEditGrid select {
   min-height: 40px;
   padding: 8px 10px;
 }

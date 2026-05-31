@@ -166,6 +166,7 @@ export function CandidatesReview({
           const relatedEvents = findRelatedPublishedEvents(candidate, publishedEvents);
           const isPublished = candidate.reviewStatus === "published";
           const isIgnored = candidate.reviewStatus === "ignored";
+          const publishButtonLabel = isIgnored ? "公開に戻す" : "公開する";
 
           return (
             <article className={styles.adminCandidateCard} key={candidate.id}>
@@ -328,9 +329,9 @@ export function CandidatesReview({
                   className={styles.primaryLink}
                   type="button"
                   onClick={() => runCandidateAction("publish", candidate)}
-                  disabled={isPublished || isIgnored}
+                  disabled={isPublished}
                 >
-                  公開する
+                  {publishButtonLabel}
                 </button>
                 <a
                   className={styles.secondaryLink}

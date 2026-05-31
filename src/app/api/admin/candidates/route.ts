@@ -193,7 +193,7 @@ async function appendEventFile(candidate: CandidateEvent) {
     return;
   }
 
-  const insertMarker = "];\n\nexport const events =";
+  const insertMarker = "];\n\nexport const publishedEvents =";
   const insertIndex = fileContent.lastIndexOf(insertMarker);
 
   if (insertIndex === -1) {
