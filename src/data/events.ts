@@ -1920,6 +1920,44 @@ const realEvents: Event[] = [
         candidateCreatedAt: "2026-05-29",
         publishedAt: "2026-05-29",
     },
+    {
+        id: "loudness-45th-anniversary-chapter6-2026-tokyo",
+        artists: [
+            "LOUDNESS",
+        ],
+        tourName: "45th Anniversary Tour 2025-2026 Chapter 6",
+        date: "2026-11-25",
+        prefecture: "東京都",
+        venue: "LINE CUBE SHIBUYA",
+        genres: [
+            "Heavy Metal",
+            "Hard Rock",
+        ],
+        ticketUrl: null,
+        officialUrl: "https://www.creativeman.co.jp/event/loudness-45th-anniversary-chapter6/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-05-31",
+        publishedAt: "2026-05-31",
+    },
+    {
+        id: "loudness-45th-anniversary-chapter6-2026-osaka",
+        artists: [
+            "LOUDNESS",
+        ],
+        tourName: "45th Anniversary Tour 2025-2026 Chapter 6",
+        date: "2026-11-27",
+        prefecture: "大阪府",
+        venue: "NHK大阪ホール",
+        genres: [
+            "Heavy Metal",
+            "Hard Rock",
+        ],
+        ticketUrl: null,
+        officialUrl: "https://www.creativeman.co.jp/event/loudness-45th-anniversary-chapter6/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-05-31",
+        publishedAt: "2026-05-31",
+    },
 ];
 
 export const events =
