@@ -208,7 +208,7 @@ async function appendIgnoredCandidate(event: Event) {
     sourceUrl:
       event.officialUrl ??
       event.ticketUrl ??
-      "https://metal-live-schedule-japan.vercel.app",
+      "https://metalscalendar.com",
     sourceType: "manual",
     sourceName: "Admin unpublished event",
     confidence: "medium",
