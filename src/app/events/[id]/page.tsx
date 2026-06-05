@@ -42,8 +42,9 @@ export async function generateMetadata({
   }
 
   const artists = formatArtists(event.artists);
-  const title = `${artists} ${event.date} ${event.prefecture}`;
-  const description = `${artists}「${event.tourName}」のライブ情報。${formatEventDate(
+  const eventYear = event.date.slice(0, 4);
+  const title = `${artists} ライブ情報 ${eventYear} ${event.prefecture}`;
+  const description = `${artists}「${event.tourName}」のメタルライブ情報。${formatEventDate(
     event.date,
   )}、${event.prefecture} / ${event.venue}。`;
 

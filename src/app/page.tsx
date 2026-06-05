@@ -87,7 +87,7 @@ export default function Page() {
     <main className={styles.page}>
       <header className={styles.header}>
         <p className={styles.kicker}>日本のヘヴィメタルライブ予定</p>
-        <h1>Metal Live Schedule Japan</h1>
+        <h1>Metals Calendar</h1>
         <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
       </header>
 

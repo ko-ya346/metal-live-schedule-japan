@@ -6,12 +6,12 @@ import styles from "../page.module.css";
 export const metadata: Metadata = {
   title: "お問い合わせ",
   description:
-    "Metal Live Schedule への連絡先です。掲載情報の修正依頼、情報提供、ご要望、ご意見はこちらからお願いします。",
+    "Metals Calendar への連絡先です。掲載情報の修正依頼、情報提供、ご要望、ご意見はこちらからお願いします。",
   alternates: {
     canonical: "/contact",
   },
   openGraph: {
-    title: "お問い合わせ | Metal Live Schedule",
+    title: "お問い合わせ | Metals Calendar",
     description:
       "掲載情報の修正依頼、公式情報にもとづくライブ情報の提供、ご要望、ご意見はこちらからお願いします。",
     url: "/contact",

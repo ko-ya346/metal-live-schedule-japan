@@ -42,7 +42,11 @@ const websiteStructuredData = {
   "@context": "https://schema.org",
   "@type": "WebSite",
   name: siteName,
-  alternateName: ["Metal Live Schedule", "日本のメタルライブ情報"],
+  alternateName: [
+    "Metal Live Schedule",
+    "Metal Live Schedule Japan",
+    "日本のメタルライブ・来日公演カレンダー",
+  ],
   url: siteUrl,
   description: siteDescription,
   inLanguage: "ja",

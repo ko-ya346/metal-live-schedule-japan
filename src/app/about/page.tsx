@@ -6,14 +6,14 @@ import styles from "../page.module.css";
 export const metadata: Metadata = {
   title: "このサイトについて",
   description:
-    "Metal Live Schedule は、日本国内のヘヴィメタルライブ情報を見やすく、検索しやすくするためのサイトです。",
+    "Metals Calendar は、日本国内のメタルライブ・来日公演情報を見やすく、検索しやすくするためのサイトです。",
   alternates: {
     canonical: "/about",
   },
   openGraph: {
-    title: "このサイトについて | Metal Live Schedule",
+    title: "このサイトについて | Metals Calendar",
     description:
-      "Metal Live Schedule の目的、掲載方針、利用時の注意事項をまとめています。",
+      "Metals Calendar の目的、掲載方針、利用時の注意事項をまとめています。",
     url: "/about",
   },
 };
@@ -25,7 +25,7 @@ export default function AboutPage() {
         <p className={styles.kicker}>About</p>
         <h1>このサイトについて</h1>
         <p className={styles.summary}>
-          Metal Live Schedule は、日本国内のヘヴィメタルライブ情報を見やすく、検索しやすくするためのサイトです。
+          Metals Calendar は、日本国内のメタルライブ・来日公演情報を見やすく、検索しやすくするためのサイトです。
         </p>
       </header>
 
