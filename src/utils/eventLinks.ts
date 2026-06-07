@@ -29,6 +29,15 @@ export function getYoutubeSearchUrl(artist: string) {
   return `https://www.youtube.com/results?search_query=${query}`;
 }
 
+export function getXShareUrl(text: string, url: string) {
+  const params = new URLSearchParams({
+    text,
+    url,
+  });
+
+  return `https://x.com/intent/post?${params.toString()}`;
+}
+
 export function formatYoutubeLinkLabel(artist: string, artistCount: number) {
   if (artistCount === 1) {
     return "YouTubeで探す";

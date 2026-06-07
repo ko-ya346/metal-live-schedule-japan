@@ -8,9 +8,10 @@ import {
   formatEventStatus,
   formatYoutubeLinkLabel,
   getSetlistSearchUrl,
+  getXShareUrl,
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
-import { siteName } from "../../site";
+import { siteName, siteUrl } from "../../site";
 import styles from "../../page.module.css";
 
 type EventPageProps = {
@@ -77,6 +78,10 @@ export default async function EventPage({ params }: EventPageProps) {
   }
 
   const shouldShowSetlistLink = isPastEventDate(event.date);
+  const eventUrl = `${siteUrl}/events/${event.id}`;
+  const shareText = `${formatArtists(event.artists)}「${event.tourName}」${formatEventDate(
+    event.date,
+  )} ${event.prefecture} / ${event.venue} - ${siteName}`;
 
   return (
     <main className={styles.page}>
@@ -150,6 +155,14 @@ export default async function EventPage({ params }: EventPageProps) {
               {formatYoutubeLinkLabel(artist, event.artists.length)}
             </a>
           ))}
+          <a
+            className={styles.secondaryLink}
+            href={getXShareUrl(shareText, eventUrl)}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Xで共有
+          </a>
         </div>
       </article>
 
