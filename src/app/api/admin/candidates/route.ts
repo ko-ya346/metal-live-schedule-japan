@@ -25,6 +25,10 @@ function isAdminAction(value: unknown): value is AdminAction {
   return value === "save" || value === "ignore" || value === "publish";
 }
 
+function isCandidateEventStatus(value: unknown): value is CandidateEventStatus {
+  return value === "review_needed" || value === "published" || value === "ignored";
+}
+
 function getTodayInJapan() {
   return new Intl.DateTimeFormat("sv-SE", {
     timeZone: "Asia/Tokyo",
@@ -329,13 +333,18 @@ function getCandidateFromRequest(body: AdminCandidateRequest) {
 function redirectWithMessage(
   request: Request,
   message: string,
-  status: CandidateEventStatus,
+  fallbackStatus: CandidateEventStatus,
 ) {
   const referer = request.headers.get("referer");
   const url = new URL(referer ?? request.url);
+  const currentStatus = url.searchParams.get("status");
+  const nextStatus = isCandidateEventStatus(currentStatus)
+    ? currentStatus
+    : fallbackStatus;
+
   url.pathname = "/admin/candidates";
   url.search = "";
-  url.searchParams.set("status", status);
+  url.searchParams.set("status", nextStatus);
   url.searchParams.set("adminMessage", message);
   return NextResponse.redirect(url, { status: 303 });
 }
