@@ -1,0 +1,60 @@
+name: Collect event candidates
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 10:00 JST on Mondays and Thursdays.
+    - cron: "0 1 * * 1,4"
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  collect:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+          cache: npm
+
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Collect candidates
+        run: npm run candidates:collect
+
+      - name: Validate data
+        run: npm run data:validate
+
+      - name: Stop if there are no changes
+        id: changes
+        run: |
+          if git diff --quiet -- src/data/candidate_events.ts; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
+          else
+            echo "has_changes=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Create pull request
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          branch="auto/collect-candidates-$(date +%Y%m%d-%H%M%S)"
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git checkout -b "$branch"
+          git add src/data/candidate_events.ts
+          git commit -m "Add collected event candidates"
+          git push origin "$branch"
+          gh pr create \
+            --title "Add collected event candidates" \
+            --body "自動収集した候補イベントを review_needed として追加します。\n\n確認事項:\n- /admin/candidates で日程・会場・出演者・公式URLを確認\n- 公開するものだけ公開\n- 対象外は ignore" \
+            --base main \
+            --head "$branch"
