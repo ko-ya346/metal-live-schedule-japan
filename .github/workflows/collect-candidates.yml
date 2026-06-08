@@ -1,4 +1,4 @@
-name: Collect event candidates
+name: Remind event candidate collection
 
 on:
   workflow_dispatch:
@@ -7,54 +7,65 @@ on:
     - cron: "0 0 * * 2,4,6"
 
 permissions:
-  contents: write
-  pull-requests: write
+  issues: write
 
 jobs:
-  collect:
+  remind:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-
-      - name: Setup Node
-        uses: actions/setup-node@v4
-        with:
-          node-version: 24
-          cache: npm
-
-      - name: Install dependencies
-        run: npm ci
-
-      - name: Collect candidates
-        run: npm run candidates:collect
-
-      - name: Validate data
-        run: npm run data:validate
-
-      - name: Stop if there are no changes
-        id: changes
-        run: |
-          if git diff --quiet -- src/data/candidate_events.ts; then
-            echo "has_changes=false" >> "$GITHUB_OUTPUT"
-          else
-            echo "has_changes=true" >> "$GITHUB_OUTPUT"
-          fi
-
-      - name: Create pull request
-        if: steps.changes.outputs.has_changes == 'true'
+      - name: Create reminder issue
         env:
           GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
         run: |
-          branch="auto/collect-candidates-$(date +%Y%m%d-%H%M%S)"
-          git config user.name "github-actions[bot]"
-          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
-          git checkout -b "$branch"
-          git add src/data/candidate_events.ts
-          git commit -m "Add collected event candidates"
-          git push origin "$branch"
-          gh pr create \
-            --title "Add collected event candidates" \
-            --body "自動収集した候補イベントを src/data/candidate_events.ts に review_needed として追加します。\n\n確認方法:\n- このPRを取り込むと /admin/candidates の「要確認」に表示されます\n- ローカルで確認する場合はこのブランチを checkout して npm run dev を実行します\n\n確認事項:\n- /admin/candidates で日程・会場・出演者・公式URLを確認\n- 公開するものだけ公開\n- 対象外は ignore" \
-            --base main \
-            --head "$branch"
+          existing_issue="$(
+            gh issue list \
+              --repo "$GH_REPO" \
+              --state open \
+              --search "新着ライブ調査 in:title" \
+              --json number \
+              --jq '.[0].number'
+          )"
+
+          if [ -n "$existing_issue" ]; then
+            echo "Collection reminder already exists: #$existing_issue"
+            exit 0
+          fi
+
+          gh issue create \
+            --repo "$GH_REPO" \
+            --title "新着ライブ調査" \
+            --body "$(cat <<'BODY'
+          Codexに新着ライブ調査を依頼する。
+
+          依頼文:
+
+          ```text
+          新着ライブを調べて、候補イベントを src/data/candidate_events.ts に review_needed で追加してください。
+          公開イベントには追加しないでください。
+          公式/信頼できるソースを優先してください。
+          npm run data:validate と npm run build を通してください。
+          ```
+
+          確認するもの:
+
+          - [ ] Creativeman
+          - [ ] UDO
+          - [ ] SMASH
+          - [ ] Evoken / EVP
+          - [ ] eplus metal / hardcore
+          - [ ] 主要会場スケジュール
+          - [ ] SEX MACHINEGUNS
+          - [ ] 人間椅子
+          - [ ] アイリフドーパ
+          - [ ] 来日メタル/ハードロック/ラウド系公演
+
+          作業後:
+
+          - [ ] /admin/candidates で候補を確認
+          - [ ] 公開するものだけ公開
+          - [ ] 対象外は ignore
+          - [ ] 必要ならX投稿
+          - [ ] push
+          BODY
+          )"
