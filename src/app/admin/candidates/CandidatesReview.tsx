@@ -1,6 +1,4 @@
-"use client";
-
-import { useMemo, useState } from "react";
+import Link from "next/link";
 import type { CandidateEvent, CandidateEventStatus } from "../../../data/candidates";
 import type { Event } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
@@ -9,6 +7,8 @@ import styles from "../../page.module.css";
 type CandidatesReviewProps = {
   candidates: CandidateEvent[];
   publishedEvents: Event[];
+  selectedStatus: CandidateEventStatus;
+  initialStatusMessage?: string | null;
 };
 
 const statusLabels: Record<CandidateEventStatus, string> = {
@@ -40,109 +40,35 @@ function findRelatedPublishedEvents(candidate: CandidateEvent, events: Event[]) 
     .slice(0, 5);
 }
 
-function createCandidateMap(candidates: CandidateEvent[]) {
-  return Object.fromEntries(candidates.map((candidate) => [candidate.id, candidate]));
-}
-
 function listToText(values: string[]) {
   return values.join("\n");
-}
-
-function textToList(value: string) {
-  return value
-    .split(/\n|,/)
-    .map((item) => item.trim())
-    .filter(Boolean);
-}
-
-async function postCandidateAction(
-  action: "save" | "ignore" | "publish",
-  candidate: CandidateEvent,
-) {
-  const response = await fetch("/api/admin/candidates", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-    },
-    body: JSON.stringify({ action, candidate }),
-  });
-
-  const body = (await response.json()) as {
-    candidate?: CandidateEvent;
-    error?: string;
-  };
-
-  if (!response.ok || !body.candidate) {
-    throw new Error(body.error ?? "候補の更新に失敗しました");
-  }
-
-  return body.candidate;
 }
 
 export function CandidatesReview({
   candidates,
   publishedEvents,
+  selectedStatus,
+  initialStatusMessage = null,
 }: CandidatesReviewProps) {
-  const [selectedStatus, setSelectedStatus] =
-    useState<CandidateEventStatus>("review_needed");
-  const [editableCandidates, setEditableCandidates] = useState<
-    Record<string, CandidateEvent>
-  >(() => createCandidateMap(candidates));
-  const [statusMessage, setStatusMessage] = useState<string | null>(null);
-  const candidateList = useMemo(
-    () => Object.values(editableCandidates),
-    [editableCandidates],
+  const filteredCandidates = candidates.filter(
+    (candidate) => candidate.reviewStatus === selectedStatus,
   );
-  const filteredCandidates = useMemo(
-    () =>
-      candidateList.filter((candidate) => candidate.reviewStatus === selectedStatus),
-    [candidateList, selectedStatus],
-  );
-
-  function updateCandidate(id: string, nextCandidate: CandidateEvent) {
-    setEditableCandidates((currentCandidates) => ({
-      ...currentCandidates,
-      [id]: nextCandidate,
-    }));
-  }
-
-  async function runCandidateAction(
-    action: "save" | "ignore" | "publish",
-    candidate: CandidateEvent,
-  ) {
-    setStatusMessage(null);
-
-    try {
-      const nextCandidate = await postCandidateAction(action, candidate);
-      updateCandidate(nextCandidate.id, nextCandidate);
-      setStatusMessage(
-        action === "publish"
-          ? `${candidate.id} を公開しました`
-          : action === "ignore"
-            ? `${candidate.id} を対象外にしました`
-            : `${candidate.id} を保存しました`,
-      );
-    } catch (error) {
-      setStatusMessage(error instanceof Error ? error.message : "更新に失敗しました");
-    }
-  }
 
   return (
     <>
       <div className={styles.adminToolbar}>
         {reviewStatuses.map((status) => (
-          <button
+          <Link
             className={`${styles.adminStatusButton} ${
               selectedStatus === status ? styles.activeAdminStatusButton : ""
             }`}
+            href={`/admin/candidates?status=${status}`}
             key={status}
-            type="button"
-            onClick={() => setSelectedStatus(status)}
           >
             {statusLabels[status]} (
-            {candidateList.filter((candidate) => candidate.reviewStatus === status).length}
+            {candidates.filter((candidate) => candidate.reviewStatus === status).length}
             )
-          </button>
+          </Link>
         ))}
       </div>
 
@@ -158,7 +84,11 @@ export function CandidatesReview({
         <p className={styles.adminMutedText}>
           本番環境では書き込みを無効にしています。操作後は `npm run build` で確認してください。
         </p>
-        {statusMessage && <p className={styles.adminMutedText}>{statusMessage}</p>}
+        {initialStatusMessage && (
+          <p className={styles.adminInlineStatus} role="status">
+            {initialStatusMessage}
+          </p>
+        )}
       </section>
 
       <div className={styles.adminCandidateList}>
@@ -170,198 +100,156 @@ export function CandidatesReview({
 
           return (
             <article className={styles.adminCandidateCard} key={candidate.id}>
-              <div className={styles.adminCandidateHeader}>
-                <div>
-                  <p className={styles.kicker}>{statusLabels[candidate.reviewStatus]}</p>
-                  <h2>{candidate.artists.join(" / ")}</h2>
-                  <p className={styles.adminCandidateId}>
-                    ID: <code>{candidate.id}</code>
-                  </p>
-                  <p className={styles.summary}>
-                    {formatCandidateDate(candidate.date)} /{" "}
-                    {[candidate.prefecture, candidate.venue]
-                      .filter(Boolean)
-                      .join(" / ") || "会場未定"}
-                  </p>
-                </div>
-              </div>
+              <form action="/api/admin/candidates" method="post">
+                <input name="candidateId" type="hidden" value={candidate.id} />
 
-              <div className={styles.adminEditGrid}>
-                <label>
-                  アーティスト
-                  <textarea
-                    value={listToText(candidate.artists)}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        artists: textToList(event.target.value),
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  ツアー/イベント名
-                  <input
-                    value={candidate.tourName ?? ""}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        tourName: event.target.value || null,
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  日付
-                  <input
-                    placeholder="YYYY-MM-DD"
-                    value={candidate.date ?? ""}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        date: event.target.value || null,
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  都道府県
-                  <input
-                    value={candidate.prefecture ?? ""}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        prefecture: event.target.value || null,
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  会場
-                  <input
-                    value={candidate.venue ?? ""}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        venue: event.target.value || null,
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  ジャンル
-                  <textarea
-                    value={listToText(candidate.genres)}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        genres: textToList(event.target.value),
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  チケットURL
-                  <input
-                    value={candidate.ticketUrl ?? ""}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        ticketUrl: event.target.value || null,
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  公式URL
-                  <input
-                    value={candidate.officialUrl ?? ""}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        officialUrl: event.target.value || null,
-                      })
-                    }
-                  />
-                </label>
-                <label>
-                  メモ
-                  <textarea
-                    value={candidate.reviewNotes}
-                    onChange={(event) =>
-                      updateCandidate(candidate.id, {
-                        ...candidate,
-                        reviewNotes: event.target.value,
-                      })
-                    }
-                  />
-                </label>
-              </div>
-
-              <dl className={styles.adminCandidateMeta}>
-                <div>
-                  <dt>情報源</dt>
-                  <dd>{candidate.sourceName}</dd>
+                <div className={styles.adminCandidateHeader}>
+                  <div>
+                    <p className={styles.kicker}>
+                      {statusLabels[candidate.reviewStatus]}
+                    </p>
+                    <h2>{candidate.artists.join(" / ")}</h2>
+                    <p className={styles.adminCandidateId}>
+                      ID: <code>{candidate.id}</code>
+                    </p>
+                    <p className={styles.summary}>
+                      {formatCandidateDate(candidate.date)} /{" "}
+                      {[candidate.prefecture, candidate.venue]
+                        .filter(Boolean)
+                        .join(" / ") || "会場未定"}
+                    </p>
+                  </div>
                 </div>
-                <div>
-                  <dt>信頼度</dt>
-                  <dd>{candidate.confidence}</dd>
-                </div>
-              </dl>
 
-              <div className={styles.adminLinkRow}>
-                <button
-                  className={styles.secondaryLink}
-                  type="button"
-                  onClick={() => runCandidateAction("save", candidate)}
-                >
-                  保存
-                </button>
-                <button
-                  className={styles.secondaryLink}
-                  type="button"
-                  onClick={() => runCandidateAction("ignore", candidate)}
-                  disabled={isIgnored}
-                >
-                  ignore
-                </button>
-                <button
-                  className={styles.primaryLink}
-                  type="button"
-                  onClick={() => runCandidateAction("publish", candidate)}
-                  disabled={isPublished}
-                >
-                  {publishButtonLabel}
-                </button>
-                <a
-                  className={styles.secondaryLink}
-                  href={candidate.sourceUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  元URLを開く
-                </a>
-                {candidate.officialUrl && (
-                  <a
-                    className={styles.secondaryLink}
-                    href={candidate.officialUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    公式URL
-                  </a>
-                )}
-                {candidate.ticketUrl && (
-                  <a
-                    className={styles.secondaryLink}
-                    href={candidate.ticketUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
+                <div className={styles.adminEditGrid}>
+                  <label>
+                    アーティスト
+                    <textarea
+                      defaultValue={listToText(candidate.artists)}
+                      name="artists"
+                    />
+                  </label>
+                  <label>
+                    ツアー/イベント名
+                    <input
+                      defaultValue={candidate.tourName ?? ""}
+                      name="tourName"
+                    />
+                  </label>
+                  <label>
+                    日付
+                    <input
+                      defaultValue={candidate.date ?? ""}
+                      name="date"
+                      placeholder="YYYY-MM-DD"
+                    />
+                  </label>
+                  <label>
+                    都道府県
+                    <input
+                      defaultValue={candidate.prefecture ?? ""}
+                      name="prefecture"
+                    />
+                  </label>
+                  <label>
+                    会場
+                    <input defaultValue={candidate.venue ?? ""} name="venue" />
+                  </label>
+                  <label>
+                    ジャンル
+                    <textarea defaultValue={listToText(candidate.genres)} name="genres" />
+                  </label>
+                  <label>
                     チケットURL
+                    <input
+                      defaultValue={candidate.ticketUrl ?? ""}
+                      name="ticketUrl"
+                    />
+                  </label>
+                  <label>
+                    公式URL
+                    <input
+                      defaultValue={candidate.officialUrl ?? ""}
+                      name="officialUrl"
+                    />
+                  </label>
+                  <label>
+                    メモ
+                    <textarea
+                      defaultValue={candidate.reviewNotes}
+                      name="reviewNotes"
+                    />
+                  </label>
+                </div>
+
+                <dl className={styles.adminCandidateMeta}>
+                  <div>
+                    <dt>情報源</dt>
+                    <dd>{candidate.sourceName}</dd>
+                  </div>
+                  <div>
+                    <dt>信頼度</dt>
+                    <dd>{candidate.confidence}</dd>
+                  </div>
+                </dl>
+
+                <div className={styles.adminLinkRow}>
+                  <button
+                    className={styles.secondaryLink}
+                    name="action"
+                    type="submit"
+                    value="save"
+                  >
+                    保存
+                  </button>
+                  <button
+                    className={styles.secondaryLink}
+                    disabled={isIgnored}
+                    name="action"
+                    type="submit"
+                    value="ignore"
+                  >
+                    ignore
+                  </button>
+                  <button
+                    className={styles.primaryLink}
+                    disabled={isPublished}
+                    name="action"
+                    type="submit"
+                    value="publish"
+                  >
+                    {publishButtonLabel}
+                  </button>
+                  <a
+                    className={styles.secondaryLink}
+                    href={candidate.sourceUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    元URLを開く
                   </a>
-                )}
-              </div>
+                  {candidate.officialUrl && (
+                    <a
+                      className={styles.secondaryLink}
+                      href={candidate.officialUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      公式URL
+                    </a>
+                  )}
+                  {candidate.ticketUrl && (
+                    <a
+                      className={styles.secondaryLink}
+                      href={candidate.ticketUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      チケットURL
+                    </a>
+                  )}
+                </div>
+              </form>
 
               <section className={styles.adminCompareSection}>
                 <h3>近い公開済みイベント</h3>
@@ -377,7 +265,6 @@ export function CandidatesReview({
                   </ul>
                 )}
               </section>
-
             </article>
           );
         })}

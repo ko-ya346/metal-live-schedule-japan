@@ -745,6 +745,16 @@
   color: #b9b9b3;
 }
 
+.adminInlineStatus {
+  padding: 12px;
+  margin: 0;
+  border: 1px solid #ff6b6b;
+  border-radius: 6px;
+  background: #181010;
+  color: #ffffff;
+  overflow-wrap: anywhere;
+}
+
 .textLink {
   color: #f2f2ef;
   font-weight: 700;

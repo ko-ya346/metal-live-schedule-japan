@@ -1,7 +1,7 @@
 import { NextResponse } from "next/server";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
-import type { CandidateEvent } from "@/src/data/candidates";
+import type { CandidateEvent, CandidateEventStatus } from "@/src/data/candidates";
 import type { Event } from "@/src/data/events";
 import { candidateEvents } from "@/src/data/candidates";
 
@@ -17,8 +17,13 @@ type AdminAction = "save" | "ignore" | "publish";
 
 type AdminCandidateRequest = {
   action: AdminAction;
-  candidate: CandidateEvent;
+  candidate?: CandidateEvent;
+  candidateId?: string;
 };
+
+function isAdminAction(value: unknown): value is AdminAction {
+  return value === "save" || value === "ignore" || value === "publish";
+}
 
 function getTodayInJapan() {
   return new Intl.DateTimeFormat("sv-SE", {
@@ -251,6 +256,90 @@ function normalizeCandidate(candidate: CandidateEvent, action: AdminAction) {
   } satisfies CandidateEvent;
 }
 
+function formValueToString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function formValueToList(formData: FormData, key: string) {
+  return formValueToString(formData, key)
+    .split(/\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+async function parseAdminCandidateRequest(request: Request) {
+  const contentType = request.headers.get("content-type") ?? "";
+
+  if (contentType.includes("application/json")) {
+    return {
+      body: (await request.json()) as AdminCandidateRequest,
+      shouldRedirect: false,
+    };
+  }
+
+  const formData = await request.formData();
+  const action = formData.get("action");
+  const candidateId = formData.get("candidateId");
+  const currentCandidate = candidateEvents.find(
+    (candidate) => candidate.id === candidateId,
+  );
+
+  if (!currentCandidate) {
+    throw new Error(`candidate not found: ${candidateId ?? "unknown"}`);
+  }
+
+  return {
+    body: {
+      action,
+      candidate: {
+        ...currentCandidate,
+        artists: formValueToList(formData, "artists"),
+        tourName: formValueToString(formData, "tourName") || null,
+        date: formValueToString(formData, "date") || null,
+        prefecture: formValueToString(formData, "prefecture") || null,
+        venue: formValueToString(formData, "venue") || null,
+        genres: formValueToList(formData, "genres"),
+        ticketUrl: formValueToString(formData, "ticketUrl") || null,
+        officialUrl: formValueToString(formData, "officialUrl") || null,
+        reviewNotes: formValueToString(formData, "reviewNotes"),
+      },
+      candidateId: typeof candidateId === "string" ? candidateId : undefined,
+    } as AdminCandidateRequest,
+    shouldRedirect: true,
+  };
+}
+
+function getCandidateFromRequest(body: AdminCandidateRequest) {
+  if (body.candidate) {
+    return body.candidate;
+  }
+
+  const currentCandidate = candidateEvents.find(
+    (candidate) => candidate.id === body.candidateId,
+  );
+
+  if (!currentCandidate) {
+    throw new Error(`candidate not found: ${body.candidateId ?? "unknown"}`);
+  }
+
+  return currentCandidate;
+}
+
+function redirectWithMessage(
+  request: Request,
+  message: string,
+  status: CandidateEventStatus,
+) {
+  const referer = request.headers.get("referer");
+  const url = new URL(referer ?? request.url);
+  url.pathname = "/admin/candidates";
+  url.search = "";
+  url.searchParams.set("status", status);
+  url.searchParams.set("adminMessage", message);
+  return NextResponse.redirect(url, { status: 303 });
+}
+
 export async function POST(request: Request) {
   if (!isLocalWriteAllowed()) {
     return NextResponse.json(
@@ -260,14 +349,32 @@ export async function POST(request: Request) {
   }
 
   try {
-    const body = (await request.json()) as AdminCandidateRequest;
-    const candidate = normalizeCandidate(body.candidate, body.action);
+    const { body, shouldRedirect } = await parseAdminCandidateRequest(request);
+
+    if (!isAdminAction(body.action)) {
+      throw new Error("invalid admin action");
+    }
+
+    const requestCandidate = getCandidateFromRequest(body);
+    const candidate = normalizeCandidate(requestCandidate, body.action);
 
     if (body.action === "publish") {
       await appendEventFile(candidate);
     }
 
     await updateCandidateFile(candidate);
+
+    if (shouldRedirect) {
+      return redirectWithMessage(
+        request,
+        body.action === "publish"
+          ? `${candidate.id} を公開しました`
+          : body.action === "ignore"
+            ? `${candidate.id} を対象外にしました`
+            : `${candidate.id} を保存しました`,
+        candidate.reviewStatus,
+      );
+    }
 
     return NextResponse.json({
       candidate,

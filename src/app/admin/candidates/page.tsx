@@ -1,5 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import type { CandidateEventStatus } from "../../../data/candidates";
 import { candidateEvents } from "../../../data/candidates";
 import { publishedEvents } from "../../../data/events";
 import styles from "../../page.module.css";
@@ -14,7 +15,26 @@ export const metadata: Metadata = {
   },
 };
 
-export default function AdminCandidatesPage() {
+type AdminCandidatesPageProps = {
+  searchParams?: Promise<{
+    adminMessage?: string;
+    status?: string;
+  }>;
+};
+
+function isCandidateEventStatus(value: unknown): value is CandidateEventStatus {
+  return value === "review_needed" || value === "published" || value === "ignored";
+}
+
+export default async function AdminCandidatesPage({
+  searchParams,
+}: AdminCandidatesPageProps) {
+  const resolvedSearchParams = await searchParams;
+  const adminMessage = resolvedSearchParams?.adminMessage;
+  const selectedStatus = isCandidateEventStatus(resolvedSearchParams?.status)
+    ? resolvedSearchParams.status
+    : "review_needed";
+
   return (
     <main className={styles.page}>
       <header className={styles.header}>
@@ -36,7 +56,12 @@ export default function AdminCandidatesPage() {
         </div>
       </section>
 
-      <CandidatesReview candidates={candidateEvents} publishedEvents={publishedEvents} />
+      <CandidatesReview
+        candidates={candidateEvents}
+        initialStatusMessage={adminMessage}
+        publishedEvents={publishedEvents}
+        selectedStatus={selectedStatus}
+      />
     </main>
   );
 }
