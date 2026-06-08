@@ -1,4 +1,4 @@
-name: Remind event candidate collection
+name: Collect research links
 
 on:
   workflow_dispatch:
@@ -7,13 +7,25 @@ on:
     - cron: "0 0 * * 2,4,6"
 
 permissions:
+  contents: read
   issues: write
 
 jobs:
-  remind:
+  collect:
     runs-on: ubuntu-latest
     steps:
-      - name: Create reminder issue
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Collect research links
+        run: npm run research:links > research-links.md
+
+      - name: Create or update research issue
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
@@ -28,44 +40,13 @@ jobs:
           )"
 
           if [ -n "$existing_issue" ]; then
-            echo "Collection reminder already exists: #$existing_issue"
+            gh issue comment "$existing_issue" \
+              --repo "$GH_REPO" \
+              --body-file research-links.md
             exit 0
           fi
 
           gh issue create \
             --repo "$GH_REPO" \
             --title "新着ライブ調査" \
-            --body "$(cat <<'BODY'
-          Codexに新着ライブ調査を依頼する。
-
-          依頼文:
-
-          ```text
-          新着ライブを調べて、候補イベントを src/data/candidate_events.ts に review_needed で追加してください。
-          公開イベントには追加しないでください。
-          公式/信頼できるソースを優先してください。
-          npm run data:validate と npm run build を通してください。
-          ```
-
-          確認するもの:
-
-          - [ ] Creativeman
-          - [ ] UDO
-          - [ ] SMASH
-          - [ ] Evoken / EVP
-          - [ ] eplus metal / hardcore
-          - [ ] 主要会場スケジュール
-          - [ ] SEX MACHINEGUNS
-          - [ ] 人間椅子
-          - [ ] アイリフドーパ
-          - [ ] 来日メタル/ハードロック/ラウド系公演
-
-          作業後:
-
-          - [ ] /admin/candidates で候補を確認
-          - [ ] 公開するものだけ公開
-          - [ ] 対象外は ignore
-          - [ ] 必要ならX投稿
-          - [ ] push
-          BODY
-          )"
+            --body-file research-links.md
