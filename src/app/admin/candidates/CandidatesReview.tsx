@@ -44,6 +44,24 @@ function listToText(values: string[]) {
   return values.join("\n");
 }
 
+function getMissingPublishFields(candidate: CandidateEvent) {
+  const missingFields: string[] = [];
+
+  if (!candidate.date) {
+    missingFields.push("日付");
+  }
+
+  if (!candidate.prefecture) {
+    missingFields.push("都道府県");
+  }
+
+  if (!candidate.venue) {
+    missingFields.push("会場");
+  }
+
+  return missingFields;
+}
+
 export function CandidatesReview({
   candidates,
   publishedEvents,
@@ -96,6 +114,8 @@ export function CandidatesReview({
           const relatedEvents = findRelatedPublishedEvents(candidate, publishedEvents);
           const isPublished = candidate.reviewStatus === "published";
           const isIgnored = candidate.reviewStatus === "ignored";
+          const missingPublishFields = getMissingPublishFields(candidate);
+          const canPublish = !isPublished && missingPublishFields.length === 0;
           const publishButtonLabel = isIgnored ? "公開に戻す" : "公開する";
 
           return (
@@ -213,10 +233,15 @@ export function CandidatesReview({
                   </button>
                   <button
                     className={styles.primaryLink}
-                    disabled={isPublished}
+                    disabled={!canPublish}
                     name="action"
                     type="submit"
                     value="publish"
+                    title={
+                      missingPublishFields.length > 0
+                        ? `公開には ${missingPublishFields.join("、")} が必要です`
+                        : undefined
+                    }
                   >
                     {publishButtonLabel}
                   </button>
@@ -249,6 +274,11 @@ export function CandidatesReview({
                     </a>
                   )}
                 </div>
+                {missingPublishFields.length > 0 && (
+                  <p className={styles.adminFieldWarning} role="status">
+                    公開には {missingPublishFields.join(" / ")} が必要です。先に保存して埋めてください。
+                  </p>
+                )}
               </form>
 
               <section className={styles.adminCompareSection}>

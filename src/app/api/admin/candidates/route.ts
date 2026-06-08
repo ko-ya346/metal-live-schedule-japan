@@ -29,6 +29,24 @@ function isCandidateEventStatus(value: unknown): value is CandidateEventStatus {
   return value === "review_needed" || value === "published" || value === "ignored";
 }
 
+function getMissingPublishFields(candidate: CandidateEvent) {
+  const missingFields: string[] = [];
+
+  if (!candidate.date) {
+    missingFields.push("日付");
+  }
+
+  if (!candidate.prefecture) {
+    missingFields.push("都道府県");
+  }
+
+  if (!candidate.venue) {
+    missingFields.push("会場");
+  }
+
+  return missingFields;
+}
+
 function getTodayInJapan() {
   return new Intl.DateTimeFormat("sv-SE", {
     timeZone: "Asia/Tokyo",
@@ -368,6 +386,15 @@ export async function POST(request: Request) {
     const candidate = normalizeCandidate(requestCandidate, body.action);
 
     if (body.action === "publish") {
+      const missingPublishFields = getMissingPublishFields(candidate);
+      if (missingPublishFields.length > 0) {
+        return redirectWithMessage(
+          request,
+          `${candidate.id} は公開できません。${missingPublishFields.join(" / ")} を埋めてください`,
+          "review_needed",
+        );
+      }
+
       await appendEventFile(candidate);
     }
 

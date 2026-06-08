@@ -755,6 +755,16 @@
   overflow-wrap: anywhere;
 }
 
+.adminFieldWarning {
+  padding: 10px 12px;
+  margin: 0;
+  border: 1px solid #6b4f1d;
+  border-radius: 6px;
+  background: #1f1810;
+  color: #ffd38a;
+  overflow-wrap: anywhere;
+}
+
 .textLink {
   color: #f2f2ef;
   font-weight: 700;

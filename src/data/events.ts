@@ -2443,6 +2443,48 @@ const realEvents: Event[] = [
         candidateCreatedAt: "2026-06-08",
         publishedAt: "2026-06-08",
     },
+    {
+        id: "black-sun-rising-fest-vol2-2026-tokyo",
+        artists: [
+            "The Kovenant",
+            "Mörk Gryning",
+            "W.E.B",
+        ],
+        tourName: "Black Sun Rising Fest vol.2",
+        date: "2026-09-13",
+        prefecture: "東京都",
+        venue: "Gotanda Blaze",
+        genres: [
+            "Black Metal",
+            "Extreme Metal",
+        ],
+        ticketUrl: "https://evp.jp/project/ticket.php?id=226",
+        officialUrl: "https://evp.jp/project/ticket.php?id=226",
+        status: "scheduled",
+        candidateCreatedAt: "2026-06-08",
+        publishedAt: "2026-06-08",
+    },
+    {
+        id: "black-sun-rising-fest-2026-osaka",
+        artists: [
+            "Nargaroth",
+            "Mörk Gryning",
+            "W.E.B",
+        ],
+        tourName: "Black Sun Rising Fest - Osaka",
+        date: "2026-09-12",
+        prefecture: "大阪府",
+        venue: "Umeda BangBoo",
+        genres: [
+            "Black Metal",
+            "Extreme Metal",
+        ],
+        ticketUrl: "https://evp.jp/project/ticket.php?id=225",
+        officialUrl: "https://evp.jp/project/ticket.php?id=225",
+        status: "scheduled",
+        candidateCreatedAt: "2026-06-08",
+        publishedAt: "2026-06-08",
+    },
 ];
 
 export const publishedEvents = realEvents;
