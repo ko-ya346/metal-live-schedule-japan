@@ -3,8 +3,8 @@ name: Collect event candidates
 on:
   workflow_dispatch:
   schedule:
-    # 10:00 JST on Mondays and Thursdays.
-    - cron: "0 1 * * 1,4"
+    # 09:00 JST on Tuesdays, Thursdays, and Saturdays.
+    - cron: "0 0 * * 2,4,6"
 
 permissions:
   contents: write
@@ -55,6 +55,6 @@ jobs:
           git push origin "$branch"
           gh pr create \
             --title "Add collected event candidates" \
-            --body "自動収集した候補イベントを review_needed として追加します。\n\n確認事項:\n- /admin/candidates で日程・会場・出演者・公式URLを確認\n- 公開するものだけ公開\n- 対象外は ignore" \
+            --body "自動収集した候補イベントを src/data/candidate_events.ts に review_needed として追加します。\n\n確認方法:\n- このPRを取り込むと /admin/candidates の「要確認」に表示されます\n- ローカルで確認する場合はこのブランチを checkout して npm run dev を実行します\n\n確認事項:\n- /admin/candidates で日程・会場・出演者・公式URLを確認\n- 公開するものだけ公開\n- 対象外は ignore" \
             --base main \
             --head "$branch"
