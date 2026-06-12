@@ -43,5 +43,5 @@ export function formatYoutubeLinkLabel(artist: string, artistCount: number) {
     return "YouTubeで探す";
   }
 
-  return `${artist}を探す`;
+  return `YouTubeで${artist}を探す`;
 }
