@@ -87,9 +87,12 @@ export default function Page() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <p className={styles.kicker}>日本のヘヴィメタルライブ予定</p>
+        <p className={styles.kicker}>日本のメタルライブ・来日公演予定</p>
         <h1>Metals Calendar</h1>
         <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
+        <p className={styles.lead}>
+          日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアのライブ情報を、日付・地域・ジャンルで探せます。
+        </p>
       </header>
 
       <section className={styles.feedbackBanner}>

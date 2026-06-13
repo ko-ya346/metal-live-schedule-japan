@@ -30,14 +30,14 @@ function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) 
   const eventYear = event.date.slice(0, 4);
   const location = event.prefecture.replace(/都|府|県$/, "");
 
-  return `${artists} 来日・ライブ ${eventYear} ${location} | チケット・会場情報`;
+  return `${artists}のメタルライブ ${eventYear} ${location} | チケット・会場情報`;
 }
 
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {
   const artists = formatArtists(event.artists);
   const ticketText = event.ticketUrl ? "チケット情報、" : "";
 
-  return `${artists}「${event.tourName}」のライブ情報。${formatEventDate(
+  return `日本のメタルライブ・来日公演情報。${artists}「${event.tourName}」のライブ情報。${formatEventDate(
     event.date,
   )}、${event.prefecture} / ${event.venue}。${ticketText}公式リンクを掲載。Japan metal concert schedule and ticket links.`;
 }
