@@ -11,6 +11,7 @@ import {
   getXShareUrl,
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
+import { SiteAnalytics } from "../../Analytics";
 import { siteName, siteUrl } from "../../site";
 import styles from "../../page.module.css";
 
@@ -182,6 +183,8 @@ export default async function EventPage({ params }: EventPageProps) {
       <Link className={styles.textLink} href="/">
         イベント一覧へ戻る
       </Link>
+
+      <SiteAnalytics />
     </main>
   );
 }

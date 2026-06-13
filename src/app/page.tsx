@@ -19,6 +19,7 @@ import { EventCalendar } from "./EventCalendar";
 import { EventCard } from "./EventCard";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
+import { SiteAnalytics } from "./Analytics";
 import styles from "./page.module.css";
 
 function formatEventCount(count: number) {
@@ -182,6 +183,8 @@ export default function Page() {
           </div>
         )}
       </section>
+
+      <SiteAnalytics />
     </main>
   );
 }
