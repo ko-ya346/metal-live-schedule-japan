@@ -30,7 +30,7 @@ function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) 
   const eventYear = event.date.slice(0, 4);
   const location = event.prefecture.replace(/都|府|県$/, "");
 
-  return `${artists}のメタルライブ ${eventYear} ${location} | チケット・会場情報`;
+  return `${artists}の来日メタルライブ ${eventYear} ${location} | チケット・会場情報`;
 }
 
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {

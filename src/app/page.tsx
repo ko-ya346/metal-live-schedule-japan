@@ -92,6 +92,7 @@ export default function Page() {
         <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
         <p className={styles.lead}>
           日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアのライブ情報を、日付・地域・ジャンルで探せます。
+          たとえば「メタル ライブ」「来日公演」「バンド名」で探すときの入口にしています。
         </p>
       </header>
 
