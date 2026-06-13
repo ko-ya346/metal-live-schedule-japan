@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { Analytics } from "@vercel/analytics/next";
 import styles from "./page.module.css";
 import { siteDescription, siteName, siteTitle, siteUrl } from "./site";
 
@@ -72,6 +73,7 @@ export default function RootLayout({
           }}
         />
         {children}
+        <Analytics />
         <footer className={styles.siteFooter}>
           <nav className={styles.footerNav} aria-label="フッターナビゲーション">
             <Link href="/">イベント一覧</Link>
