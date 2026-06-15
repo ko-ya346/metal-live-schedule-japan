@@ -72,22 +72,16 @@ npm run data:validate
 
 ## 自動収集とPR
 
-GitHub Actions は定期実行で調査メモを更新し、条件に合う新規候補があれば候補データの PR を作成します。
+GitHub Actions は定期実行で調査メモを更新します。候補の確認は `/admin/candidates` で行います。
 
 - 調査メモ: `npm run research:links`
-- 候補生成: `npm run research:candidates`
+- 候補確認: `/admin/candidates`
 - 候補保存先: `src/data/candidate_events.ts`
 - 公開データには自動反映しない
-- PR を見てから `/admin/candidates` で人間が確認する
 
-必要な環境変数:
+SNS 由来や未確認情報は信頼度を低くして、あくまでレビュー対象にします。
 
-- `OPENAI_API_KEY`
-- 任意: `OPENAI_MODEL`
-
-自動生成の候補は `review_needed` のまま残し、公開はしません。SNS 由来や未確認情報は信頼度を低くして、あくまでレビュー対象にします。
-
-将来はこの仕組みをそのまま使って、Search Console のクエリ分析や SEO 改善提案の PR も追加できます。収集、候補生成、レビュー、反映を分けてあるので、出力先だけ足せば拡張しやすい形です。
+将来はこの仕組みをそのまま使って、Search Console のクエリ分析や SEO 改善提案を足せます。収集、候補、レビュー、反映を分けてあるので、出力先だけ増やせば拡張しやすい形です。
 
 ## 確認用ページ
 
