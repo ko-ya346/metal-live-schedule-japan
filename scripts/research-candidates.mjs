@@ -441,7 +441,10 @@ async function callOpenAI(prompt) {
 
   if (!response.ok) {
     const body = await response.text();
-    throw new Error(`OpenAI request failed: HTTP ${response.status} ${body}`);
+    return {
+      candidates: [],
+      skippedReason: `OpenAI request failed: HTTP ${response.status} ${body}`,
+    };
   }
 
   const data = await response.json();
@@ -504,7 +507,7 @@ function buildPrompt(summaries, knownSummary) {
   ].join("\n");
 }
 
-function buildReport({ sections, summaries, candidates, skipped }) {
+function buildReport({ sections, summaries, candidates, skipped, skippedReason }) {
   const lines = [
     `# 候補自動生成レポート (${today})`,
     "",
@@ -515,9 +518,15 @@ function buildReport({ sections, summaries, candidates, skipped }) {
     `- 追加候補数: ${candidates.length}`,
     `- 重複/不正で除外: ${skipped}`,
     "",
-    "## /admin/candidates で確認してください",
-    "",
   ];
+
+  if (skippedReason) {
+    lines.push(`- 候補生成スキップ理由: ${skippedReason}`);
+    lines.push("");
+  }
+
+  lines.push("## /admin/candidates で確認してください");
+  lines.push("");
 
   if (candidates.length === 0) {
     lines.push("- 新規候補なし");
@@ -588,7 +597,15 @@ async function main() {
   }
 
   await appendCandidates(candidates);
-  await writeReport(buildReport({ sections, summaries, candidates, skipped }));
+  await writeReport(
+    buildReport({
+      sections,
+      summaries,
+      candidates,
+      skipped,
+      skippedReason: parsed.skippedReason,
+    }),
+  );
 }
 
 await main();
