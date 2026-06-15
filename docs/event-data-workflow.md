@@ -70,14 +70,22 @@ npm run data:validate
 
 `npm run data:validate` は、公開イベント、候補イベント、収集対象をチェックします。
 
-## 自動収集とPR
+## 自動収集と候補確認
 
-GitHub Actions は定期実行で調査メモを更新します。候補の確認は `/admin/candidates` で行います。
+GitHub Actions は定期実行で調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
 
 - 調査メモ: `npm run research:links`
+- 候補生成: `npm run research:candidates`
 - 候補確認: `/admin/candidates`
 - 候補保存先: `src/data/candidate_events.ts`
 - 公開データには自動反映しない
+- 新規候補が追加されると、GitHub Actions が main にコミットする
+- Issue には `/admin/candidates` の確認依頼だけを残す
+
+必要な環境変数:
+
+- `OPENAI_API_KEY`
+- 任意: `OPENAI_MODEL`
 
 SNS 由来や未確認情報は信頼度を低くして、あくまでレビュー対象にします。
 
