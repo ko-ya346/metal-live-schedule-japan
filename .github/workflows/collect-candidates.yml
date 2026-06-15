@@ -1,4 +1,4 @@
-name: Collect research links
+name: Collect research links and candidate PRs
 
 on:
   workflow_dispatch:
@@ -7,8 +7,9 @@ on:
     - cron: "0 0 * * 2,4,6"
 
 permissions:
-  contents: read
+  contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   collect:
@@ -43,10 +44,64 @@ jobs:
             gh issue comment "$existing_issue" \
               --repo "$GH_REPO" \
               --body-file research-links.md
+          else
+            gh issue create \
+              --repo "$GH_REPO" \
+              --title "新着ライブ調査" \
+              --body-file research-links.md
+          fi
+
+      - name: Generate candidate review report and updates
+        env:
+          OPENAI_API_KEY: ${{ secrets.OPENAI_API_KEY }}
+          OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
+        run: npm run research:candidates -- --input=research-links.md --report=/tmp/candidate-report.md --write
+
+      - name: Detect candidate changes
+        id: changes
+        run: |
+          if git diff --quiet -- src/data/candidate_events.ts; then
+            echo "has_changes=false" >> "$GITHUB_OUTPUT"
             exit 0
           fi
 
-          gh issue create \
+          echo "has_changes=true" >> "$GITHUB_OUTPUT"
+
+      - name: Create or update candidate PR
+        if: steps.changes.outputs.has_changes == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          branch="automation/candidate-research"
+
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch"
+          git add src/data/candidate_events.ts
+          git commit -m "Automated candidate research" || exit 0
+          git push --force-with-lease origin "$branch"
+
+          existing_pr="$(
+            gh pr list \
+              --repo "$GH_REPO" \
+              --head "$branch" \
+              --state open \
+              --json number \
+              --jq '.[0].number'
+          )"
+
+          if [ -n "$existing_pr" ]; then
+            gh pr edit "$existing_pr" \
+              --repo "$GH_REPO" \
+              --title "Automated candidate research" \
+              --body-file /tmp/candidate-report.md
+            exit 0
+          fi
+
+          gh pr create \
             --repo "$GH_REPO" \
-            --title "新着ライブ調査" \
-            --body-file research-links.md
+            --head "$branch" \
+            --base main \
+            --title "Automated candidate research" \
+            --body-file /tmp/candidate-report.md
