@@ -2678,6 +2678,45 @@ const realEvents: Event[] = [
         candidateCreatedAt: "2026-06-15",
         publishedAt: "2026-06-15",
     },
+    {
+        id: "novel-core-perfectly-defective-tour-2026-final-tokyo",
+        artists: [
+            "Novel Core",
+        ],
+        tourName: "PERFECTLY DEFECTiVE TOUR 2026 -FINAL-",
+        date: "2026-06-26",
+        prefecture: "東京都",
+        venue: "豊洲PIT",
+        genres: [
+            "Heavy Metal",
+        ],
+        ticketUrl: null,
+        officialUrl: "https://www.creativeman.co.jp/event/novel-core26/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-06-22",
+        publishedAt: "2026-06-22",
+    },
+    {
+        id: "hyena-risingfall-heavy-metal-heroes-release-party-2026-t",
+        artists: [
+            "HYENA",
+            "RISINGFALL",
+            "ABIGAIL",
+            "CHASE THE TOP",
+        ],
+        tourName: "HYENA (from Peru) Japan tour 2026 HYENA&RISINGFALL split AL“Heavy Metal Heroes” Release Party",
+        date: "2026-06-27",
+        prefecture: "東京都",
+        venue: "初台ライブハウスWALL",
+        genres: [
+            "Heavy Metal",
+        ],
+        ticketUrl: "https://eplus.jp/sf/detail/4517020001-P0030001P021001",
+        officialUrl: null,
+        status: "scheduled",
+        candidateCreatedAt: "2026-06-22",
+        publishedAt: "2026-06-22",
+    },
 ];
 
 export const publishedEvents = realEvents;
