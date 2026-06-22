@@ -255,14 +255,37 @@
 }
 
 .calendarEvent {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 5px;
   margin: 0;
-  padding: 4px 6px;
+  padding: 4px 6px 4px 7px;
+  border: 1px solid #3a3030;
+  border-left: 4px solid var(--genre-color, #b42020);
   border-radius: 4px;
-  background: #b42020;
-  color: #ffffff;
+  background: #231818;
+  color: #f7f7f2;
   font-size: 0.78rem;
   font-weight: 700;
   overflow-wrap: anywhere;
+}
+
+.calendarEvent span:first-child {
+  min-width: 0;
+}
+
+.genreColorDots {
+  display: flex;
+  flex: 0 0 auto;
+  gap: 3px;
+}
+
+.genreColorDot {
+  width: 6px;
+  height: 6px;
+  border-radius: 999px;
+  background: var(--genre-color, #9a9a94);
 }
 
 .outsideMonth {
@@ -855,8 +878,13 @@
   }
 
   .calendarEvent {
-    padding: 3px 4px;
+    gap: 3px;
+    padding: 3px 4px 3px 5px;
     font-size: 0.68rem;
+  }
+
+  .genreColorDots {
+    display: none;
   }
 
   .eventLinks {

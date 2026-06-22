@@ -1,3 +1,4 @@
+import type { CSSProperties } from "react";
 import type { Event } from "../data/events";
 import {
   formatCalendarMonth,
@@ -17,6 +18,15 @@ type EventCalendarProps = {
 };
 
 const weekDays = ["日", "月", "火", "水", "木", "金", "土"];
+const genreColorRules = [
+  { keywords: ["Black", "Death", "Doom", "Grind", "Extreme"], color: "#c84bff" },
+  { keywords: ["Core", "Hardcore", "Loud"], color: "#ff6b6b" },
+  { keywords: ["Power", "Melodic", "Symphonic"], color: "#f4b84a" },
+  { keywords: ["Hard Rock", "Heavy Rock", "Rock"], color: "#4fb3ff" },
+  { keywords: ["Punk"], color: "#67d78f" },
+  { keywords: ["Metal"], color: "#d7d7d2" },
+];
+const fallbackGenreColor = "#9a9a94";
 
 function groupEventsByDate(events: Event[]) {
   return events.reduce<Record<string, Event[]>>((groups, event) => {
@@ -37,6 +47,26 @@ function formatCalendarEventArtists(artists: Event["artists"]) {
   }
 
   return `${headliner} +${otherArtists.length}`;
+}
+
+function getGenreColor(genre: string) {
+  const matchedRule = genreColorRules.find((rule) =>
+    rule.keywords.some((keyword) =>
+      genre.toLowerCase().includes(keyword.toLowerCase()),
+    ),
+  );
+
+  return matchedRule?.color ?? fallbackGenreColor;
+}
+
+function getGenreColors(genres: Event["genres"]) {
+  return Array.from(new Set(genres.map(getGenreColor))).slice(0, 3);
+}
+
+function getCalendarEventStyle(genres: Event["genres"]) {
+  return {
+    "--genre-color": getGenreColors(genres)[0] ?? fallbackGenreColor,
+  } as CSSProperties;
 }
 
 export function EventCalendar({
@@ -93,11 +123,31 @@ export function EventCalendar({
             >
               <span className={styles.calendarDate}>{date.getDate()}</span>
               <div className={styles.calendarEvents}>
-                {dateEvents.map((event) => (
-                  <p className={styles.calendarEvent} key={event.id}>
-                    {formatCalendarEventArtists(event.artists)}
-                  </p>
-                ))}
+                {dateEvents.map((event) => {
+                  const genreColors = getGenreColors(event.genres);
+
+                  return (
+                    <p
+                      className={styles.calendarEvent}
+                      key={event.id}
+                      style={getCalendarEventStyle(event.genres)}
+                      title={`${event.artists.join(", ")} / ${event.genres.join(", ")}`}
+                    >
+                      <span>{formatCalendarEventArtists(event.artists)}</span>
+                      {genreColors.length > 1 ? (
+                        <span className={styles.genreColorDots} aria-hidden="true">
+                          {genreColors.map((color) => (
+                            <span
+                              className={styles.genreColorDot}
+                              key={color}
+                              style={{ "--genre-color": color } as CSSProperties}
+                            />
+                          ))}
+                        </span>
+                      ) : null}
+                    </p>
+                  );
+                })}
               </div>
             </button>
           );
