@@ -80,7 +80,8 @@ GitHub Actions は定期実行で調査リンクを集め、LLM で候補イベ�
 - 候補保存先: `src/data/candidate_events.ts`
 - 公開データには自動反映しない
 - 新規候補が追加されると、GitHub Actions が main にコミットする
-- Issue には `/admin/candidates` の確認依頼だけを残す
+- 新規候補が追加された回だけ、日付付きの確認 issue を作る
+- `/admin/candidates` で確認が終わったら、その issue を close する
 
 必要な環境変数:
 

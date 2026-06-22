@@ -49,42 +49,26 @@ jobs:
           git push
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
-      - name: Create or update candidate review issue
+      - name: Create candidate review issue
+        if: steps.candidate_commit.outputs.committed == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
           GH_REPO: ${{ github.repository }}
-          CANDIDATES_COMMITTED: ${{ steps.candidate_commit.outputs.committed }}
         run: |
+          today="$(TZ=Asia/Tokyo date +%Y-%m-%d)"
+
           {
             echo "# 候補イベント確認依頼"
             echo
-            if [ "$CANDIDATES_COMMITTED" = "true" ]; then
-              echo "自動収集で候補イベントを追加しました。"
-            else
-              echo "今回の自動収集では新規候補の追加はありません。"
-            fi
+            echo "自動収集で候補イベントを追加しました。"
             echo
             echo "/admin/candidates を開いて、review_needed の候補を確認してください。"
+            echo "確認が終わったら、この issue を close してください。"
             echo
             cat candidate-report.md
           } > candidate-issue.md
 
-          existing_issue="$(
-            gh issue list \
-              --repo "$GH_REPO" \
-              --state open \
-              --search "候補イベント確認 in:title" \
-              --json number \
-              --jq '.[0].number'
-          )"
-
-          if [ -n "$existing_issue" ]; then
-            gh issue comment "$existing_issue" \
-              --repo "$GH_REPO" \
-              --body-file candidate-issue.md
-          else
-            gh issue create \
-              --repo "$GH_REPO" \
-              --title "候補イベント確認" \
-              --body-file candidate-issue.md
-          fi
+          gh issue create \
+            --repo "$GH_REPO" \
+            --title "候補イベント確認 ${today}" \
+            --body-file candidate-issue.md
