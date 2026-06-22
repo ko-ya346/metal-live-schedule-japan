@@ -81,7 +81,9 @@ GitHub Actions は定期実行で調査リンクを集め、LLM で候補イベ�
 - 公開データには自動反映しない
 - 新規候補が追加されると、GitHub Actions が main にコミットする
 - 新規候補が追加された回だけ、日付付きの確認 issue を作る
-- `/admin/candidates` で確認が終わったら、その issue を close する
+- `/admin/candidates` で人間または LLM が確認し、必要な反映が終わったら、その issue を close する
+
+LLM に候補収集を依頼する場合は、未 close の候補確認 issue も確認対象に含めます。issue の候補を見て、候補データへの追加、既存データとの重複確認、対象外判断が終わったものは LLM が close して構いません。
 
 必要な環境変数:
 

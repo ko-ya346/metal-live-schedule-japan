@@ -63,7 +63,7 @@ jobs:
             echo "自動収集で候補イベントを追加しました。"
             echo
             echo "/admin/candidates を開いて、review_needed の候補を確認してください。"
-            echo "確認が終わったら、この issue を close してください。"
+            echo "人間または LLM が候補を確認し、必要な反映が終わったらこの issue を close してください。"
             echo
             cat candidate-report.md
           } > candidate-issue.md
