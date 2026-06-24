@@ -189,6 +189,72 @@ function buildKnownIdSet() {
   ]);
 }
 
+function normalizeForMatch(value) {
+  return String(value ?? "")
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[\s　"'“”‘’・･.,，.()（）\-ー]/g, "");
+}
+
+function buildKnownEvents() {
+  return [...events, ...candidateEvents].map((event) => ({
+    id: event.id,
+    date: event.date ?? null,
+    prefecture: normalizeForMatch(event.prefecture),
+    venue: normalizeForMatch(event.venue),
+    artists: event.artists.map((artist) => normalizeForMatch(artist)),
+  }));
+}
+
+function hasSharedArtist(leftArtists, rightArtists) {
+  return leftArtists.some((leftArtist) =>
+    rightArtists.some(
+      (rightArtist) =>
+        leftArtist === rightArtist ||
+        (leftArtist.length >= 4 && rightArtist.includes(leftArtist)) ||
+        (rightArtist.length >= 4 && leftArtist.includes(rightArtist)),
+    ),
+  );
+}
+
+function isSameVenue(leftVenue, rightVenue) {
+  if (!leftVenue || !rightVenue) {
+    return false;
+  }
+
+  return (
+    leftVenue === rightVenue ||
+    (leftVenue.length >= 6 && rightVenue.includes(leftVenue)) ||
+    (rightVenue.length >= 6 && leftVenue.includes(rightVenue))
+  );
+}
+
+function isKnownEvent(candidate, knownEvents) {
+  if (!candidate.date) {
+    return false;
+  }
+
+  const candidateArtists = candidate.artists.map((artist) => normalizeForMatch(artist));
+  const candidatePrefecture = normalizeForMatch(candidate.prefecture);
+  const candidateVenue = normalizeForMatch(candidate.venue);
+
+  return knownEvents.some((knownEvent) => {
+    if (knownEvent.date !== candidate.date) {
+      return false;
+    }
+
+    if (!hasSharedArtist(candidateArtists, knownEvent.artists)) {
+      return false;
+    }
+
+    if (isSameVenue(candidateVenue, knownEvent.venue)) {
+      return true;
+    }
+
+    return Boolean(candidatePrefecture && candidatePrefecture === knownEvent.prefecture);
+  });
+}
+
 function getKnownSummary() {
   const published = events.slice(-80).map((event) =>
     [
@@ -337,7 +403,7 @@ function toNullableString(value) {
   return text.length > 0 ? text : null;
 }
 
-function normalizeCandidate(candidate, knownIds) {
+function normalizeCandidate(candidate, knownIds, knownEvents) {
   const artists = Array.isArray(candidate.artists)
     ? candidate.artists.map((artist) => String(artist).trim()).filter(Boolean)
     : [];
@@ -369,7 +435,7 @@ function normalizeCandidate(candidate, knownIds) {
     return null;
   }
 
-  return {
+  const normalizedCandidate = {
     id,
     artists,
     tourName: toNullableString(candidate.tourName),
@@ -409,6 +475,12 @@ function normalizeCandidate(candidate, knownIds) {
     collectedAt: today,
     reviewedAt: null,
   };
+
+  if (isKnownEvent(normalizedCandidate, knownEvents)) {
+    return null;
+  }
+
+  return normalizedCandidate;
 }
 
 async function callOpenAI(prompt) {
@@ -592,9 +664,10 @@ async function main() {
   const rawCandidates = Array.isArray(parsed.candidates) ? parsed.candidates : [];
   const candidates = [];
   let skipped = parsed.skippedReason ? 1 : 0;
+  const knownEvents = buildKnownEvents();
 
   for (const rawCandidate of rawCandidates) {
-    const candidate = normalizeCandidate(rawCandidate, knownIds);
+    const candidate = normalizeCandidate(rawCandidate, knownIds, knownEvents);
 
     if (!candidate) {
       skipped += 1;
@@ -602,6 +675,13 @@ async function main() {
     }
 
     knownIds.add(candidate.id);
+    knownEvents.push({
+      id: candidate.id,
+      date: candidate.date,
+      prefecture: normalizeForMatch(candidate.prefecture),
+      venue: normalizeForMatch(candidate.venue),
+      artists: candidate.artists.map((artist) => normalizeForMatch(artist)),
+    });
     candidates.push(candidate);
   }
 
