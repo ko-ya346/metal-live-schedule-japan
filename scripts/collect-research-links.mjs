@@ -15,8 +15,18 @@ const sources = [
     maxLinks: 6,
   },
   {
+    name: "Creativeman artists",
+    url: "https://www.creativeman.co.jp/artist/",
+    maxLinks: 8,
+  },
+  {
     name: "UDO",
     url: "https://www.udo.jp/concert",
+    maxLinks: 5,
+  },
+  {
+    name: "H.I.P.",
+    url: "https://www.hipjpn.co.jp/",
     maxLinks: 5,
   },
   {
@@ -33,6 +43,16 @@ const sources = [
     name: "eplus metal / hardcore",
     url: "https://eplus.jp/sf/live/metal-core",
     maxLinks: 8,
+  },
+  {
+    name: "eplus metal / hardcore page 2",
+    url: "https://eplus.jp/sf/live/metal-core/p2",
+    maxLinks: 8,
+  },
+  {
+    name: "amass live news",
+    url: "https://amass.jp/",
+    maxLinks: 6,
   },
   {
     name: "Club Citta",
@@ -90,6 +110,16 @@ const includeKeywords = [
   "SiM",
   "UADA",
   "FRONTLINE FESTIVAL",
+  "MAYHEM",
+  "EVANESCENCE",
+  "ELVENKING",
+  "MORBIDFEST",
+  "Black Sun Rising",
+  "I Am Morbid",
+  "Terrorizer",
+  "Pagan Metal",
+  "PUNK LIVES",
+  "HYENA",
 ];
 
 const excludePatterns = [
@@ -107,7 +137,28 @@ const excludePatterns = [
   /\/faq/i,
   /\/company/i,
   /\/access/i,
+  /\/login/i,
+  /\/mypage/i,
+  /\/register/i,
+  /\/search/i,
+  /\/sf\/word\//i,
+  /\/newrelease/i,
+  /\/tag\//i,
+  /\/category\//i,
+  /hb\.afl\.rakuten\.co\.jp/i,
+  /backnumber/i,
   /^会員メニュー$/,
+  /^メタル･ハードコアのワード一覧$/,
+  /^ジャンルで探す$/,
+  /^次へ$/,
+  /^前へ$/,
+  /^コンテンツへスキップ$/,
+  /^New Release$/i,
+  /^100%Metal - metal100\.com$/i,
+  /^Top$/i,
+  /^Tour Date$/i,
+  /^WOM$/i,
+  /^About$/i,
   /^[0-9]+$/,
 ];
 
@@ -171,7 +222,7 @@ function getMatchedKeywords(title, url) {
 
 function isExcluded(title, url) {
   const value = `${title} ${url}`;
-  return excludePatterns.some((pattern) => pattern.test(value));
+  return excludePatterns.some((pattern) => pattern.test(title) || pattern.test(value));
 }
 
 function getKnownUrls() {
