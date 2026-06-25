@@ -95,6 +95,7 @@ When collecting candidate events, regularly check these preferred artists becaus
 - SEX MACHINEGUNS
 - 人間椅子
 - アイリフドーパ
+- FASTKILL
 
 Also collect reliable candidate events for visiting international metal, heavy rock, loud rock, metalcore, hardcore, and related heavy music artists. Do not limit collection to the preferred artist list.
 

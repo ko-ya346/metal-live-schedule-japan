@@ -93,6 +93,7 @@ const includeKeywords = [
   "SEX MACHINEGUNS",
   "人間椅子",
   "アイリフドーパ",
+  "FASTKILL",
   "LOUDNESS",
   "NEMOPHILA",
   "LOVEBITES",
