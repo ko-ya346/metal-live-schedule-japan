@@ -132,6 +132,7 @@ function formatCandidateObject(candidate) {
     "prefecture",
     "venue",
     "genres",
+    "isInternational",
     "ticketUrl",
     "officialUrl",
     "sourceUrl",
@@ -446,6 +447,7 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
       Array.isArray(candidate.genres) && candidate.genres.length > 0
         ? candidate.genres.map((genre) => String(genre).trim()).filter(Boolean)
         : ["Heavy Metal"],
+    isInternational: candidate.isInternational === true,
     ticketUrl: candidate.ticketUrl ? normalizeUrl(String(candidate.ticketUrl)) : null,
     officialUrl: candidate.officialUrl
       ? normalizeUrl(String(candidate.officialUrl))
@@ -551,6 +553,7 @@ function buildPrompt(summaries, knownSummary) {
     "- If the page is mainly blues, jazz, funk, psychedelic, pop, idol, or non-heavy rock, exclude it unless the page clearly has a metal/heavy co-performing artist.",
     "- When unsure whether the artist belongs to the project's scope, prefer excluding it over adding noisy candidates.",
     "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible.",
+    "- Set isInternational to true when the main purpose is a visiting international artist's Japan show. Domestic-only events should be false.",
     "- If date, prefecture, or venue is missing but the announcement is important, keep the missing field null and explain it in reviewNotes.",
     "- Keep reviewNotes in Japanese and include why a human should review it.",
     "",
@@ -565,6 +568,7 @@ function buildPrompt(summaries, knownSummary) {
       "prefecture": "東京都 or null",
       "venue": "venue name or null",
       "genres": ["Heavy Metal"],
+      "isInternational": true,
       "ticketUrl": null,
       "officialUrl": null,
       "sourceUrl": "https://...",

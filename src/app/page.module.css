@@ -744,6 +744,19 @@
   resize: vertical;
 }
 
+.adminEditGrid .adminCheckboxField {
+  align-items: center;
+  display: flex;
+  gap: 8px;
+  min-height: 40px;
+}
+
+.adminEditGrid .adminCheckboxField input {
+  flex: 0 0 auto;
+  min-height: auto;
+  width: auto;
+}
+
 .adminEditGrid label:first-child,
 .adminEditGrid label:nth-child(6),
 .adminEditGrid label:last-child {

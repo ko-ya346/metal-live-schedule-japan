@@ -238,6 +238,19 @@ export function EventsReview({ events }: EventsReviewProps) {
                   }
                 />
               </label>
+              <label className={styles.adminCheckboxField}>
+                <input
+                  checked={event.isInternational}
+                  type="checkbox"
+                  onChange={(changeEvent) =>
+                    updateEvent(event.id, {
+                      ...event,
+                      isInternational: changeEvent.target.checked,
+                    })
+                  }
+                />
+                来日公演
+              </label>
               <label>
                 チケットURL
                 <input

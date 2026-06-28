@@ -54,6 +54,10 @@ for (const event of events) {
     errors.push(`events:${event.id}: invalid status "${event.status}"`);
   }
 
+  if (typeof event.isInternational !== "boolean") {
+    errors.push(`events:${event.id}: isInternational must be boolean`);
+  }
+
   for (const field of ["ticketUrl", "officialUrl"]) {
     if (!isValidUrl(event[field])) {
       errors.push(`events:${event.id}: invalid ${field}`);
@@ -86,6 +90,10 @@ for (const candidate of candidateEvents) {
 
   if (!confidences.has(candidate.confidence)) {
     errors.push(`candidateEvents:${candidate.id}: invalid confidence`);
+  }
+
+  if (typeof candidate.isInternational !== "boolean") {
+    errors.push(`candidateEvents:${candidate.id}: isInternational must be boolean`);
   }
 
   if (!sourceTypes.has(candidate.sourceType)) {

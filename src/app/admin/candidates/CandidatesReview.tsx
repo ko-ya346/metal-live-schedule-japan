@@ -179,6 +179,14 @@ export function CandidatesReview({
                     ジャンル
                     <textarea defaultValue={listToText(candidate.genres)} name="genres" />
                   </label>
+                  <label className={styles.adminCheckboxField}>
+                    <input
+                      defaultChecked={candidate.isInternational}
+                      name="isInternational"
+                      type="checkbox"
+                    />
+                    来日公演
+                  </label>
                   <label>
                     チケットURL
                     <input
