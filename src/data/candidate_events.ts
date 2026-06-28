@@ -3864,9 +3864,9 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "SHINJUKU ANTIKNOCK",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "公式ライブハウス発表。出演バンドはメタル・ハードコア系で対象ジャンルに合致。",
         collectedAt: "2026-06-27",
-        reviewedAt: null,
+        reviewedAt: "2026-06-29",
     },
 ];

@@ -2922,6 +2922,30 @@ const realEvents: Event[] = [
         candidateCreatedAt: "2026-06-25",
         publishedAt: "2026-06-26",
     },
+    {
+        id: "covenant-release-event-2026-07-19-shinjuku-antiknock",
+        artists: [
+            "GUNGIRE",
+            "EACH OF THE DAYS",
+            "BRIDEAR",
+            "Haze of the Bullet",
+            "Blossom",
+        ],
+        tourName: "COVENANT RELEASE EVENT",
+        date: "2026-07-19",
+        prefecture: "東京都",
+        venue: "新宿ANTIKNOCK",
+        genres: [
+            "Metalcore",
+            "Hardcore",
+            "Heavy Metal",
+        ],
+        ticketUrl: "https://www.livepocket.jp/e/covenant_release_event",
+        officialUrl: "https://www.antiknock.net/schedule/20260719/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-06-27",
+        publishedAt: "2026-06-29",
+    },
 ];
 
 export const publishedEvents = realEvents;
