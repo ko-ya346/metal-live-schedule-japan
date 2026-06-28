@@ -1,4 +1,5 @@
 "use client";
+import Link from "next/link";
 import { useState } from "react";
 import type { EventDate } from "../data/events";
 import { events } from "../data/events";
@@ -103,14 +104,19 @@ export default function Page() {
             載っていないライブや変更情報があれば、公式URLつきで教えてください。
           </p>
         </div>
-        <a
-          className={styles.primaryLink}
-          href={xReportUrl}
-          target="_blank"
-          rel="noreferrer"
-        >
-          Xで連絡する
-        </a>
+        <div className={styles.bannerLinks}>
+          <Link className={styles.secondaryLink} href="/international">
+            来日公演を見る
+          </Link>
+          <a
+            className={styles.primaryLink}
+            href={xReportUrl}
+            target="_blank"
+            rel="noreferrer"
+          >
+            Xで連絡する
+          </a>
+        </div>
       </section>
 
       <EventFilters

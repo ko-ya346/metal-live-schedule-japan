@@ -75,6 +75,7 @@ export default function RootLayout({
         <footer className={styles.siteFooter}>
           <nav className={styles.footerNav} aria-label="フッターナビゲーション">
             <Link href="/">イベント一覧</Link>
+            <Link href="/international">来日公演</Link>
             <Link href="/about">About</Link>
             <Link href="/contact">Contact</Link>
           </nav>

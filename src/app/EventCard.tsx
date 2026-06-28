@@ -1,3 +1,5 @@
+"use client";
+
 import type { Event } from "../data/events";
 import Link from "next/link";
 import { isPastEventDate } from "../utils/date";
