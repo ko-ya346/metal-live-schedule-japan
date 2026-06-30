@@ -4019,4 +4019,31 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-06-27",
         reviewedAt: "2026-06-29",
     },
+
+    {
+        id: "heavy-metal-unza-unza-2026-08-21-matsuyama",
+        artists: [
+            "SEX MACHINEGUNS",
+            "バックドロップシンデレラ",
+        ],
+        tourName: null,
+        date: "2026-08-21",
+        prefecture: "愛媛県",
+        venue: "W studio RED",
+        genres: [
+            "Heavy Metal",
+        ],
+        isInternational: false,
+        ticketUrl: "https://eplus.jp/sf/detail/4559780001-P0030001P021001",
+        officialUrl: null,
+        sourceUrl: "https://eplus.jp/sf/detail/4559780001-P0030001P021001",
+        sourceType: "ticket",
+        sourceName: "eplus metal / hardcore page 2",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "公式チケット販売ページからの情報で、出演にSEX MACHINEGUNSが含まれているため確認推奨。",
+        collectedAt: "2026-06-30",
+        reviewedAt: null,
+    },
 ];
