@@ -8,6 +8,7 @@ console.log(`{
     prefecture: null,
     venue: null,
     genres: ["Heavy Metal"],
+    isInternational: false,
     ticketUrl: null,
     officialUrl: null,
     sourceUrl: "https://example.com/source",
