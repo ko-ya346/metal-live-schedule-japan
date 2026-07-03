@@ -6,12 +6,20 @@ import styles from "./page.module.css";
 type EventDateGroupProps = {
   date: Event["date"];
   events: Event[];
+  showEnglishDate?: boolean;
 };
 
-export function EventDateGroup({ date, events }: EventDateGroupProps) {
+export function EventDateGroup({
+  date,
+  events,
+  showEnglishDate = false,
+}: EventDateGroupProps) {
   return (
     <section className={styles.dateGroup}>
-      <h2 className={styles.dateHeading}>{formatEventDate(date)}</h2>
+      <h2 className={styles.dateHeading}>
+        {formatEventDate(date)}
+        {showEnglishDate ? ` / ${date}` : ""}
+      </h2>
 
       <div className={styles.eventList}>
         {events.map((event) => (

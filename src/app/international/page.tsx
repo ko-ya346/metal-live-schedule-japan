@@ -13,16 +13,16 @@ import { SiteAnalytics } from "../Analytics";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
-  title: "来日メタル・海外バンド公演",
+  title: "International Metal Shows in Japan / 来日メタル公演",
   description:
-    "日本で開催される来日メタル、海外ハードロック、ラウドロック、メタルコア、ハードコア系アーティストのライブ予定をまとめています。",
+    "International metal, hard rock, metalcore and hardcore concerts in Japan. 日本で開催される海外アーティストの来日公演情報を掲載しています。",
   alternates: {
     canonical: "/international",
   },
   openGraph: {
-    title: "来日メタル・海外バンド公演 | Metals Calendar",
+    title: "International Metal Shows in Japan | Metals Calendar",
     description:
-      "来日メタル、海外ハードロック、ラウドロック、メタルコア、ハードコア系アーティストの日本公演予定を探せます。",
+      "Find upcoming international metal, hard rock, metalcore and hardcore concerts in Japan.",
     url: "/international",
   },
 };
@@ -49,6 +49,10 @@ export default function InternationalPage() {
           日本で開催される海外メタル、ハードロック、ラウドロック、メタルコア、ハードコア系アーティストのライブ予定をまとめています。
           チケットや公式情報は各イベントページから確認できます。
         </p>
+        <p className={styles.lead} lang="en">
+          Find upcoming international metal, hard rock, metalcore and hardcore
+          shows across Japan. Open an event for ticket and official links.
+        </p>
       </header>
 
       <section className={styles.infoContent}>
@@ -61,7 +65,7 @@ export default function InternationalPage() {
       </section>
 
       <section className={styles.upcomingSection}>
-        <h2 className={styles.sectionTitle}>今後の来日公演</h2>
+        <h2 className={styles.sectionTitle}>今後の来日公演 / Upcoming shows</h2>
 
         {dates.length === 0 ? (
           <p className={styles.empty}>今後の来日公演はまだありません。</p>
@@ -72,6 +76,7 @@ export default function InternationalPage() {
                 date={date}
                 events={eventsByDate[date]}
                 key={date}
+                showEnglishDate
               />
             ))}
           </div>
@@ -79,7 +84,7 @@ export default function InternationalPage() {
       </section>
 
       <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
+        イベント一覧へ戻る / All events
       </Link>
 
       <SiteAnalytics />

@@ -22,6 +22,23 @@ export function EventCard({ event }: EventCardProps) {
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
   const [isYoutubeOpen, setIsYoutubeOpen] = useState(false);
   const youtubeDetailsRef = useRef<HTMLDetailsElement>(null);
+  const labels = event.isInternational
+    ? {
+        detail: "詳細 / Details",
+        ticket: "チケット / Tickets",
+        official: "公式 / Official",
+        venue: "会場 / Venue",
+        genre: "ジャンル / Genre",
+        status: "状況 / Status",
+      }
+    : {
+        detail: "詳細",
+        ticket: "チケット",
+        official: "公式",
+        venue: "会場",
+        genre: "ジャンル",
+        status: "状況",
+      };
 
   useEffect(() => {
     if (!isYoutubeOpen) {
@@ -54,24 +71,24 @@ export function EventCard({ event }: EventCardProps) {
 
       <dl className={styles.eventMeta}>
         <div>
-          <dt>会場</dt>
+          <dt>{labels.venue}</dt>
           <dd>
             {event.prefecture} / {event.venue}
           </dd>
         </div>
         <div>
-          <dt>ジャンル</dt>
+          <dt>{labels.genre}</dt>
           <dd>{event.genres.join(", ")}</dd>
         </div>
         <div>
-          <dt>状況</dt>
+          <dt>{labels.status}</dt>
           <dd>{formatEventStatus(event.status)}</dd>
         </div>
       </dl>
 
       <div className={styles.eventLinks}>
         <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
-          詳細
+          {labels.detail}
         </Link>
         {event.ticketUrl && (
           <a
@@ -80,7 +97,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            チケット
+            {labels.ticket}
           </a>
         )}
         {event.officialUrl && (
@@ -90,7 +107,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            公式
+            {labels.official}
           </a>
         )}
         {shouldShowSetlistLink && (

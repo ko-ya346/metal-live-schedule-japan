@@ -46,6 +46,18 @@ function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEve
   )}、${event.prefecture} / ${event.venue}。${ticketText}公式リンクを掲載。Japan metal concert schedule and ticket links.`;
 }
 
+function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) {
+  if (event.status === "cancelled") {
+    return "https://schema.org/EventCancelled";
+  }
+
+  if (event.status === "postponed") {
+    return "https://schema.org/EventPostponed";
+  }
+
+  return "https://schema.org/EventScheduled";
+}
+
 export function generateStaticParams() {
   return events.map((event) => ({
     id: event.id,
@@ -97,12 +109,42 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const eventUrl = `${siteUrl}/events/${event.id}`;
+  const isInternational = event.isInternational;
+  const eventStructuredData = {
+    "@context": "https://schema.org",
+    "@type": "Event",
+    name: `${formatArtists(event.artists)} - ${event.tourName}`,
+    description: formatEventPageDescription(event),
+    startDate: event.date,
+    eventStatus: getSchemaEventStatus(event),
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    url: eventUrl,
+    location: {
+      "@type": "Place",
+      name: event.venue,
+      address: {
+        "@type": "PostalAddress",
+        addressRegion: event.prefecture,
+        addressCountry: "JP",
+      },
+    },
+    performer: event.artists.map((artist) => ({
+      "@type": "PerformingGroup",
+      name: artist,
+    })),
+  };
   const shareText = `${formatArtists(event.artists)}「${event.tourName}」${formatEventDate(
     event.date,
   )} ${event.prefecture} / ${event.venue} - ${siteName}`;
 
   return (
     <main className={styles.page}>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{
+          __html: JSON.stringify(eventStructuredData).replace(/</g, "\\u003c"),
+        }}
+      />
       <header className={styles.header}>
         <p className={styles.kicker}>Event</p>
         <h1>{formatArtists(event.artists)}</h1>
@@ -112,21 +154,24 @@ export default async function EventPage({ params }: EventPageProps) {
       <article className={styles.eventDetail}>
         <dl className={styles.eventDetailMeta}>
           <div>
-            <dt>日程</dt>
-            <dd>{formatEventDate(event.date)}</dd>
+            <dt>{isInternational ? "日程 / Date" : "日程"}</dt>
+            <dd>
+              {formatEventDate(event.date)}
+              {isInternational ? ` / ${event.date}` : ""}
+            </dd>
           </div>
           <div>
-            <dt>会場</dt>
+            <dt>{isInternational ? "会場 / Venue" : "会場"}</dt>
             <dd>
               {event.prefecture} / {event.venue}
             </dd>
           </div>
           <div>
-            <dt>ジャンル</dt>
+            <dt>{isInternational ? "ジャンル / Genre" : "ジャンル"}</dt>
             <dd>{event.genres.join(", ")}</dd>
           </div>
           <div>
-            <dt>状況</dt>
+            <dt>{isInternational ? "状況 / Status" : "状況"}</dt>
             <dd>{formatEventStatus(event.status)}</dd>
           </div>
         </dl>
@@ -139,7 +184,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              チケット
+              {isInternational ? "チケット / Tickets" : "チケット"}
             </a>
           )}
           {event.officialUrl && (
@@ -149,7 +194,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              公式
+              {isInternational ? "公式 / Official" : "公式"}
             </a>
           )}
           {shouldShowSetlistLink && (
@@ -185,7 +230,7 @@ export default async function EventPage({ params }: EventPageProps) {
       </article>
 
       <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
+        {isInternational ? "イベント一覧へ戻る / All events" : "イベント一覧へ戻る"}
       </Link>
 
       <SiteAnalytics />
