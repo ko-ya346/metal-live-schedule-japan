@@ -21,6 +21,7 @@ export type Event = {
     // Operational dates. Existing older events may not have these yet.
     candidateCreatedAt?: string;
     publishedAt?: string;
+    updatedAt?: string;
 };
 
 const sampleEvents: Event[] = [

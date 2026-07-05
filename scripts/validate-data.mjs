@@ -64,7 +64,7 @@ for (const event of events) {
     }
   }
 
-  for (const field of ["candidateCreatedAt", "publishedAt"]) {
+  for (const field of ["candidateCreatedAt", "publishedAt", "updatedAt"]) {
     if (event[field] !== undefined && !datePattern.test(event[field])) {
       errors.push(`events:${event.id}: ${field} must be YYYY-MM-DD`);
     }

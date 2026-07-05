@@ -89,6 +89,7 @@ function formatEventObject(event: Event) {
     "status",
     "candidateCreatedAt",
     "publishedAt",
+    "updatedAt",
   ])},`;
 }
 
@@ -288,6 +289,7 @@ function normalizeEvent(event: Event) {
     ticketUrl: event.ticketUrl || null,
     officialUrl: event.officialUrl || null,
     status,
+    updatedAt: getTodayInJapan(),
   } satisfies Event;
 }
 

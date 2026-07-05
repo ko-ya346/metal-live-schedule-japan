@@ -1,43 +1,46 @@
 import type { MetadataRoute } from "next";
-import { events } from "../data/events";
+import { publishedEvents, type Event } from "../data/events";
 import { siteUrl } from "./site";
 
+function getEventModifiedDate(event: Event) {
+  return event.updatedAt ?? event.publishedAt;
+}
+
+function getLatestEventModifiedDate(events: Event[]) {
+  return events
+    .map(getEventModifiedDate)
+    .filter((date): date is string => Boolean(date))
+    .sort((a, b) => b.localeCompare(a))[0];
+}
+
 export default function sitemap(): MetadataRoute.Sitemap {
-  const now = new Date();
+  const latestEventModifiedDate = getLatestEventModifiedDate(publishedEvents);
 
   const staticPages: MetadataRoute.Sitemap = [
     {
       url: siteUrl,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 1,
+      lastModified: latestEventModifiedDate,
     },
     {
       url: `${siteUrl}/about`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.5,
     },
     {
       url: `${siteUrl}/international`,
-      lastModified: now,
-      changeFrequency: "daily",
-      priority: 0.8,
+      lastModified: latestEventModifiedDate,
     },
     {
       url: `${siteUrl}/contact`,
-      lastModified: now,
-      changeFrequency: "monthly",
-      priority: 0.4,
     },
   ];
 
-  const eventPages: MetadataRoute.Sitemap = events.map((event) => ({
-    url: `${siteUrl}/events/${event.id}`,
-    lastModified: now,
-    changeFrequency: "weekly",
-    priority: 0.7,
-  }));
+  const eventPages: MetadataRoute.Sitemap = publishedEvents.map((event) => {
+    const lastModified = getEventModifiedDate(event);
+
+    return {
+      url: `${siteUrl}/events/${event.id}`,
+      ...(lastModified ? { lastModified } : {}),
+    };
+  });
 
   return [...staticPages, ...eventPages];
 }

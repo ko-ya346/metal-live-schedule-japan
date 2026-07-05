@@ -35,6 +35,7 @@
 - `officialUrl`
 - `status`
 - `publishedAt`
+- `updatedAt`
 
 候補イベントは `src/data/candidate_events.ts` に置き、確認後に公開イベントへ移します。
 

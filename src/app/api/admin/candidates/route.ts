@@ -125,6 +125,8 @@ function formatCandidateObject(candidate: CandidateEvent) {
 }
 
 function formatEventObject(candidate: CandidateEvent): Event {
+  const publishedAt = getTodayInJapan();
+
   return {
     id: candidate.id,
     artists: candidate.artists,
@@ -138,7 +140,8 @@ function formatEventObject(candidate: CandidateEvent): Event {
     officialUrl: candidate.officialUrl,
     status: candidate.eventStatus,
     candidateCreatedAt: candidate.collectedAt,
-    publishedAt: getTodayInJapan(),
+    publishedAt,
+    updatedAt: publishedAt,
   };
 }
 
@@ -245,6 +248,7 @@ async function appendEventFile(candidate: CandidateEvent) {
       "status",
       "candidateCreatedAt",
       "publishedAt",
+      "updatedAt",
     ],
   )},\n${fileContent.slice(insertIndex)}`;
 
