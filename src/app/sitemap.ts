@@ -1,5 +1,9 @@
 import type { MetadataRoute } from "next";
 import { publishedEvents, type Event } from "../data/events";
+import {
+  getArtists,
+  getEventsByArtistSlug,
+} from "../utils/artists";
 import { siteUrl } from "./site";
 
 function getEventModifiedDate(event: Event) {
@@ -42,5 +46,17 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  return [...staticPages, ...eventPages];
+  const artistPages: MetadataRoute.Sitemap = getArtists(publishedEvents).map(
+    (artist) => {
+      const artistEvents = getEventsByArtistSlug(publishedEvents, artist.slug);
+      const lastModified = getLatestEventModifiedDate(artistEvents);
+
+      return {
+        url: `${siteUrl}/artists/${encodeURIComponent(artist.slug)}`,
+        ...(lastModified ? { lastModified } : {}),
+      };
+    },
+  );
+
+  return [...staticPages, ...eventPages, ...artistPages];
 }

@@ -4,7 +4,6 @@ import type { Event } from "../data/events";
 import Link from "next/link";
 import { isPastEventDate } from "../utils/date";
 import {
-  formatArtists,
   formatEventStatus,
   formatYoutubeLinkLabel,
   getSetlistSearchUrl,
@@ -12,6 +11,7 @@ import {
 } from "../utils/eventLinks";
 import styles from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
+import { ArtistLinks } from "./ArtistLinks";
 
 type EventCardProps = {
   event: Event;
@@ -62,9 +62,10 @@ export function EventCard({ event }: EventCardProps) {
     <article className={styles.eventCard}>
       <div>
         <p className={styles.artist}>
-          <Link className={styles.eventTitleLink} href={`/events/${event.id}`}>
-            {formatArtists(event.artists)}
-          </Link>
+          <ArtistLinks
+            artists={event.artists}
+            className={styles.eventTitleLink}
+          />
         </p>
         <p className={styles.tourName}>{event.tourName}</p>
       </div>

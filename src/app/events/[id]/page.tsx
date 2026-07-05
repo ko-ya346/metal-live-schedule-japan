@@ -12,6 +12,7 @@ import {
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
 import { SiteAnalytics } from "../../Analytics";
+import { ArtistLinks } from "../../ArtistLinks";
 import { siteName, siteUrl } from "../../site";
 import styles from "../../page.module.css";
 
@@ -147,7 +148,12 @@ export default async function EventPage({ params }: EventPageProps) {
       />
       <header className={styles.header}>
         <p className={styles.kicker}>Event</p>
-        <h1>{formatArtists(event.artists)}</h1>
+        <h1>
+          <ArtistLinks
+            artists={event.artists}
+            className={styles.eventTitleLink}
+          />
+        </h1>
         <p className={styles.summary}>{event.tourName}</p>
       </header>
 
