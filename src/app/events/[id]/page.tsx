@@ -11,11 +11,13 @@ import {
   getXShareUrl,
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
+import { getRelatedEventCandidates } from "../../../utils/events";
 import { SiteAnalytics } from "../../Analytics";
 import { ArtistLinks } from "../../ArtistLinks";
 import { PrefectureLink } from "../../PrefectureLink";
 import { VenueLink } from "../../VenueLink";
 import { siteName, siteUrl } from "../../site";
+import { RelatedEvents } from "./RelatedEvents";
 import styles from "../../page.module.css";
 
 type EventPageProps = {
@@ -139,6 +141,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const shareText = `${formatArtists(event.artists)}「${event.tourName}」${formatEventDate(
     event.date,
   )} ${event.prefecture} / ${event.venue} - ${siteName}`;
+  const relatedEventCandidates = getRelatedEventCandidates(event, events);
 
   return (
     <main className={styles.page}>
@@ -245,6 +248,11 @@ export default async function EventPage({ params }: EventPageProps) {
           </a>
         </div>
       </article>
+
+      <RelatedEvents
+        currentEvent={event}
+        relatedEventCandidates={relatedEventCandidates}
+      />
 
       <Link className={styles.textLink} href="/">
         {isInternational ? "イベント一覧へ戻る / All events" : "イベント一覧へ戻る"}

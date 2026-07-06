@@ -12,6 +12,12 @@ export type DateRangeFilter = "all" | "thisWeek" | "thisMonth";
 
 type EventGroupsByDate = Record<string, Event[]>;
 
+export type RelatedEvents = {
+  sameArtists: Event[];
+  sameVenue: Event[];
+  samePrefecture: Event[];
+};
+
 const PREFECTURE_ORDER = [
   "北海道",
   "宮城県",
@@ -110,4 +116,31 @@ export function getGroupedEventDates(groups: EventGroupsByDate) {
   return (Object.keys(groups) as EventDate[]).sort(
     (a, b) => getEventDateTime(a) - getEventDateTime(b),
   );
+}
+
+function hasSharedArtist(a: Event, b: Event) {
+  return a.artists.some((artist) => b.artists.includes(artist));
+}
+
+export function getRelatedEventCandidates(
+  currentEvent: Event,
+  eventList: Event[],
+): RelatedEvents {
+  const otherEvents = eventList.filter((event) => event.id !== currentEvent.id);
+
+  return {
+    sameArtists: sortEventsByDate(
+      otherEvents.filter((event) => hasSharedArtist(currentEvent, event)),
+    ),
+    sameVenue: sortEventsByDate(
+      otherEvents.filter(
+        (event) =>
+          event.prefecture === currentEvent.prefecture &&
+          event.venue === currentEvent.venue,
+      ),
+    ),
+    samePrefecture: sortEventsByDate(
+      otherEvents.filter((event) => event.prefecture === currentEvent.prefecture),
+    ),
+  };
 }
