@@ -8,6 +8,7 @@ import {
   getEventsByPrefectureSlug,
   getPrefectures,
 } from "../utils/prefectures";
+import { getEventMonths, getEventsByMonthKey } from "../utils/months";
 import { siteUrl } from "./site";
 
 function getEventModifiedDate(event: Event) {
@@ -77,5 +78,23 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
-  return [...staticPages, ...eventPages, ...artistPages, ...prefecturePages];
+  const monthPages: MetadataRoute.Sitemap = getEventMonths(publishedEvents).map(
+    (month) => {
+      const monthEvents = getEventsByMonthKey(publishedEvents, month.key);
+      const lastModified = getLatestEventModifiedDate(monthEvents);
+
+      return {
+        url: `${siteUrl}/months/${month.key}`,
+        ...(lastModified ? { lastModified } : {}),
+      };
+    },
+  );
+
+  return [
+    ...staticPages,
+    ...eventPages,
+    ...artistPages,
+    ...prefecturePages,
+    ...monthPages,
+  ];
 }
