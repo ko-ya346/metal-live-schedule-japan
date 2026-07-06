@@ -40,8 +40,8 @@ export function getXShareUrl(text: string, url: string) {
 
 export function formatYoutubeLinkLabel(artist: string, artistCount: number) {
   if (artistCount === 1) {
-    return "YouTubeで探す";
+    return "YouTubeで探す / Search YouTube";
   }
 
-  return `YouTubeで${artist}を探す`;
+  return `${artist}をYouTubeで探す / Search ${artist} on YouTube`;
 }

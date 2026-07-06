@@ -382,9 +382,9 @@
 
 .eventCard {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr) auto;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
   gap: 20px;
-  align-items: center;
+  align-items: start;
   padding: 18px;
   border: 1px solid #383838;
   border-left: 4px solid #c52727;
@@ -456,8 +456,9 @@
 .eventLinks {
   display: flex;
   flex-wrap: wrap;
+  grid-column: 1 / -1;
   gap: 8px;
-  justify-content: flex-end;
+  justify-content: flex-start;
 }
 
 .eventDetail {
@@ -919,7 +920,13 @@
   }
 
   .eventLinks {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: stretch;
+  }
+
+  .eventLinks > * {
+    min-width: 0;
   }
 
   .sectionHeader {

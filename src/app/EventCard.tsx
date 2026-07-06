@@ -25,17 +25,11 @@ export function EventCard({ event }: EventCardProps) {
   const youtubeDetailsRef = useRef<HTMLDetailsElement>(null);
   const labels = event.isInternational
     ? {
-        detail: "詳細 / Details",
-        ticket: "チケット / Tickets",
-        official: "公式 / Official",
         venue: "会場 / Venue",
         genre: "ジャンル / Genre",
         status: "状況 / Status",
       }
     : {
-        detail: "詳細",
-        ticket: "チケット",
-        official: "公式",
         venue: "会場",
         genre: "ジャンル",
         status: "状況",
@@ -94,7 +88,7 @@ export function EventCard({ event }: EventCardProps) {
 
       <div className={styles.eventLinks}>
         <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
-          {labels.detail}
+          詳細 / Details
         </Link>
         {event.ticketUrl && (
           <a
@@ -103,7 +97,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            {labels.ticket}
+            チケット / Tickets
           </a>
         )}
         {event.officialUrl && (
@@ -113,7 +107,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            {labels.official}
+            公式 / Official
           </a>
         )}
         {shouldShowSetlistLink && (
@@ -123,7 +117,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            セットリストを探す
+            セットリスト / Setlist
           </a>
         )}
         {shouldCollapseYoutubeLinks ? (
@@ -134,7 +128,7 @@ export function EventCard({ event }: EventCardProps) {
             ref={youtubeDetailsRef}
           >
             <summary className={styles.secondaryLink}>
-              YouTube
+              アーティスト別にYouTubeで探す / Search by artist
             </summary>
             <div className={styles.youtubeArtistLinks}>
               {event.artists.map((artist) => (

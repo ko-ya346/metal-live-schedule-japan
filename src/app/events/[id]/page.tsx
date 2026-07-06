@@ -195,7 +195,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              {isInternational ? "チケット / Tickets" : "チケット"}
+              チケット / Tickets
             </a>
           )}
           {event.officialUrl && (
@@ -205,7 +205,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              {isInternational ? "公式 / Official" : "公式"}
+              公式 / Official
             </a>
           )}
           {shouldShowSetlistLink && (
@@ -215,7 +215,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              セットリストを探す
+              セットリスト / Setlist
             </a>
           )}
           {event.artists.map((artist) => (
@@ -235,7 +235,7 @@ export default async function EventPage({ params }: EventPageProps) {
             target="_blank"
             rel="noreferrer"
           >
-            Xで共有
+            Xで共有 / Share
           </a>
         </div>
       </article>
