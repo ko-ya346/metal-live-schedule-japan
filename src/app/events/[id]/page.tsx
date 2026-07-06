@@ -13,6 +13,7 @@ import {
 } from "../../../utils/eventLinks";
 import { SiteAnalytics } from "../../Analytics";
 import { ArtistLinks } from "../../ArtistLinks";
+import { PrefectureLink } from "../../PrefectureLink";
 import { siteName, siteUrl } from "../../site";
 import styles from "../../page.module.css";
 
@@ -169,7 +170,11 @@ export default async function EventPage({ params }: EventPageProps) {
           <div>
             <dt>{isInternational ? "会場 / Venue" : "会場"}</dt>
             <dd>
-              {event.prefecture} / {event.venue}
+              <PrefectureLink
+                className={styles.inlineLink}
+                prefecture={event.prefecture}
+              />{" "}
+              / {event.venue}
             </dd>
           </div>
           <div>

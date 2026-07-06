@@ -412,6 +412,16 @@
   color: #ff6b6b;
 }
 
+.inlineLink {
+  color: inherit;
+  text-decoration-color: #ff6b6b;
+  text-underline-offset: 3px;
+}
+
+.inlineLink:hover {
+  color: #ff6b6b;
+}
+
 .tourName {
   margin: 6px 0 0;
   color: #b9b9b3;

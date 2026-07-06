@@ -12,6 +12,7 @@ import {
 import styles from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
 import { ArtistLinks } from "./ArtistLinks";
+import { PrefectureLink } from "./PrefectureLink";
 
 type EventCardProps = {
   event: Event;
@@ -74,7 +75,11 @@ export function EventCard({ event }: EventCardProps) {
         <div>
           <dt>{labels.venue}</dt>
           <dd>
-            {event.prefecture} / {event.venue}
+            <PrefectureLink
+              className={styles.inlineLink}
+              prefecture={event.prefecture}
+            />{" "}
+            / {event.venue}
           </dd>
         </div>
         <div>
@@ -128,7 +133,9 @@ export function EventCard({ event }: EventCardProps) {
             open={isYoutubeOpen}
             ref={youtubeDetailsRef}
           >
-            <summary className={styles.secondaryLink}>YouTube</summary>
+            <summary className={styles.secondaryLink}>
+              YouTube
+            </summary>
             <div className={styles.youtubeArtistLinks}>
               {event.artists.map((artist) => (
                 <a
