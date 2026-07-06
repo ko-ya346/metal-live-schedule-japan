@@ -9,6 +9,7 @@ import {
   getPrefectures,
 } from "../utils/prefectures";
 import { getEventMonths, getEventsByMonthKey } from "../utils/months";
+import { getEventsByVenueSlug, getVenues } from "../utils/venues";
 import { siteUrl } from "./site";
 
 function getEventModifiedDate(event: Event) {
@@ -90,11 +91,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   );
 
+  const venuePages: MetadataRoute.Sitemap = getVenues(publishedEvents).map(
+    (venue) => {
+      const venueEvents = getEventsByVenueSlug(publishedEvents, venue.slug);
+      const lastModified = getLatestEventModifiedDate(venueEvents);
+
+      return {
+        url: `${siteUrl}/venues/${encodeURIComponent(venue.slug)}`,
+        ...(lastModified ? { lastModified } : {}),
+      };
+    },
+  );
+
   return [
     ...staticPages,
     ...eventPages,
     ...artistPages,
     ...prefecturePages,
     ...monthPages,
+    ...venuePages,
   ];
 }

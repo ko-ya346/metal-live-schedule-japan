@@ -13,6 +13,7 @@ import styles from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
 import { ArtistLinks } from "./ArtistLinks";
 import { PrefectureLink } from "./PrefectureLink";
+import { VenueLink } from "./VenueLink";
 
 type EventCardProps = {
   event: Event;
@@ -73,7 +74,12 @@ export function EventCard({ event }: EventCardProps) {
               className={styles.inlineLink}
               prefecture={event.prefecture}
             />{" "}
-            / {event.venue}
+            / {" "}
+            <VenueLink
+              className={styles.inlineLink}
+              prefecture={event.prefecture}
+              venue={event.venue}
+            />
           </dd>
         </div>
         <div>

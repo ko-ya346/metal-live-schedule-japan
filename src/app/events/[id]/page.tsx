@@ -14,6 +14,7 @@ import {
 import { SiteAnalytics } from "../../Analytics";
 import { ArtistLinks } from "../../ArtistLinks";
 import { PrefectureLink } from "../../PrefectureLink";
+import { VenueLink } from "../../VenueLink";
 import { siteName, siteUrl } from "../../site";
 import styles from "../../page.module.css";
 
@@ -174,7 +175,12 @@ export default async function EventPage({ params }: EventPageProps) {
                 className={styles.inlineLink}
                 prefecture={event.prefecture}
               />{" "}
-              / {event.venue}
+              / {" "}
+              <VenueLink
+                className={styles.inlineLink}
+                prefecture={event.prefecture}
+                venue={event.venue}
+              />
             </dd>
           </div>
           <div>
