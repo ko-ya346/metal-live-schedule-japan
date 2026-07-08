@@ -1,8 +1,4 @@
-import {
-  ALL_FILTER_VALUE,
-  DATE_RANGE_ALL_VALUE,
-  type DateRangeFilter,
-} from "../utils/events";
+import { ALL_FILTER_VALUE } from "../utils/events";
 import styles from "./page.module.css";
 
 type EventFiltersProps = {
@@ -10,12 +6,10 @@ type EventFiltersProps = {
   prefectures: string[];
   selectedGenre: string;
   selectedPrefecture: string;
-  selectedDateRange: DateRangeFilter;
   searchQuery: string;
   canReset: boolean;
   onGenreChange: (genre: string) => void;
   onPrefectureChange: (prefecture: string) => void;
-  onDateRangeChange: (dateRange: DateRangeFilter) => void;
   onSearchQueryChange: (query: string) => void;
   onReset: () => void;
 };
@@ -25,15 +19,17 @@ export function EventFilters({
   prefectures,
   selectedGenre,
   selectedPrefecture,
-  selectedDateRange,
   searchQuery,
   canReset,
   onGenreChange,
   onPrefectureChange,
-  onDateRangeChange,
   onSearchQueryChange,
   onReset,
 }: EventFiltersProps) {
+  const prefectureQuery =
+    selectedPrefecture === ALL_FILTER_VALUE ? "" : selectedPrefecture;
+  const genreQuery = selectedGenre === ALL_FILTER_VALUE ? "" : selectedGenre;
+
   return (
     <section className={styles.filters} aria-label="ライブの絞り込み">
       <label className={`${styles.filterField} ${styles.searchField}`}>
@@ -48,46 +44,42 @@ export function EventFilters({
 
       <label className={styles.filterField}>
         <span>都道府県</span>
-        <select
-          value={selectedPrefecture}
-          onChange={(event) => onPrefectureChange(event.target.value)}
-        >
-          <option value={ALL_FILTER_VALUE}>すべての都道府県</option>
+        <input
+          type="search"
+          value={prefectureQuery}
+          onChange={(event) =>
+            onPrefectureChange(event.target.value || ALL_FILTER_VALUE)
+          }
+          placeholder="例: 東京、神奈川、大阪"
+          list="prefecture-filter-options"
+        />
+        <datalist id="prefecture-filter-options">
           {prefectures.map((prefecture) => (
             <option key={prefecture} value={prefecture}>
               {prefecture}
             </option>
           ))}
-        </select>
-      </label>
-
-      <label className={styles.filterField}>
-        <span>期間</span>
-        <select
-          value={selectedDateRange}
-          onChange={(event) =>
-            onDateRangeChange(event.target.value as DateRangeFilter)
-          }
-        >
-          <option value={DATE_RANGE_ALL_VALUE}>すべての期間</option>
-          <option value="thisWeek">今週</option>
-          <option value="thisMonth">今月</option>
-        </select>
+        </datalist>
       </label>
 
       <label className={styles.filterField}>
         <span>ジャンル</span>
-        <select
-          value={selectedGenre}
-          onChange={(event) => onGenreChange(event.target.value)}
-        >
-          <option value={ALL_FILTER_VALUE}>すべてのジャンル</option>
+        <input
+          type="search"
+          value={genreQuery}
+          onChange={(event) =>
+            onGenreChange(event.target.value || ALL_FILTER_VALUE)
+          }
+          placeholder="例: Metalcore、Hardcore"
+          list="genre-filter-options"
+        />
+        <datalist id="genre-filter-options">
           {genres.map((genre) => (
             <option key={genre} value={genre}>
               {genre}
             </option>
           ))}
-        </select>
+        </datalist>
       </label>
 
       <div className={styles.filterActions}>
