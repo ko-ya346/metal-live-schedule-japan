@@ -225,14 +225,11 @@
 .calendarCell {
   min-height: 104px;
   padding: 8px;
-  border: 0;
   border-right: 1px solid #303030;
   border-bottom: 1px solid #303030;
   background: #181818;
   color: inherit;
-  font: inherit;
   text-align: left;
-  cursor: pointer;
 }
 
 .calendarCell:nth-child(7n + 7) {
@@ -257,6 +254,29 @@
   font-weight: 700;
 }
 
+.calendarDateButton {
+  display: inline-flex;
+  min-height: 24px;
+  min-width: 24px;
+  align-items: center;
+  justify-content: center;
+  padding: 0;
+  margin: 0 0 6px;
+  border: 0;
+  border-radius: 4px;
+  background: transparent;
+  color: #c8c8c2;
+  font: inherit;
+  font-size: 0.82rem;
+  font-weight: 700;
+  cursor: pointer;
+}
+
+.calendarDateButton:hover {
+  background: #342020;
+  color: #ffffff;
+}
+
 .calendarEvents {
   display: grid;
   gap: 4px;
@@ -277,23 +297,16 @@
   font-size: 0.78rem;
   font-weight: 700;
   overflow-wrap: anywhere;
+  text-decoration: none;
+}
+
+.calendarEvent:hover {
+  border-color: #ff6b6b;
+  color: #ffffff;
 }
 
 .calendarEvent span:first-child {
   min-width: 0;
-}
-
-.genreColorDots {
-  display: flex;
-  flex: 0 0 auto;
-  gap: 3px;
-}
-
-.genreColorDot {
-  width: 6px;
-  height: 6px;
-  border-radius: 999px;
-  background: var(--genre-color, #9a9a94);
 }
 
 .outsideMonth {
@@ -308,7 +321,7 @@
   background: #241717;
 }
 
-.outsideMonth .calendarDate {
+.outsideMonth .calendarDateButton {
   color: #6f6f6a;
 }
 
@@ -996,10 +1009,6 @@
     gap: 3px;
     padding: 3px 4px 3px 5px;
     font-size: 0.68rem;
-  }
-
-  .genreColorDots {
-    display: none;
   }
 
   .eventLinks {
