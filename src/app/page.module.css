@@ -4,7 +4,7 @@
 }
 
 .page {
-  max-width: 960px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 48px 20px 64px;
   color: #f2f2ef;
@@ -404,8 +404,8 @@
 
 .eventCard {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1.8fr);
-  gap: 20px;
+  grid-template-columns: 1fr;
+  gap: 14px;
   align-items: start;
   padding: 18px;
   border: 1px solid #383838;
@@ -452,14 +452,14 @@
 
 .eventMeta {
   display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 10px;
   margin: 0;
 }
 
 .eventMeta div {
   display: grid;
-  grid-template-columns: 64px minmax(0, 1fr);
-  gap: 12px;
+  gap: 4px;
 }
 
 .eventMeta dt {
@@ -935,7 +935,7 @@
 }
 
 .siteFooter {
-  max-width: 960px;
+  max-width: 1180px;
   margin: 0 auto;
   padding: 0 20px 36px;
   color: #d0d0d0;
@@ -978,6 +978,15 @@
   .filters,
   .eventCard {
     grid-template-columns: 1fr;
+  }
+
+  .eventMeta {
+    grid-template-columns: 1fr;
+  }
+
+  .eventMeta div {
+    grid-template-columns: 64px minmax(0, 1fr);
+    gap: 12px;
   }
 
   .feedbackBanner {
