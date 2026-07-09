@@ -34,21 +34,24 @@ function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) 
   const artists = formatArtists(event.artists);
   const eventYear = event.date.slice(0, 4);
   const location = event.prefecture.replace(/都|府|県$/, "");
-  const eventType = event.isInternational ? "来日メタルライブ" : "メタルライブ";
 
-  return `${artists}の${eventType} ${eventYear} ${location} | チケット・会場情報`;
+  if (event.isInternational) {
+    return `${artists} 来日公演 ${eventYear} ${location} | 日程・チケット・会場`;
+  }
+
+  return `${artists}のメタルライブ ${eventYear} ${location} | 日程・チケット・会場`;
 }
 
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {
   const artists = formatArtists(event.artists);
   const ticketText = event.ticketUrl ? "チケット情報、" : "";
   const eventTypeText = event.isInternational
-    ? "日本のメタルライブ・来日公演情報。"
+    ? "日本で開催されるメタル・ハードロック系の来日公演情報。"
     : "日本のメタルライブ情報。";
 
   return `${eventTypeText}${artists}「${event.tourName}」のライブ情報。${formatEventDate(
     event.date,
-  )}、${event.prefecture} / ${event.venue}。${ticketText}公式リンクを掲載。Japan metal concert schedule and ticket links.`;
+  )}、${event.prefecture} / ${event.venue}で開催。${ticketText}公式リンク、会場情報、関連ライブを掲載。Japan tour schedule and ticket links.`;
 }
 
 function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -69,6 +72,18 @@ function formatOperationalDate(date: string | undefined) {
   }
 
   return formatEventDate(date as `${number}-${number}-${number}`);
+}
+
+function formatEventSummary(event: NonNullable<ReturnType<typeof findEvent>>) {
+  const artists = formatArtists(event.artists);
+  const eventType = event.isInternational ? "来日公演" : "ライブ";
+  const ticketText = event.ticketUrl
+    ? "チケット情報と公式情報へのリンクを掲載しています。"
+    : "公式情報へのリンクを掲載しています。";
+
+  return `${artists}の${eventType}「${event.tourName}」は、${formatEventDate(
+    event.date,
+  )}に${event.prefecture}の${event.venue}で開催予定です。${ticketText}`;
 }
 
 export function generateStaticParams() {
@@ -173,6 +188,8 @@ export default async function EventPage({ params }: EventPageProps) {
       </header>
 
       <article className={styles.eventDetail}>
+        <p className={styles.eventDetailSummary}>{formatEventSummary(event)}</p>
+
         <dl className={styles.eventDetailMeta}>
           <div>
             <dt>{isInternational ? "日程 / Date" : "日程"}</dt>
