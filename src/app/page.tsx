@@ -94,12 +94,12 @@ export default function Page() {
         <div>
           <h2>掲載漏れ・修正依頼</h2>
           <p>
-            載っていないライブや変更情報があれば、公式URLつきで教えてください。
+            来日公演や国内ライブの掲載漏れ、変更情報があれば、公式URLつきで教えてください。
           </p>
         </div>
         <div className={styles.bannerLinks}>
           <Link className={styles.secondaryLink} href="/international">
-            来日公演を見る
+            来日メタル公演を見る
           </Link>
           <a
             className={styles.primaryLink}

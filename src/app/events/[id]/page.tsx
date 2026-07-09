@@ -256,6 +256,11 @@ export default async function EventPage({ params }: EventPageProps) {
           >
             Xで共有 / Share
           </a>
+          {isInternational && (
+            <Link className={styles.secondaryLink} href="/international">
+              来日公演一覧 / Japan tours
+            </Link>
+          )}
         </div>
 
         <section className={styles.eventSourceSection}>

@@ -13,16 +13,16 @@ import { SiteAnalytics } from "../Analytics";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
-  title: "International Metal Shows in Japan / 来日メタル公演",
+  title: "メタル来日公演・海外バンドのJapan Tour情報",
   description:
-    "International metal, hard rock, metalcore and hardcore concerts in Japan. 日本で開催される海外アーティストの来日公演情報を掲載しています。",
+    "日本で開催される海外メタル、ハードロック、メタルコア、ハードコア系アーティストの来日公演・Japan Tour日程、会場、チケット情報を掲載しています。",
   alternates: {
     canonical: "/international",
   },
   openGraph: {
-    title: "International Metal Shows in Japan | Metals Calendar",
+    title: "メタル来日公演・海外バンドのJapan Tour情報 | Metals Calendar",
     description:
-      "Find upcoming international metal, hard rock, metalcore and hardcore concerts in Japan.",
+      "日本で開催される海外メタル、ハードロック、メタルコア、ハードコア系アーティストの来日公演・Japan Tour日程を探せます。",
     url: "/international",
   },
 };
@@ -46,8 +46,8 @@ export default function InternationalPage() {
           {upcomingEvents.length}件の来日・海外アーティスト公演があります
         </p>
         <p className={styles.lead}>
-          日本で開催される海外メタル、ハードロック、ラウドロック、メタルコア、ハードコア系アーティストのライブ予定をまとめています。
-          チケットや公式情報は各イベントページから確認できます。
+          日本で開催される海外メタル、ハードロック、ラウドロック、メタルコア、ハードコア系アーティストの来日公演・Japan Tour予定をまとめています。
+          公演日、会場、チケットや公式情報は各イベントページから確認できます。
         </p>
         <p className={styles.lead} lang="en">
           Find upcoming international metal, hard rock, metalcore and hardcore
