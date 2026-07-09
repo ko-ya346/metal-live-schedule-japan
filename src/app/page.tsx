@@ -123,8 +123,8 @@ export default function Page() {
         <h1>Metals Calendar</h1>
         <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
         <p className={styles.lead}>
-          日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアのライブ情報を、日付・地域・ジャンルで探せます。
-          たとえば「メタル ライブ」「来日公演」「バンド名」で探すときの入口にしています。
+          日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアの公演情報を掲載しています。
+          日付・地域・ジャンルで探しながら、日程・会場・チケット情報・公式情報を確認できます。
         </p>
       </header>
 
