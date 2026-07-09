@@ -54,7 +54,7 @@ export default function AboutPage() {
         <section className={styles.infoSection}>
           <h2>情報提供</h2>
           <p>
-            掲載漏れや修正が必要な情報を見つけた場合は、アーティスト名、公演日、会場名、確認できる公式URLを添えて X から送ってください。
+            掲載漏れや修正が必要な情報を見つけた場合は、X から連絡してください。
           </p>
           <a
             className={styles.primaryLink}
@@ -62,7 +62,7 @@ export default function AboutPage() {
             target="_blank"
             rel="noreferrer"
           >
-            掲載漏れ・修正依頼を送る
+            掲載漏れ・修正を連絡する
           </a>
         </section>
       </div>

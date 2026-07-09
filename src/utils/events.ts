@@ -64,6 +64,7 @@ export function filterEvents(
   selectedPrefecture: string,
   selectedGenre: string,
   searchQuery = "",
+  internationalOnly = false,
 ) {
   const normalizedSearchQuery = normalizeFilterText(searchQuery);
   const normalizedPrefecture = normalizeFilterText(selectedPrefecture);
@@ -91,8 +92,9 @@ export function filterEvents(
     const matchesSearch =
       normalizedSearchQuery === "" ||
       searchableText.includes(normalizedSearchQuery);
+    const matchesInternational = !internationalOnly || event.isInternational;
 
-    return matchesPrefecture && matchesGenre && matchesSearch;
+    return matchesPrefecture && matchesGenre && matchesSearch && matchesInternational;
   });
 }
 

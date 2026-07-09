@@ -43,12 +43,14 @@ function getRecentlyPublishedEvents(eventList: typeof events) {
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
+  const [internationalOnly, setInternationalOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<EventDate | null>(null);
   const [visibleMonth, setVisibleMonth] = useState(getCurrentMonthKey);
   const hasActiveFilters =
     selectedPrefecture !== ALL_FILTER_VALUE ||
     selectedGenre !== ALL_FILTER_VALUE ||
+    internationalOnly ||
     searchQuery.trim() !== "";
 
   const filterGenres = getEventGenres(events);
@@ -61,6 +63,7 @@ export default function Page() {
     selectedPrefecture,
     selectedGenre,
     searchQuery,
+    internationalOnly,
   );
   const selectedDateEvents = selectedDate
     ? filteredEvents.filter((event) => event.date === selectedDate)
@@ -75,6 +78,7 @@ export default function Page() {
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
     setSelectedGenre(ALL_FILTER_VALUE);
+    setInternationalOnly(false);
     setSearchQuery("");
   }
 
@@ -88,19 +92,19 @@ export default function Page() {
           日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアのライブ情報を、日付・地域・ジャンルで探せます。
           たとえば「メタル ライブ」「来日公演」「バンド名」で探すときの入口にしています。
         </p>
+        <nav className={styles.headerNav} aria-label="主要な一覧">
+          <Link href="/international">来日メタル公演</Link>
+        </nav>
       </header>
 
       <section className={styles.feedbackBanner}>
         <div>
-          <h2>掲載漏れ・修正依頼</h2>
+          <h2>掲載漏れ・修正の連絡</h2>
           <p>
-            来日公演や国内ライブの掲載漏れ、変更情報があれば、公式URLつきで教えてください。
+            来日公演や国内ライブの掲載漏れ、変更情報があれば連絡してください。
           </p>
         </div>
         <div className={styles.bannerLinks}>
-          <Link className={styles.secondaryLink} href="/international">
-            来日メタル公演を見る
-          </Link>
           <a
             className={styles.primaryLink}
             href={xReportUrl}
@@ -117,10 +121,12 @@ export default function Page() {
         prefectures={filterPrefectures}
         selectedGenre={selectedGenre}
         selectedPrefecture={selectedPrefecture}
+        internationalOnly={internationalOnly}
         searchQuery={searchQuery}
         canReset={hasActiveFilters}
         onGenreChange={setSelectedGenre}
         onPrefectureChange={setSelectedPrefecture}
+        onInternationalOnlyChange={setInternationalOnly}
         onSearchQueryChange={setSearchQuery}
         onReset={resetFilters}
       />

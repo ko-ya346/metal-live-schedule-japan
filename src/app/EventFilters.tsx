@@ -6,10 +6,12 @@ type EventFiltersProps = {
   prefectures: string[];
   selectedGenre: string;
   selectedPrefecture: string;
+  internationalOnly: boolean;
   searchQuery: string;
   canReset: boolean;
   onGenreChange: (genre: string) => void;
   onPrefectureChange: (prefecture: string) => void;
+  onInternationalOnlyChange: (internationalOnly: boolean) => void;
   onSearchQueryChange: (query: string) => void;
   onReset: () => void;
 };
@@ -19,10 +21,12 @@ export function EventFilters({
   prefectures,
   selectedGenre,
   selectedPrefecture,
+  internationalOnly,
   searchQuery,
   canReset,
   onGenreChange,
   onPrefectureChange,
+  onInternationalOnlyChange,
   onSearchQueryChange,
   onReset,
 }: EventFiltersProps) {
@@ -80,6 +84,17 @@ export function EventFilters({
             </option>
           ))}
         </datalist>
+      </label>
+
+      <label className={styles.filterCheckboxField}>
+        <input
+          type="checkbox"
+          checked={internationalOnly}
+          onChange={(event) =>
+            onInternationalOnlyChange(event.target.checked)
+          }
+        />
+        <span>来日公演に絞る</span>
       </label>
 
       <div className={styles.filterActions}>
