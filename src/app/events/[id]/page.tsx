@@ -63,6 +63,14 @@ function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) 
   return "https://schema.org/EventScheduled";
 }
 
+function formatOperationalDate(date: string | undefined) {
+  if (!date) {
+    return null;
+  }
+
+  return formatEventDate(date as `${number}-${number}-${number}`);
+}
+
 export function generateStaticParams() {
   return events.map((event) => ({
     id: event.id,
@@ -142,6 +150,8 @@ export default async function EventPage({ params }: EventPageProps) {
     event.date,
   )} ${event.prefecture} / ${event.venue} - ${siteName}`;
   const relatedEventCandidates = getRelatedEventCandidates(event, events);
+  const publishedDate = formatOperationalDate(event.publishedAt);
+  const updatedDate = formatOperationalDate(event.updatedAt ?? event.publishedAt);
 
   return (
     <main className={styles.page}>
@@ -247,6 +257,67 @@ export default async function EventPage({ params }: EventPageProps) {
             Xで共有 / Share
           </a>
         </div>
+
+        <section className={styles.eventSourceSection}>
+          <h2>掲載情報</h2>
+          <dl className={styles.eventSourceMeta}>
+            {publishedDate && (
+              <div>
+                <dt>掲載日</dt>
+                <dd>{publishedDate}</dd>
+              </div>
+            )}
+            {updatedDate && (
+              <div>
+                <dt>最終更新</dt>
+                <dd>{updatedDate}</dd>
+              </div>
+            )}
+            <div>
+              <dt>情報源</dt>
+              <dd>
+                {event.officialUrl ? (
+                  <a
+                    className={styles.inlineLink}
+                    href={event.officialUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    公式情報
+                  </a>
+                ) : (
+                  "公式情報未登録"
+                )}
+                {event.ticketUrl && (
+                  <>
+                    {" "}
+                    /{" "}
+                    <a
+                      className={styles.inlineLink}
+                      href={event.ticketUrl}
+                      target="_blank"
+                      rel="noreferrer"
+                    >
+                      チケット情報
+                    </a>
+                  </>
+                )}
+              </dd>
+            </div>
+          </dl>
+          <p>
+            公演内容は変更される場合があります。来場前に公式情報やチケット販売ページを確認してください。
+          </p>
+        </section>
+
+        {shouldShowSetlistLink && (
+          <section className={styles.eventArchiveNote}>
+            <h2>アーカイブ</h2>
+            <p>
+              このライブは終了済みです。過去の公演記録として掲載し、セットリスト検索への導線を残しています。
+            </p>
+          </section>
+        )}
       </article>
 
       <RelatedEvents

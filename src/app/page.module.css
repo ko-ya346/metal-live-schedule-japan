@@ -525,6 +525,52 @@
   gap: 8px;
 }
 
+.eventSourceSection,
+.eventArchiveNote {
+  display: grid;
+  gap: 10px;
+  padding-top: 16px;
+  border-top: 1px solid #303030;
+}
+
+.eventSourceSection h2,
+.eventArchiveNote h2 {
+  margin: 0;
+  color: #f2f2ef;
+  font-size: 1rem;
+}
+
+.eventSourceMeta {
+  display: grid;
+  gap: 8px;
+  margin: 0;
+}
+
+.eventSourceMeta div {
+  display: grid;
+  grid-template-columns: 96px minmax(0, 1fr);
+  gap: 14px;
+}
+
+.eventSourceMeta dt {
+  color: #ff6b6b;
+  font-size: 0.8rem;
+  font-weight: 700;
+}
+
+.eventSourceMeta dd {
+  margin: 0;
+  color: #f2f2ef;
+  overflow-wrap: anywhere;
+}
+
+.eventSourceSection p,
+.eventArchiveNote p {
+  margin: 0;
+  color: #b9b9b3;
+  line-height: 1.7;
+}
+
 .relatedEventsSection {
   display: grid;
   gap: 16px;
@@ -1044,6 +1090,10 @@
   }
 
   .eventDetailMeta div {
+    grid-template-columns: 1fr;
+  }
+
+  .eventSourceMeta div {
     grid-template-columns: 1fr;
   }
 
