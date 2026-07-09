@@ -3774,6 +3774,50 @@ const realEvents: Event[] = [
         publishedAt: "2026-07-06",
         updatedAt: "2026-07-06",
     },
+    {
+        id: "harakiri-for-the-sky-2026-osaka",
+        artists: [
+            "Harakiri For The Sky",
+            "DUIR",
+        ],
+        tourName: "Harakiri for the Sky Japan Tour 2026",
+        date: "2026-10-31",
+        prefecture: "大阪府",
+        venue: "Shinsaibashi Clapper",
+        genres: [
+            "Post-Black Metal",
+            "Folk Black Metal",
+        ],
+        isInternational: true,
+        ticketUrl: "https://evp.jp/project/ticket.php?id=233",
+        officialUrl: "https://evp.jp/project/ticket.php?id=233",
+        status: "scheduled",
+        candidateCreatedAt: "2026-07-09",
+        publishedAt: "2026-07-09",
+        updatedAt: "2026-07-09",
+    },
+    {
+        id: "harakiri-for-the-sky-2026-tokyo",
+        artists: [
+            "Harakiri For The Sky",
+            "DUIR",
+        ],
+        tourName: "Harakiri for the Sky Japan Tour 2026",
+        date: "2026-11-01",
+        prefecture: "東京都",
+        venue: "club ASIA",
+        genres: [
+            "Post-Black Metal",
+            "Folk Black Metal",
+        ],
+        isInternational: true,
+        ticketUrl: "https://evp.jp/project/ticket.php?id=234",
+        officialUrl: "https://evp.jp/project/ticket.php?id=234",
+        status: "scheduled",
+        candidateCreatedAt: "2026-07-09",
+        publishedAt: "2026-07-09",
+        updatedAt: "2026-07-09",
+    },
 ];
 
 export const publishedEvents = realEvents;
