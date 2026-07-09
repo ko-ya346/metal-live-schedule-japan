@@ -14,6 +14,8 @@ import {
 } from "../utils/events";
 import { xReportUrl } from "../utils/contact";
 import { getCurrentMonthKey, isPastEventDate } from "../utils/date";
+import { getEventMonths } from "../utils/months";
+import { getPrefectures } from "../utils/prefectures";
 import { EventCalendar } from "./EventCalendar";
 import { EventCard } from "./EventCard";
 import { EventDateGroup } from "./EventDateGroup";
@@ -40,6 +42,33 @@ function getRecentlyPublishedEvents(eventList: typeof events) {
     .slice(0, 5);
 }
 
+function getPopularPrefectureLinks(eventList: typeof events) {
+  const eventCountByPrefecture = new Map<string, number>();
+
+  eventList.forEach((event) => {
+    eventCountByPrefecture.set(
+      event.prefecture,
+      (eventCountByPrefecture.get(event.prefecture) ?? 0) + 1,
+    );
+  });
+
+  return getPrefectures(eventList)
+    .map((prefecture) => ({
+      ...prefecture,
+      count: eventCountByPrefecture.get(prefecture.name) ?? 0,
+    }))
+    .sort((a, b) => {
+      const countDiff = b.count - a.count;
+
+      if (countDiff !== 0) {
+        return countDiff;
+      }
+
+      return a.name.localeCompare(b.name, "ja");
+    })
+    .slice(0, 6);
+}
+
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
@@ -58,6 +87,11 @@ export default function Page() {
   const recentlyPublishedEvents = getRecentlyPublishedEvents(events);
 
   const sortedEvents = sortEventsByDate(events);
+  const allUpcomingEvents = sortedEvents.filter(
+    (event) => !isPastEventDate(event.date),
+  );
+  const upcomingMonthLinks = getEventMonths(allUpcomingEvents).slice(0, 4);
+  const popularPrefectureLinks = getPopularPrefectureLinks(allUpcomingEvents);
   const filteredEvents = filterEvents(
     sortedEvents,
     selectedPrefecture,
@@ -92,104 +126,151 @@ export default function Page() {
           日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアのライブ情報を、日付・地域・ジャンルで探せます。
           たとえば「メタル ライブ」「来日公演」「バンド名」で探すときの入口にしています。
         </p>
-        <nav className={styles.headerNav} aria-label="主要な一覧">
-          <Link href="/international">来日メタル公演</Link>
-        </nav>
       </header>
 
-      <section className={styles.feedbackBanner}>
-        <div>
-          <h2>掲載漏れ・修正の連絡</h2>
-          <p>
-            来日公演や国内ライブの掲載漏れ、変更情報があれば連絡してください。
-          </p>
-        </div>
-        <div className={styles.bannerLinks}>
-          <a
-            className={styles.primaryLink}
-            href={xReportUrl}
-            target="_blank"
-            rel="noreferrer"
+      <div className={styles.contentLayout}>
+        <aside className={styles.sidebar} aria-label="絞り込みと探し方">
+          <EventFilters
+            genres={filterGenres}
+            prefectures={filterPrefectures}
+            selectedGenre={selectedGenre}
+            selectedPrefecture={selectedPrefecture}
+            internationalOnly={internationalOnly}
+            searchQuery={searchQuery}
+            canReset={hasActiveFilters}
+            onGenreChange={setSelectedGenre}
+            onPrefectureChange={setSelectedPrefecture}
+            onInternationalOnlyChange={setInternationalOnly}
+            onSearchQueryChange={setSearchQuery}
+            onReset={resetFilters}
+          />
+
+          <section
+            className={styles.searchGuide}
+            aria-labelledby="search-guide-title"
           >
-            Xで連絡する
-          </a>
-        </div>
-      </section>
+            <div>
+              <p className={styles.kicker}>Search</p>
+              <h2 id="search-guide-title">目的別に探す</h2>
+            </div>
 
-      <EventFilters
-        genres={filterGenres}
-        prefectures={filterPrefectures}
-        selectedGenre={selectedGenre}
-        selectedPrefecture={selectedPrefecture}
-        internationalOnly={internationalOnly}
-        searchQuery={searchQuery}
-        canReset={hasActiveFilters}
-        onGenreChange={setSelectedGenre}
-        onPrefectureChange={setSelectedPrefecture}
-        onInternationalOnlyChange={setInternationalOnly}
-        onSearchQueryChange={setSearchQuery}
-        onReset={resetFilters}
-      />
+            <div className={styles.searchGuideGroups}>
+              <div className={styles.searchGuideGroup}>
+                <h3>来日公演</h3>
+                <Link href="/international">来日メタル公演をみる</Link>
+              </div>
 
-      <EventCalendar
-        events={filteredEvents}
-        monthKey={visibleMonth}
-        selectedDate={selectedDate}
-        onMonthChange={setVisibleMonth}
-        onDateSelect={setSelectedDate}
-      />
+              <div className={styles.searchGuideGroup}>
+                <h3>月別</h3>
+                <div className={styles.searchGuideLinks}>
+                  {upcomingMonthLinks.map((month) => (
+                    <Link href={`/months/${month.key}`} key={month.key}>
+                      {month.label}
+                    </Link>
+                  ))}
+                </div>
+              </div>
 
-      {recentlyPublishedEvents.length > 0 && (
-        <section className={styles.recentSection}>
-          <h2 className={styles.sectionTitle}>最近追加したライブ</h2>
-          <div className={styles.eventList}>
-            {recentlyPublishedEvents.map((event) => (
-              <EventCard event={event} key={event.id} />
-            ))}
-          </div>
-        </section>
-      )}
+              <div className={styles.searchGuideGroup}>
+                <h3>地域別</h3>
+                <div className={styles.searchGuideLinks}>
+                  {popularPrefectureLinks.map((prefecture) => (
+                    <Link
+                      href={`/prefectures/${prefecture.slug}`}
+                      key={prefecture.slug}
+                    >
+                      {prefecture.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+            </div>
+          </section>
 
-      {selectedDate && (
-        <section className={styles.selectedDateSection}>
-          <div className={styles.sectionHeader}>
-            <h2 className={styles.sectionTitle}>選択した日のライブ</h2>
-            <button
-              className={styles.clearDateButton}
-              type="button"
-              onClick={() => setSelectedDate(null)}
-            >
-              選択を解除
-            </button>
-          </div>
+          <section className={styles.feedbackBanner}>
+            <div>
+              <h2>掲載漏れ・修正の連絡</h2>
+              <p>
+                来日公演や国内ライブの掲載漏れ、変更情報があれば連絡してください。
+              </p>
+            </div>
+            <div className={styles.bannerLinks}>
+              <a
+                className={styles.primaryLink}
+                href={xReportUrl}
+                target="_blank"
+                rel="noreferrer"
+              >
+                Xで連絡する
+              </a>
+            </div>
+          </section>
+        </aside>
 
-          {selectedDateEvents.length > 0 ? (
-            <EventDateGroup date={selectedDate} events={selectedDateEvents} />
-          ) : (
-            <p className={styles.empty}>選択した日に一致するライブはありません。</p>
+        <div className={styles.mainColumn}>
+          <EventCalendar
+            events={filteredEvents}
+            monthKey={visibleMonth}
+            selectedDate={selectedDate}
+            onMonthChange={setVisibleMonth}
+            onDateSelect={setSelectedDate}
+          />
+
+          {recentlyPublishedEvents.length > 0 && (
+            <section className={styles.recentSection}>
+              <h2 className={styles.sectionTitle}>最近追加したライブ</h2>
+              <div className={styles.eventList}>
+                {recentlyPublishedEvents.map((event) => (
+                  <EventCard event={event} key={event.id} />
+                ))}
+              </div>
+            </section>
           )}
-        </section>
-      )}
 
-      <section className={styles.upcomingSection}>
-        <h2 className={styles.sectionTitle}>今後のライブ</h2>
+          {selectedDate && (
+            <section className={styles.selectedDateSection}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>選択した日のライブ</h2>
+                <button
+                  className={styles.clearDateButton}
+                  type="button"
+                  onClick={() => setSelectedDate(null)}
+                >
+                  選択を解除
+                </button>
+              </div>
 
-        {upcomingDates.length === 0 ? (
-          <p className={styles.empty}>
-            今後のライブはありません。絞り込み条件を変更するか、リセットしてください。
-          </p>
-        ) : (
-          <div className={styles.dateGroups}>
-            {upcomingDates.map((date) => (
-              <EventDateGroup
-                date={date}
-                events={upcomingEventsByDate[date]}
-                key={date}
-              />
-            ))}
-          </div>
-        )}
-      </section>
+              {selectedDateEvents.length > 0 ? (
+                <EventDateGroup date={selectedDate} events={selectedDateEvents} />
+              ) : (
+                <p className={styles.empty}>
+                  選択した日に一致するライブはありません。
+                </p>
+              )}
+            </section>
+          )}
+
+          <section className={styles.upcomingSection}>
+            <h2 className={styles.sectionTitle}>今後のライブ</h2>
+
+            {upcomingDates.length === 0 ? (
+              <p className={styles.empty}>
+                今後のライブはありません。絞り込み条件を変更するか、リセットしてください。
+              </p>
+            ) : (
+              <div className={styles.dateGroups}>
+                {upcomingDates.map((date) => (
+                  <EventDateGroup
+                    date={date}
+                    events={upcomingEventsByDate[date]}
+                    key={date}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
+        </div>
+      </div>
 
       <SiteAnalytics />
     </main>
