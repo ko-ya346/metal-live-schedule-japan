@@ -65,8 +65,7 @@ function getPopularPrefectureLinks(eventList: typeof events) {
       }
 
       return a.name.localeCompare(b.name, "ja");
-    })
-    .slice(0, 6);
+    });
 }
 
 export default function Page() {
@@ -90,7 +89,7 @@ export default function Page() {
   const allUpcomingEvents = sortedEvents.filter(
     (event) => !isPastEventDate(event.date),
   );
-  const upcomingMonthLinks = getEventMonths(allUpcomingEvents).slice(0, 4);
+  const upcomingMonthLinks = getEventMonths(allUpcomingEvents);
   const popularPrefectureLinks = getPopularPrefectureLinks(allUpcomingEvents);
   const filteredEvents = filterEvents(
     sortedEvents,
