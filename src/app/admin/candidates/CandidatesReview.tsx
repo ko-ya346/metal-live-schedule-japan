@@ -1,4 +1,8 @@
+"use client";
+
 import Link from "next/link";
+import type { ReactNode } from "react";
+import { useFormStatus } from "react-dom";
 import type { CandidateEvent, CandidateEventStatus } from "../../../data/candidates";
 import type { Event } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
@@ -60,6 +64,53 @@ function getMissingPublishFields(candidate: CandidateEvent) {
   }
 
   return missingFields;
+}
+
+type AdminSubmitButtonProps = {
+  children: ReactNode;
+  className: string;
+  disabled?: boolean;
+  name: string;
+  title?: string;
+  value: string;
+};
+
+function AdminSubmitButton({
+  children,
+  className,
+  disabled = false,
+  name,
+  title,
+  value,
+}: AdminSubmitButtonProps) {
+  const { pending } = useFormStatus();
+
+  return (
+    <button
+      className={className}
+      disabled={disabled || pending}
+      name={name}
+      type="submit"
+      value={value}
+      title={title}
+    >
+      {children}
+    </button>
+  );
+}
+
+function FormPendingStatus() {
+  const { pending } = useFormStatus();
+
+  if (!pending) {
+    return null;
+  }
+
+  return (
+    <p className={styles.adminMutedText} role="status">
+      処理中です。完了するまでそのままお待ちください。
+    </p>
+  );
 }
 
 export function CandidatesReview({
@@ -222,28 +273,25 @@ export function CandidatesReview({
                 </dl>
 
                 <div className={styles.adminLinkRow}>
-                  <button
+                  <AdminSubmitButton
                     className={styles.secondaryLink}
                     name="action"
-                    type="submit"
                     value="save"
                   >
                     保存
-                  </button>
-                  <button
+                  </AdminSubmitButton>
+                  <AdminSubmitButton
                     className={styles.secondaryLink}
                     disabled={isIgnored}
                     name="action"
-                    type="submit"
                     value="ignore"
                   >
                     ignore
-                  </button>
-                  <button
+                  </AdminSubmitButton>
+                  <AdminSubmitButton
                     className={styles.primaryLink}
                     disabled={!canPublish}
                     name="action"
-                    type="submit"
                     value="publish"
                     title={
                       missingPublishFields.length > 0
@@ -252,7 +300,7 @@ export function CandidatesReview({
                     }
                   >
                     {publishButtonLabel}
-                  </button>
+                  </AdminSubmitButton>
                   <a
                     className={styles.secondaryLink}
                     href={candidate.sourceUrl}
@@ -282,6 +330,7 @@ export function CandidatesReview({
                     </a>
                   )}
                 </div>
+                <FormPendingStatus />
                 {missingPublishFields.length > 0 && (
                   <p className={styles.adminFieldWarning} role="status">
                     公開には {missingPublishFields.join(" / ")} が必要です。先に保存して埋めてください。
