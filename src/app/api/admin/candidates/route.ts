@@ -130,7 +130,7 @@ function formatEventObject(candidate: CandidateEvent): Event {
   return {
     id: candidate.id,
     artists: candidate.artists,
-    tourName: candidate.tourName ?? "TOUR NAME",
+    tourName: candidate.tourName ?? candidate.artists.join(" / "),
     date: candidate.date as Event["date"],
     prefecture: candidate.prefecture ?? "都道府県",
     venue: candidate.venue ?? "会場名",
