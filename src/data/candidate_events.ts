@@ -5785,4 +5785,31 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-07-16",
         reviewedAt: "2026-07-16",
     },
+
+    {
+        id: "turnstile-japan-tour-2026",
+        artists: [
+            "TURNSTILE",
+        ],
+        tourName: null,
+        date: null,
+        prefecture: null,
+        venue: null,
+        genres: [
+            "Hardcore",
+            "Punk",
+        ],
+        isInternational: true,
+        ticketUrl: null,
+        officialUrl: "https://smash-jpn.com/new/detail/?id=6988&status=0",
+        sourceUrl: "https://smash-jpn.com/new/detail/?id=6988&status=0",
+        sourceType: "promoter",
+        sourceName: "SMASH",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "TURNSTILEの来日公演が公式に発表されているが、日程・会場情報が記載されていないため詳細確認が必要。",
+        collectedAt: "2026-07-18",
+        reviewedAt: null,
+    },
 ];
