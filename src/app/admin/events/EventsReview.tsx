@@ -1,5 +1,6 @@
 "use client";
 
+import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
 import type { Event, EventStatus } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
@@ -32,6 +33,34 @@ function textToList(value: string) {
     .filter(Boolean);
 }
 
+function formValueToString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
+
+function formValueToList(formData: FormData, key: string) {
+  return formValueToString(formData, key)
+    .split(/\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function formDataToEvent(event: Event, formData: FormData): Event {
+  return {
+    ...event,
+    artists: formValueToList(formData, "artists"),
+    tourName: formValueToString(formData, "tourName"),
+    date: formValueToString(formData, "date") as Event["date"],
+    prefecture: formValueToString(formData, "prefecture"),
+    venue: formValueToString(formData, "venue"),
+    genres: formValueToList(formData, "genres"),
+    isInternational: formData.get("isInternational") === "on",
+    ticketUrl: formValueToString(formData, "ticketUrl") || null,
+    officialUrl: formValueToString(formData, "officialUrl") || null,
+    status: formValueToString(formData, "status") as EventStatus,
+  };
+}
+
 async function postEventAction(action: "save" | "unpublish", event: Event) {
   const response = await fetch("/api/admin/events", {
     method: "POST",
@@ -59,6 +88,7 @@ export function EventsReview({ events }: EventsReviewProps) {
   );
   const [searchQuery, setSearchQuery] = useState("");
   const [statusMessage, setStatusMessage] = useState<string | null>(null);
+  const [pendingEventId, setPendingEventId] = useState<string | null>(null);
   const eventList = useMemo(() => Object.values(editableEvents), [editableEvents]);
   const filteredEvents = useMemo(() => {
     const normalizedQuery = searchQuery.trim().toLocaleLowerCase();
@@ -102,6 +132,7 @@ export function EventsReview({ events }: EventsReviewProps) {
     }
 
     setStatusMessage(null);
+    setPendingEventId(event.id);
 
     try {
       const nextEvent = await postEventAction(action, event);
@@ -120,7 +151,25 @@ export function EventsReview({ events }: EventsReviewProps) {
       setStatusMessage(`${event.id} を保存しました`);
     } catch (error) {
       setStatusMessage(error instanceof Error ? error.message : "更新に失敗しました");
+    } finally {
+      setPendingEventId(null);
     }
+  }
+
+  function handleEventSubmit(submitEvent: FormEvent<HTMLFormElement>, event: Event) {
+    submitEvent.preventDefault();
+
+    const submitter = (submitEvent.nativeEvent as SubmitEvent).submitter;
+    const action =
+      submitter instanceof HTMLButtonElement ? submitter.value : "save";
+
+    if (action !== "save" && action !== "unpublish") {
+      setStatusMessage("不明な操作です");
+      return;
+    }
+
+    const formData = new FormData(submitEvent.currentTarget);
+    runEventAction(action, formDataToEvent(event, formData));
   }
 
   return (
@@ -149,8 +198,12 @@ export function EventsReview({ events }: EventsReviewProps) {
       </section>
 
       <div className={styles.adminCandidateList}>
-        {filteredEvents.map((event) => (
+        {filteredEvents.map((event) => {
+          const isPending = pendingEventId === event.id;
+
+          return (
           <article className={styles.adminCandidateCard} key={event.id}>
+            <form onSubmit={(submitEvent) => handleEventSubmit(submitEvent, event)}>
             <div className={styles.adminCandidateHeader}>
               <div>
                 <p className={styles.kicker}>{eventStatusLabels[event.status]}</p>
@@ -168,6 +221,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 アーティスト
                 <textarea
+                  name="artists"
                   value={listToText(event.artists)}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -180,6 +234,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 ツアー/イベント名
                 <input
+                  name="tourName"
                   value={event.tourName}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -192,6 +247,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 日付
                 <input
+                  name="date"
                   placeholder="YYYY-MM-DD"
                   value={event.date}
                   onChange={(changeEvent) =>
@@ -205,6 +261,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 都道府県
                 <input
+                  name="prefecture"
                   value={event.prefecture}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -217,6 +274,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 会場
                 <input
+                  name="venue"
                   value={event.venue}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -229,6 +287,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 ジャンル
                 <textarea
+                  name="genres"
                   value={listToText(event.genres)}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -241,6 +300,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label className={styles.adminCheckboxField}>
                 <input
                   checked={event.isInternational}
+                  name="isInternational"
                   type="checkbox"
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -254,6 +314,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 チケットURL
                 <input
+                  name="ticketUrl"
                   value={event.ticketUrl ?? ""}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -266,6 +327,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 公式URL
                 <input
+                  name="officialUrl"
                   value={event.officialUrl ?? ""}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -278,6 +340,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               <label>
                 ステータス
                 <select
+                  name="status"
                   value={event.status}
                   onChange={(changeEvent) =>
                     updateEvent(event.id, {
@@ -298,15 +361,19 @@ export function EventsReview({ events }: EventsReviewProps) {
             <div className={styles.adminLinkRow}>
               <button
                 className={styles.secondaryLink}
-                type="button"
-                onClick={() => runEventAction("save", event)}
+                disabled={isPending}
+                name="action"
+                type="submit"
+                value="save"
               >
                 保存
               </button>
               <button
                 className={styles.secondaryLink}
-                type="button"
-                onClick={() => runEventAction("unpublish", event)}
+                disabled={isPending}
+                name="action"
+                type="submit"
+                value="unpublish"
               >
                 公開取り消し
               </button>
@@ -331,8 +398,15 @@ export function EventsReview({ events }: EventsReviewProps) {
                 </a>
               )}
             </div>
+            {isPending && (
+              <p className={styles.adminMutedText} role="status">
+                処理中です。完了するまでそのままお待ちください。
+              </p>
+            )}
+            </form>
           </article>
-        ))}
+          );
+        })}
       </div>
     </>
   );

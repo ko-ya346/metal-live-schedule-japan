@@ -1,8 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import type { ReactNode } from "react";
-import { useFormStatus } from "react-dom";
+import type { FormEvent, ReactNode } from "react";
+import { useMemo, useState } from "react";
 import type { CandidateEvent, CandidateEventStatus } from "../../../data/candidates";
 import type { Event } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
@@ -70,6 +70,7 @@ type AdminSubmitButtonProps = {
   children: ReactNode;
   className: string;
   disabled?: boolean;
+  isPending?: boolean;
   name: string;
   title?: string;
   value: string;
@@ -79,16 +80,15 @@ function AdminSubmitButton({
   children,
   className,
   disabled = false,
+  isPending = false,
   name,
   title,
   value,
 }: AdminSubmitButtonProps) {
-  const { pending } = useFormStatus();
-
   return (
     <button
       className={className}
-      disabled={disabled || pending}
+      disabled={disabled || isPending}
       name={name}
       type="submit"
       value={value}
@@ -99,18 +99,59 @@ function AdminSubmitButton({
   );
 }
 
-function FormPendingStatus() {
-  const { pending } = useFormStatus();
+function formValueToString(formData: FormData, key: string) {
+  const value = formData.get(key);
+  return typeof value === "string" ? value.trim() : "";
+}
 
-  if (!pending) {
-    return null;
+function formValueToList(formData: FormData, key: string) {
+  return formValueToString(formData, key)
+    .split(/\n|,/)
+    .map((item) => item.trim())
+    .filter(Boolean);
+}
+
+function formDataToCandidate(
+  candidate: CandidateEvent,
+  formData: FormData,
+): CandidateEvent {
+  return {
+    ...candidate,
+    artists: formValueToList(formData, "artists"),
+    tourName: formValueToString(formData, "tourName") || null,
+    date: formValueToString(formData, "date") || null,
+    prefecture: formValueToString(formData, "prefecture") || null,
+    venue: formValueToString(formData, "venue") || null,
+    genres: formValueToList(formData, "genres"),
+    isInternational: formData.get("isInternational") === "on",
+    ticketUrl: formValueToString(formData, "ticketUrl") || null,
+    officialUrl: formValueToString(formData, "officialUrl") || null,
+    reviewNotes: formValueToString(formData, "reviewNotes"),
+  };
+}
+
+async function postCandidateAction(
+  action: "save" | "ignore" | "publish",
+  candidate: CandidateEvent,
+) {
+  const response = await fetch("/api/admin/candidates", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+    },
+    body: JSON.stringify({ action, candidate }),
+  });
+
+  const body = (await response.json()) as {
+    candidate?: CandidateEvent;
+    error?: string;
+  };
+
+  if (!response.ok || !body.candidate) {
+    throw new Error(body.error ?? "候補イベントの更新に失敗しました");
   }
 
-  return (
-    <p className={styles.adminMutedText} role="status">
-      処理中です。完了するまでそのままお待ちください。
-    </p>
-  );
+  return body.candidate;
 }
 
 export function CandidatesReview({
@@ -119,9 +160,63 @@ export function CandidatesReview({
   selectedStatus,
   initialStatusMessage = null,
 }: CandidatesReviewProps) {
-  const filteredCandidates = candidates.filter(
+  const [editableCandidates, setEditableCandidates] = useState<
+    Record<string, CandidateEvent>
+  >(() => Object.fromEntries(candidates.map((candidate) => [candidate.id, candidate])));
+  const [statusMessage, setStatusMessage] = useState<string | null>(
+    initialStatusMessage,
+  );
+  const [pendingCandidateId, setPendingCandidateId] = useState<string | null>(null);
+  const candidateList = useMemo(
+    () => Object.values(editableCandidates),
+    [editableCandidates],
+  );
+  const filteredCandidates = candidateList.filter(
     (candidate) => candidate.reviewStatus === selectedStatus,
   );
+
+  async function handleCandidateSubmit(
+    event: FormEvent<HTMLFormElement>,
+    candidate: CandidateEvent,
+  ) {
+    event.preventDefault();
+
+    const submitter = (event.nativeEvent as SubmitEvent).submitter;
+    const action =
+      submitter instanceof HTMLButtonElement ? submitter.value : "save";
+
+    if (action !== "save" && action !== "ignore" && action !== "publish") {
+      setStatusMessage("不明な操作です");
+      return;
+    }
+
+    const formData = new FormData(event.currentTarget);
+    const nextCandidate = formDataToCandidate(candidate, formData);
+
+    setStatusMessage(null);
+    setPendingCandidateId(candidate.id);
+
+    try {
+      const savedCandidate = await postCandidateAction(action, nextCandidate);
+      setEditableCandidates((currentCandidates) => ({
+        ...currentCandidates,
+        [savedCandidate.id]: savedCandidate,
+      }));
+      setStatusMessage(
+        action === "publish"
+          ? `${savedCandidate.id} を公開しました`
+          : action === "ignore"
+            ? `${savedCandidate.id} を対象外にしました`
+            : `${savedCandidate.id} を保存しました`,
+      );
+    } catch (error) {
+      setStatusMessage(
+        error instanceof Error ? error.message : "候補イベントの更新に失敗しました",
+      );
+    } finally {
+      setPendingCandidateId(null);
+    }
+  }
 
   return (
     <>
@@ -135,7 +230,10 @@ export function CandidatesReview({
             key={status}
           >
             {statusLabels[status]} (
-            {candidates.filter((candidate) => candidate.reviewStatus === status).length}
+            {
+              candidateList.filter((candidate) => candidate.reviewStatus === status)
+                .length
+            }
             )
           </Link>
         ))}
@@ -153,9 +251,9 @@ export function CandidatesReview({
         <p className={styles.adminMutedText}>
           本番環境では書き込みを無効にしています。操作後は `npm run build` で確認してください。
         </p>
-        {initialStatusMessage && (
+        {statusMessage && (
           <p className={styles.adminInlineStatus} role="status">
-            {initialStatusMessage}
+            {statusMessage}
           </p>
         )}
       </section>
@@ -168,10 +266,15 @@ export function CandidatesReview({
           const missingPublishFields = getMissingPublishFields(candidate);
           const canPublish = !isPublished && missingPublishFields.length === 0;
           const publishButtonLabel = isIgnored ? "公開に戻す" : "公開する";
+          const isPending = pendingCandidateId === candidate.id;
 
           return (
             <article className={styles.adminCandidateCard} key={candidate.id}>
-              <form action="/api/admin/candidates" method="post">
+              <form
+                action="/api/admin/candidates"
+                method="post"
+                onSubmit={(event) => handleCandidateSubmit(event, candidate)}
+              >
                 <input name="candidateId" type="hidden" value={candidate.id} />
 
                 <div className={styles.adminCandidateHeader}>
@@ -275,6 +378,7 @@ export function CandidatesReview({
                 <div className={styles.adminLinkRow}>
                   <AdminSubmitButton
                     className={styles.secondaryLink}
+                    isPending={isPending}
                     name="action"
                     value="save"
                   >
@@ -283,6 +387,7 @@ export function CandidatesReview({
                   <AdminSubmitButton
                     className={styles.secondaryLink}
                     disabled={isIgnored}
+                    isPending={isPending}
                     name="action"
                     value="ignore"
                   >
@@ -291,6 +396,7 @@ export function CandidatesReview({
                   <AdminSubmitButton
                     className={styles.primaryLink}
                     disabled={!canPublish}
+                    isPending={isPending}
                     name="action"
                     value="publish"
                     title={
@@ -330,7 +436,11 @@ export function CandidatesReview({
                     </a>
                   )}
                 </div>
-                <FormPendingStatus />
+                {isPending && (
+                  <p className={styles.adminMutedText} role="status">
+                    処理中です。完了するまでそのままお待ちください。
+                  </p>
+                )}
                 {missingPublishFields.length > 0 && (
                   <p className={styles.adminFieldWarning} role="status">
                     公開には {missingPublishFields.join(" / ")} が必要です。先に保存して埋めてください。
