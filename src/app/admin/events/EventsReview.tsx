@@ -40,7 +40,7 @@ function formValueToString(formData: FormData, key: string) {
 
 function formValueToList(formData: FormData, key: string) {
   return formValueToString(formData, key)
-    .split(/\n|,/)
+    .split(/\n/)
     .map((item) => item.trim())
     .filter(Boolean);
 }
