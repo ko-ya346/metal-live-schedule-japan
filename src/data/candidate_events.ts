@@ -7238,4 +7238,31 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-08-06",
         reviewedAt: null,
     },
+
+    {
+        id: "anamanaguchi-tokyo-2026-10-13",
+        artists: [
+            "ANAMANAGUCHI",
+        ],
+        tourName: "ANAMANAGUCHI TOKYO 2026",
+        date: "2026-10-13",
+        prefecture: "東京都",
+        venue: "duo MUSIC EXCHANGE",
+        genres: [
+            "Chiptune",
+            "Electronic Rock",
+        ],
+        isInternational: true,
+        ticketUrl: "https://eplus.jp/anamanaguchi/",
+        officialUrl: "https://smash-jpn.com/live/?id=4751",
+        sourceUrl: "https://amass.jp/191135/",
+        sourceType: "band_official",
+        sourceName: "amass live news",
+        confidence: "medium",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "8bitチップチューンバンドAnamanaguchiの12年ぶりの来日公演。ジャンルは厳密にはメタルではないため中程度の信頼度。",
+        collectedAt: "2026-08-08",
+        reviewedAt: null,
+    },
 ];
