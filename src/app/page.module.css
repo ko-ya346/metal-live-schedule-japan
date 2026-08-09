@@ -747,20 +747,28 @@
 .eventCard {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 14px;
+  gap: 16px;
   align-items: start;
-  padding: 18px;
-  border: 1px solid #383838;
+  padding: 20px;
+  border: 1px solid #343434;
   border-left: 4px solid #c52727;
   border-radius: 6px;
-  background: #181818;
-  box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
+  background:
+    linear-gradient(135deg, rgb(255 255 255 / 0.035), transparent 44%),
+    #171717;
+  box-shadow: 0 14px 30px rgb(0 0 0 / 0.38);
+}
+
+.eventCardHeader {
+  display: grid;
+  gap: 7px;
 }
 
 .artist {
   margin: 0;
-  font-size: 1.2rem;
-  font-weight: 800;
+  font-size: 1.24rem;
+  font-weight: 900;
+  line-height: 1.35;
   color: #ffffff;
   overflow-wrap: anywhere;
 }
@@ -787,33 +795,41 @@
 }
 
 .tourName {
-  margin: 6px 0 0;
+  margin: 0;
   color: #b9b9b3;
+  line-height: 1.55;
   overflow-wrap: anywhere;
 }
 
 .eventMeta {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
   margin: 0;
 }
 
 .eventMeta div {
   display: grid;
-  gap: 4px;
+  align-content: start;
+  gap: 5px;
+  min-height: 74px;
+  padding: 10px 12px;
+  border: 1px solid #2d2d2d;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.22);
 }
 
 .eventMeta dt {
-  color: #ff6b6b;
+  color: #ff7777;
   font-size: 0.78rem;
-  font-weight: 700;
+  font-weight: 800;
   text-transform: uppercase;
 }
 
 .eventMeta dd {
   margin: 0;
   color: #f2f2ef;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
@@ -823,6 +839,7 @@
   grid-column: 1 / -1;
   gap: 8px;
   justify-content: flex-start;
+  padding-top: 2px;
 }
 
 .eventDetail {
@@ -1002,18 +1019,28 @@
   justify-content: center;
   min-height: 40px;
   padding: 0 16px;
-  border-radius: 6px;
-  font-weight: 700;
+  border-radius: 5px;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.2;
   text-decoration: none;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease,
+    transform 150ms ease;
 }
 
 .primaryLink {
+  border: 1px solid #d83a3a;
   background: #c52727;
   color: #ffffff;
 }
 
 .primaryLink:hover {
+  border-color: #f05a5a;
   background: #e33a3a;
+  transform: translateY(-1px);
 }
 
 .primaryLink:disabled,
@@ -1021,6 +1048,7 @@
 .adminStatusButton:disabled {
   opacity: 0.5;
   cursor: not-allowed;
+  transform: none;
 }
 
 .primaryLink:disabled:hover {
@@ -1028,16 +1056,20 @@
 }
 
 .secondaryLink {
-  border: 1px solid #4a4a4a;
+  border: 1px solid #454545;
   color: #f2f2ef;
-  background: transparent;
+  background: #111111;
   font: inherit;
+  font-size: 0.92rem;
+  font-weight: 800;
   cursor: pointer;
 }
 
 .secondaryLink:hover {
   border-color: #ff6b6b;
   color: #ff6b6b;
+  background: #181010;
+  transform: translateY(-1px);
 }
 
 .youtubeDetails {
@@ -1422,6 +1454,7 @@
   .eventMeta div {
     grid-template-columns: 64px minmax(0, 1fr);
     gap: 12px;
+    min-height: 0;
   }
 
   .feedbackBanner {

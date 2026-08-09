@@ -56,7 +56,7 @@ export function EventCard({ event }: EventCardProps) {
 
   return (
     <article className={styles.eventCard}>
-      <div>
+      <div className={styles.eventCardHeader}>
         <p className={styles.artist}>
           <ArtistLinks
             artists={event.artists}
@@ -92,7 +92,7 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </dl>
 
-      <div className={styles.eventLinks}>
+      <div className={styles.eventLinks} aria-label="イベントリンク">
         <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
           詳細 / Details
         </Link>
