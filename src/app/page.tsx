@@ -174,6 +174,9 @@ export default function Page() {
   const allUpcomingEvents = sortedEvents.filter(
     (event) => !isPastEventDate(event.date),
   );
+  const upcomingInternationalCount = allUpcomingEvents.filter(
+    (event) => event.isInternational,
+  ).length;
   const upcomingMonthLinks = getEventMonths(allUpcomingEvents);
   const popularPrefectureLinks = getPopularPrefectureLinks(allUpcomingEvents);
   const filteredEvents = filterEvents(
@@ -203,13 +206,39 @@ export default function Page() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
-        <p className={styles.kicker}>日本のメタルライブ・来日公演予定</p>
-        <h1>Metals Calendar</h1>
-        <p className={styles.summary}>{formatEventCount(filteredEvents.length)}</p>
-        <p className={styles.lead}>
-          日本のメタルライブ、来日公演、ラウドロック、メタルコア、ハードコアの公演情報を掲載しています。
-          日付・地域・ジャンルで探しながら、日程・会場・チケット情報・公式情報を確認できます。
-        </p>
+        <div className={styles.heroCopy}>
+          <p className={styles.kicker}>日本のメタルライブ・来日公演予定</p>
+          <h1>Metals Calendar</h1>
+          <p className={styles.summary}>
+            {formatEventCount(filteredEvents.length)}
+          </p>
+          <p className={styles.lead}>
+            来日公演から国内バンドの小規模ライブまで、日本で観られるヘヴィミュージックの予定をまとめています。
+            行ける日、行ける場所、気になるバンドから次のライブを探せます。
+          </p>
+          <div className={styles.heroActions} aria-label="主要ページ">
+            <Link className={styles.primaryLink} href={`/months/${currentMonthKey}`}>
+              今月のライブ
+            </Link>
+            <Link className={styles.secondaryLink} href="/international">
+              来日公演
+            </Link>
+          </div>
+        </div>
+        <div className={styles.heroStats} aria-label="掲載状況">
+          <div>
+            <strong>{allUpcomingEvents.length}</strong>
+            <span>今後のライブ</span>
+          </div>
+          <div>
+            <strong>{upcomingInternationalCount}</strong>
+            <span>来日公演</span>
+          </div>
+          <div>
+            <strong>{upcomingMonthLinks.length}</strong>
+            <span>掲載月</span>
+          </div>
+        </div>
       </header>
 
       <div className={styles.contentLayout}>
