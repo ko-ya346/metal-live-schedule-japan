@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import type { EventDate } from "../data/events";
+import type { Event, EventDate } from "../data/events";
 import { events } from "../data/events";
 import {
   ALL_FILTER_VALUE,
@@ -13,7 +13,13 @@ import {
   sortEventsByDate,
 } from "../utils/events";
 import { xReportUrl } from "../utils/contact";
-import { getCurrentMonthKey, isPastEventDate } from "../utils/date";
+import {
+  formatCalendarMonth,
+  formatEventDate,
+  getCurrentMonthKey,
+  getEventMonthKey,
+  isPastEventDate,
+} from "../utils/date";
 import { getEventMonths } from "../utils/months";
 import { getPrefectures } from "../utils/prefectures";
 import { EventCalendar } from "./EventCalendar";
@@ -42,6 +48,50 @@ function getRecentlyPublishedEvents(eventList: typeof events) {
     .slice(0, 5);
 }
 
+function getFeaturedEvents(eventList: typeof events, monthKey: string) {
+  const featuredGenreKeywords = [
+    "Metal",
+    "Hardcore",
+    "Loud",
+    "Punk",
+    "Rock",
+  ];
+
+  return eventList
+    .filter(
+      (event) =>
+        !isPastEventDate(event.date) && getEventMonthKey(event.date) === monthKey,
+    )
+    .map((event) => {
+      const genreScore = event.genres.some((genre) =>
+        featuredGenreKeywords.some((keyword) => genre.includes(keyword)),
+      )
+        ? 2
+        : 0;
+      const titleScore = /fest|festival|sonic|tour|来日/i.test(event.tourName)
+        ? 2
+        : 0;
+      const score =
+        (event.isInternational ? 4 : 0) +
+        genreScore +
+        titleScore +
+        Math.min(event.artists.length - 1, 3);
+
+      return { event, score };
+    })
+    .sort((a, b) => {
+      const scoreDiff = b.score - a.score;
+
+      if (scoreDiff !== 0) {
+        return scoreDiff;
+      }
+
+      return a.event.date.localeCompare(b.event.date);
+    })
+    .slice(0, 5)
+    .map((item) => item.event);
+}
+
 function getPopularPrefectureLinks(eventList: typeof events) {
   const eventCountByPrefecture = new Map<string, number>();
 
@@ -68,6 +118,39 @@ function getPopularPrefectureLinks(eventList: typeof events) {
     });
 }
 
+function formatFeaturedArtists(artists: Event["artists"]) {
+  if (artists.length <= 2) {
+    return artists.join(" / ");
+  }
+
+  return `${artists.slice(0, 2).join(" / ")} ほか${artists.length - 2}組`;
+}
+
+function FeaturedEventCard({ event }: { event: Event }) {
+  return (
+    <Link className={styles.featuredCard} href={`/events/${event.id}`}>
+      <span className={styles.featuredTopLine}>
+        <span className={styles.featuredDate}>{formatEventDate(event.date)}</span>
+        {event.isInternational && <span className={styles.featuredBadge}>来日</span>}
+      </span>
+      <span className={styles.featuredArtist}>
+        {formatFeaturedArtists(event.artists)}
+      </span>
+      <span className={styles.featuredPlace}>
+        {event.prefecture} / {event.venue}
+      </span>
+      <span className={styles.featuredTour} title={event.tourName}>
+        {event.tourName}
+      </span>
+      <span className={styles.featuredTags}>
+        {event.genres.slice(0, 1).map((genre) => (
+          <span key={genre}>{genre}</span>
+        ))}
+      </span>
+    </Link>
+  );
+}
+
 export default function Page() {
   const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
   const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
@@ -84,6 +167,8 @@ export default function Page() {
   const filterGenres = getEventGenres(events);
   const filterPrefectures = getEventPrefectures(events);
   const recentlyPublishedEvents = getRecentlyPublishedEvents(events);
+  const currentMonthKey = getCurrentMonthKey();
+  const featuredEvents = getFeaturedEvents(events, currentMonthKey);
 
   const sortedEvents = sortEventsByDate(events);
   const allUpcomingEvents = sortedEvents.filter(
@@ -214,6 +299,33 @@ export default function Page() {
             onMonthChange={setVisibleMonth}
             onDateSelect={setSelectedDate}
           />
+
+          {featuredEvents.length > 0 && (
+            <section className={styles.featuredSection}>
+              <div className={styles.sectionHeader}>
+                <div>
+                  <p className={styles.kicker}>Featured</p>
+                  <h2 className={styles.sectionTitle}>
+                    {formatCalendarMonth(currentMonthKey)}の注目ライブ
+                  </h2>
+                  <p className={styles.sectionLead}>
+                    来日公演やフェスを中心にピックアップしています。
+                  </p>
+                </div>
+                <Link
+                  className={styles.secondaryLink}
+                  href={`/months/${currentMonthKey}`}
+                >
+                  今月のライブをみる
+                </Link>
+              </div>
+              <div className={styles.featuredGrid}>
+                {featuredEvents.map((event) => (
+                  <FeaturedEventCard event={event} key={event.id} />
+                ))}
+              </div>
+            </section>
+          )}
 
           {recentlyPublishedEvents.length > 0 && (
             <section className={styles.recentSection}>
