@@ -7963,4 +7963,33 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-08-13",
         reviewedAt: null,
     },
+
+    {
+        id: "morbidfest-japan-2026-09-03-to-09-06-time-change",
+        artists: [
+            "I AM MORBID",
+            "TERRORIZER",
+            "ATER",
+        ],
+        tourName: "MORBIDFEST JAPAN 2026",
+        date: null,
+        prefecture: null,
+        venue: null,
+        genres: [
+            "Death Metal",
+            "Extreme Metal",
+        ],
+        isInternational: true,
+        ticketUrl: null,
+        officialUrl: "https://evp.jp/news/info.php?id=132",
+        sourceUrl: "https://evp.jp/news/info.php?id=132",
+        sourceType: "promoter",
+        sourceName: "Evoken / EVP",
+        confidence: "medium",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "MORBIDFEST JAPANの開催日と出演者は明記されているが、会場や都道府県の情報が欠落しているため要確認。出演予定だったチリのATERのキャンセルも記載されているが、イベント自体は継続予定。",
+        collectedAt: "2026-08-15",
+        reviewedAt: null,
+    },
 ];
