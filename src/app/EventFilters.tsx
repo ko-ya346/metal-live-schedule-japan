@@ -33,6 +33,36 @@ export function EventFilters({
   const prefectureQuery =
     selectedPrefecture === ALL_FILTER_VALUE ? "" : selectedPrefecture;
   const genreQuery = selectedGenre === ALL_FILTER_VALUE ? "" : selectedGenre;
+  const activeFilters = [
+    searchQuery.trim()
+      ? {
+          key: "search",
+          label: `キーワード: ${searchQuery.trim()}`,
+          onClear: () => onSearchQueryChange(""),
+        }
+      : null,
+    prefectureQuery
+      ? {
+          key: "prefecture",
+          label: `都道府県: ${prefectureQuery}`,
+          onClear: () => onPrefectureChange(ALL_FILTER_VALUE),
+        }
+      : null,
+    genreQuery
+      ? {
+          key: "genre",
+          label: `ジャンル: ${genreQuery}`,
+          onClear: () => onGenreChange(ALL_FILTER_VALUE),
+        }
+      : null,
+    internationalOnly
+      ? {
+          key: "international",
+          label: "来日公演",
+          onClear: () => onInternationalOnlyChange(false),
+        }
+      : null,
+  ].filter((filter): filter is NonNullable<typeof filter> => Boolean(filter));
 
   return (
     <section className={styles.filters} aria-label="ライブの絞り込み">
@@ -107,6 +137,26 @@ export function EventFilters({
           絞り込みをリセット
         </button>
       </div>
+
+      {activeFilters.length > 0 && (
+        <div className={styles.activeFilters} aria-label="適用中の絞り込み">
+          <span>適用中</span>
+          <div className={styles.activeFilterChips}>
+            {activeFilters.map((filter) => (
+              <button
+                className={styles.activeFilterChip}
+                key={filter.key}
+                type="button"
+                onClick={filter.onClear}
+                aria-label={`${filter.label}を解除`}
+              >
+                {filter.label}
+                <span aria-hidden="true">x</span>
+              </button>
+            ))}
+          </div>
+        </div>
+      )}
     </section>
   );
 }

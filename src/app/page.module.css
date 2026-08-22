@@ -437,6 +437,54 @@
   cursor: not-allowed;
 }
 
+.activeFilters {
+  display: grid;
+  grid-column: 1 / -1;
+  gap: 8px;
+  padding-top: 2px;
+}
+
+.activeFilters > span {
+  color: #b9b9b3;
+  font-size: 0.8rem;
+  font-weight: 800;
+}
+
+.activeFilterChips {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.activeFilterChip {
+  display: inline-flex;
+  align-items: center;
+  max-width: 100%;
+  gap: 8px;
+  min-height: 32px;
+  padding: 0 10px;
+  border: 1px solid #4a4a4a;
+  border-radius: 999px;
+  background: #0f0f0f;
+  color: #f2f2ef;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  overflow-wrap: anywhere;
+  cursor: pointer;
+}
+
+.activeFilterChip:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.activeFilterChip span {
+  flex: 0 0 auto;
+  color: #ff7777;
+  font-size: 0.8rem;
+}
+
 .calendar {
   display: grid;
   gap: 14px;
