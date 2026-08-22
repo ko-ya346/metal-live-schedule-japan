@@ -205,7 +205,7 @@ export default function Page() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.heroHeader}`}>
         <div className={styles.heroCopy}>
           <p className={styles.kicker}>日本のメタルライブ・来日公演予定</p>
           <h1>Metals Calendar</h1>

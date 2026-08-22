@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { events } from "../../../data/events";
+import { getArtistSlug } from "../../../utils/artists";
 import { formatEventDate, isPastEventDate } from "../../../utils/date";
 import {
   formatArtists,
@@ -12,6 +13,8 @@ import {
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
 import { getRelatedEventCandidates } from "../../../utils/events";
+import { getPrefectureSlug } from "../../../utils/prefectures";
+import { getVenueSlug } from "../../../utils/venues";
 import { SiteAnalytics } from "../../Analytics";
 import { ArtistLinks } from "../../ArtistLinks";
 import { PrefectureLink } from "../../PrefectureLink";
@@ -84,6 +87,56 @@ function formatEventSummary(event: NonNullable<ReturnType<typeof findEvent>>) {
   return `${artists}の${eventType}「${event.tourName}」は、${formatEventDate(
     event.date,
   )}に${event.prefecture}の${event.venue}で開催予定です。${ticketText}`;
+}
+
+function EventDiscoveryLinks({
+  event,
+}: {
+  event: NonNullable<ReturnType<typeof findEvent>>;
+}) {
+  const artistLinks = event.artists.slice(0, 3).map((artist) => ({
+    href: `/artists/${encodeURIComponent(getArtistSlug(artist))}`,
+    label: `${artist}のライブ`,
+  }));
+  const links = [
+    ...artistLinks,
+    {
+      href: `/venues/${encodeURIComponent(
+        getVenueSlug(event.prefecture, event.venue),
+      )}`,
+      label: `${event.venue}のライブ`,
+    },
+    {
+      href: `/prefectures/${getPrefectureSlug(event.prefecture)}`,
+      label: `${event.prefecture}のライブ`,
+    },
+  ];
+
+  if (event.isInternational) {
+    links.push({
+      href: "/international",
+      label: "来日公演をもっと見る",
+    });
+  }
+
+  return (
+    <section className={styles.discoverySection}>
+      <div>
+        <p className={styles.kicker}>Discover</p>
+        <h2>このライブから探す</h2>
+        <p>
+          気になった出演者、会場、地域から近いライブを続けて探せます。
+        </p>
+      </div>
+      <div className={styles.discoveryLinks}>
+        {links.map((link) => (
+          <Link className={styles.discoveryLink} href={link.href} key={link.href}>
+            {link.label}
+          </Link>
+        ))}
+      </div>
+    </section>
+  );
 }
 
 export function generateStaticParams() {
@@ -279,6 +332,8 @@ export default async function EventPage({ params }: EventPageProps) {
             </Link>
           )}
         </div>
+
+        <EventDiscoveryLinks event={event} />
 
         <section className={styles.eventSourceSection}>
           <h2>掲載情報</h2>
