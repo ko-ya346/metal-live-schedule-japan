@@ -2,6 +2,16 @@
 
 This is a Next.js app for a Japan heavy metal live event calendar.
 
+## LLM context policy
+
+When an agent needs project context, prefer the compact entry points first:
+- `llms.txt`
+- `docs/llm-wiki/index.md`
+- `docs/project-roadmap.md` only when product direction matters
+- `docs/event-data-workflow.md` only when candidate collection or review workflow matters
+
+Avoid rereading long docs or large data files unless the task requires them.
+
 ## Goal
 
 Build a small MVP for manually maintained live event data.

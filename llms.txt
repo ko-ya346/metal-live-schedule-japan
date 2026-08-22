@@ -1,0 +1,22 @@
+# Metals Calendar LLM Entry
+
+Metals Calendar is a Next.js app for Japanese metal/heavy music live events.
+
+Read in this order:
+
+1. `docs/llm-wiki/index.md` - compact working context for LLM agents
+2. `AGENTS.md` - full project rules and crawling policy
+3. `docs/project-roadmap.md` - product direction and next milestones
+4. `docs/event-data-workflow.md` - candidate collection/review workflow
+
+Common tasks:
+
+- UI work: inspect `src/app`, keep changes small, run `npm run build`.
+- Event data: edit `src/data/candidate_events.ts` for review candidates; do not auto-publish unless instructed.
+- Published events: edit `src/data/events.ts` only after human review or explicit instruction.
+- Copy consistency: use `eventLinkLabels` in `src/utils/eventLinks.ts`; run `npm run copy:check`.
+- Data validation: run `npm run data:validate`.
+
+Current priority:
+
+Build a useful discovery index for metal/heavy live events in Japan, not a generic news site.

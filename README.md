@@ -9,7 +9,8 @@
 - 日付、地域、ジャンルでライブ情報を探せるようにする
 - 手作業で確認しながら、公開前の候補イベントを管理しやすくする
 
-詳しい方向性は [`docs/search-index-roadmap.md`](docs/search-index-roadmap.md) にまとめています。
+詳しい方向性は [`docs/project-roadmap.md`](docs/project-roadmap.md) にまとめています。
+LLM向けの短い作業コンテキストは [`llms.txt`](llms.txt) と [`docs/llm-wiki/index.md`](docs/llm-wiki/index.md) にあります。
 
 ## 主な機能
 
