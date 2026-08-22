@@ -25,6 +25,65 @@ function isValidUrl(value) {
   }
 }
 
+function isValidDate(value) {
+  if (!datePattern.test(value)) {
+    return false;
+  }
+
+  const date = new Date(`${value}T00:00:00.000Z`);
+
+  return !Number.isNaN(date.getTime()) && date.toISOString().slice(0, 10) === value;
+}
+
+function isNonEmptyString(value) {
+  return typeof value === "string" && value.trim() !== "";
+}
+
+function checkRequiredString(item, label, field) {
+  if (!isNonEmptyString(item[field])) {
+    errors.push(`${label}:${item.id}: ${field} must not be empty`);
+  }
+}
+
+function checkOptionalDate(item, label, field, allowNull = false) {
+  const value = item[field];
+
+  if (value === undefined || (allowNull && value === null)) {
+    return;
+  }
+
+  if (!isNonEmptyString(value) || !isValidDate(value)) {
+    errors.push(`${label}:${item.id}: ${field} must be a valid YYYY-MM-DD date`);
+  }
+}
+
+function checkStringArray(item, label, field) {
+  const values = item[field];
+
+  if (!Array.isArray(values) || values.length === 0) {
+    errors.push(`${label}:${item.id}: ${field} must not be empty`);
+    return;
+  }
+
+  const seen = new Set();
+
+  for (const value of values) {
+    if (!isNonEmptyString(value)) {
+      errors.push(`${label}:${item.id}: ${field} must not contain empty values`);
+      continue;
+    }
+
+    const normalizedValue = value.trim().toLocaleLowerCase();
+
+    if (seen.has(normalizedValue)) {
+      warnings.push(`${label}:${item.id}: duplicate ${field} value "${value}"`);
+    }
+
+    seen.add(normalizedValue);
+  }
+
+}
+
 function checkUniqueIds(items, label) {
   const seen = new Set();
 
@@ -42,13 +101,14 @@ checkUniqueIds(candidateEvents, "candidateEvents");
 checkUniqueIds(crawlTargets, "crawlTargets");
 
 for (const event of events) {
-  if (!Array.isArray(event.artists) || event.artists.length === 0) {
-    errors.push(`events:${event.id}: artists must not be empty`);
-  }
+  checkRequiredString(event, "events", "id");
+  checkRequiredString(event, "events", "tourName");
+  checkRequiredString(event, "events", "prefecture");
+  checkRequiredString(event, "events", "venue");
+  checkStringArray(event, "events", "artists");
+  checkStringArray(event, "events", "genres");
 
-  if (!datePattern.test(event.date)) {
-    errors.push(`events:${event.id}: date must be YYYY-MM-DD`);
-  }
+  checkOptionalDate(event, "events", "date");
 
   if (!eventStatuses.has(event.status)) {
     errors.push(`events:${event.id}: invalid status "${event.status}"`);
@@ -65,19 +125,31 @@ for (const event of events) {
   }
 
   for (const field of ["candidateCreatedAt", "publishedAt", "updatedAt"]) {
-    if (event[field] !== undefined && !datePattern.test(event[field])) {
-      errors.push(`events:${event.id}: ${field} must be YYYY-MM-DD`);
-    }
+    checkOptionalDate(event, "events", field);
   }
 }
 
 for (const candidate of candidateEvents) {
-  if (!Array.isArray(candidate.artists) || candidate.artists.length === 0) {
-    errors.push(`candidateEvents:${candidate.id}: artists must not be empty`);
+  checkRequiredString(candidate, "candidateEvents", "id");
+  checkRequiredString(candidate, "candidateEvents", "sourceUrl");
+  checkRequiredString(candidate, "candidateEvents", "sourceName");
+  checkStringArray(candidate, "candidateEvents", "artists");
+  checkStringArray(candidate, "candidateEvents", "genres");
+
+  checkOptionalDate(candidate, "candidateEvents", "date", true);
+  checkOptionalDate(candidate, "candidateEvents", "collectedAt");
+  checkOptionalDate(candidate, "candidateEvents", "reviewedAt", true);
+
+  if (candidate.tourName !== null && !isNonEmptyString(candidate.tourName)) {
+    errors.push(`candidateEvents:${candidate.id}: tourName must be a string or null`);
   }
 
-  if (candidate.date !== null && !datePattern.test(candidate.date)) {
-    errors.push(`candidateEvents:${candidate.id}: date must be YYYY-MM-DD or null`);
+  if (candidate.prefecture !== null && !isNonEmptyString(candidate.prefecture)) {
+    errors.push(`candidateEvents:${candidate.id}: prefecture must be a string or null`);
+  }
+
+  if (candidate.venue !== null && !isNonEmptyString(candidate.venue)) {
+    errors.push(`candidateEvents:${candidate.id}: venue must be a string or null`);
   }
 
   if (!eventStatuses.has(candidate.eventStatus)) {
@@ -114,6 +186,12 @@ for (const candidate of candidateEvents) {
     );
   }
 
+  if (candidate.reviewStatus !== "review_needed" && candidate.reviewedAt === null) {
+    warnings.push(
+      `candidateEvents:${candidate.id}: reviewed candidate should have reviewedAt`,
+    );
+  }
+
   if (candidate.reviewStatus === "published" && !publishedEvent) {
     warnings.push(
       `candidateEvents:${candidate.id}: published candidate is not found in published events`,
@@ -122,6 +200,9 @@ for (const candidate of candidateEvents) {
 }
 
 for (const target of crawlTargets) {
+  checkRequiredString(target, "crawlTargets", "id");
+  checkRequiredString(target, "crawlTargets", "name");
+
   if (!targetTypes.has(target.type)) {
     errors.push(`crawlTargets:${target.id}: invalid type`);
   }
@@ -134,9 +215,7 @@ for (const target of crawlTargets) {
     errors.push(`crawlTargets:${target.id}: invalid url`);
   }
 
-  if (target.lastCheckedAt !== null && !datePattern.test(target.lastCheckedAt)) {
-    errors.push(`crawlTargets:${target.id}: lastCheckedAt must be YYYY-MM-DD or null`);
-  }
+  checkOptionalDate(target, "crawlTargets", "lastCheckedAt", true);
 }
 
 for (const warning of warnings) {

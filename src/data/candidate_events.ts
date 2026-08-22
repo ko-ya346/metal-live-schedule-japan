@@ -3547,7 +3547,6 @@ export const candidateEvents: CandidateEvent[] = [
             "Stercore",
             "HOTOKE",
             "In Denial",
-            "Paramena",
             "PARAMENA",
         ],
         tourName: "The Discovery World Tour Japan 2026",
