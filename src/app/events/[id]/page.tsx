@@ -5,6 +5,7 @@ import { events } from "../../../data/events";
 import { getArtistSlug } from "../../../utils/artists";
 import { formatEventDate, isPastEventDate } from "../../../utils/date";
 import {
+  eventLinkLabels,
   formatArtists,
   formatEventStatus,
   formatYoutubeLinkLabel,
@@ -284,7 +285,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              チケット / Tickets
+              {eventLinkLabels.ticket}
             </a>
           )}
           {event.officialUrl && (
@@ -294,7 +295,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              公式 / Official
+              {eventLinkLabels.official}
             </a>
           )}
           {shouldShowSetlistLink && (
@@ -304,7 +305,7 @@ export default async function EventPage({ params }: EventPageProps) {
               target="_blank"
               rel="noreferrer"
             >
-              セットリスト / Setlist
+              {eventLinkLabels.setlist}
             </a>
           )}
           {event.artists.map((artist) => (
@@ -324,11 +325,11 @@ export default async function EventPage({ params }: EventPageProps) {
             target="_blank"
             rel="noreferrer"
           >
-            Xで共有 / Share
+            {eventLinkLabels.share}
           </a>
           {isInternational && (
             <Link className={styles.secondaryLink} href="/international">
-              来日公演一覧 / Japan tours
+              {eventLinkLabels.international}
             </Link>
           )}
         </div>
@@ -403,7 +404,7 @@ export default async function EventPage({ params }: EventPageProps) {
       />
 
       <Link className={styles.textLink} href="/">
-        {isInternational ? "イベント一覧へ戻る / All events" : "イベント一覧へ戻る"}
+        {eventLinkLabels.allEvents}
       </Link>
 
       <SiteAnalytics />

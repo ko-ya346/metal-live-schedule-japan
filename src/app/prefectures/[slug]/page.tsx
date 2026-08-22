@@ -15,6 +15,7 @@ import {
 } from "../../../utils/prefectures";
 import { EventDateGroup } from "../../EventDateGroup";
 import { SiteAnalytics } from "../../Analytics";
+import { eventLinkLabels } from "../../../utils/eventLinks";
 import styles from "../../page.module.css";
 
 type PrefecturePageProps = {
@@ -122,9 +123,7 @@ export default async function PrefecturePage({ params }: PrefecturePageProps) {
         </section>
       )}
 
-      <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
-      </Link>
+      <Link className={styles.textLink} href="/">{eventLinkLabels.allEvents}</Link>
 
       <SiteAnalytics />
     </main>

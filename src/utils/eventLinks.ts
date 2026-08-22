@@ -38,6 +38,17 @@ export function getXShareUrl(text: string, url: string) {
   return `https://x.com/intent/post?${params.toString()}`;
 }
 
+export const eventLinkLabels = {
+  detail: "詳細 / Details",
+  ticket: "チケット / Tickets",
+  official: "公式 / Official",
+  setlist: "セットリスト / Setlist",
+  share: "Xで共有 / Share",
+  international: "来日公演一覧 / Japan tours",
+  allEvents: "イベント一覧へ戻る / All events",
+  youtubeMenu: "アーティスト別にYouTubeで探す / Search YouTube by artist",
+} as const;
+
 export function formatYoutubeLinkLabel(artist: string, artistCount: number) {
   if (artistCount === 1) {
     return "YouTubeで探す / Search YouTube";

@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { xProfileUrl, xReportUrl } from "../../utils/contact";
+import { eventLinkLabels } from "../../utils/eventLinks";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
@@ -33,7 +34,7 @@ export default function ContactPage() {
         <section className={styles.infoSection}>
           <h2>連絡先</h2>
           <p>
-            連絡は X からお願いします。掲載漏れや変更情報、ご要望、ご意見があれば気軽に連絡してください。
+            連絡は Xからお願いします。掲載漏れや変更情報、ご要望、ご意見があれば気軽に連絡してください。
           </p>
           <a
             className={styles.primaryLink}
@@ -54,9 +55,7 @@ export default function ContactPage() {
         </section>
       </div>
 
-      <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
-      </Link>
+      <Link className={styles.textLink} href="/">{eventLinkLabels.allEvents}</Link>
     </main>
   );
 }

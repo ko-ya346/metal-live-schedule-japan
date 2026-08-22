@@ -4,6 +4,7 @@ import type { Event } from "../data/events";
 import Link from "next/link";
 import { isPastEventDate } from "../utils/date";
 import {
+  eventLinkLabels,
   formatEventStatus,
   formatYoutubeLinkLabel,
   getSetlistSearchUrl,
@@ -94,7 +95,7 @@ export function EventCard({ event }: EventCardProps) {
 
       <div className={styles.eventLinks} aria-label="イベントリンク">
         <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
-          詳細 / Details
+          {eventLinkLabels.detail}
         </Link>
         {event.ticketUrl && (
           <a
@@ -103,7 +104,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            チケット / Tickets
+            {eventLinkLabels.ticket}
           </a>
         )}
         {event.officialUrl && (
@@ -113,7 +114,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            公式 / Official
+            {eventLinkLabels.official}
           </a>
         )}
         {shouldShowSetlistLink && (
@@ -123,7 +124,7 @@ export function EventCard({ event }: EventCardProps) {
             target="_blank"
             rel="noreferrer"
           >
-            セットリスト / Setlist
+            {eventLinkLabels.setlist}
           </a>
         )}
         {shouldCollapseYoutubeLinks ? (
@@ -134,7 +135,7 @@ export function EventCard({ event }: EventCardProps) {
             ref={youtubeDetailsRef}
           >
             <summary className={styles.secondaryLink}>
-              アーティスト別にYouTubeで探す / Search by artist
+              {eventLinkLabels.youtubeMenu}
             </summary>
             <div className={styles.youtubeArtistLinks}>
               {event.artists.map((artist) => (

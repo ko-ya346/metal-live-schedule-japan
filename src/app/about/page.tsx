@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { xReportUrl } from "../../utils/contact";
+import { eventLinkLabels } from "../../utils/eventLinks";
 import styles from "../page.module.css";
 
 export const metadata: Metadata = {
@@ -54,7 +55,7 @@ export default function AboutPage() {
         <section className={styles.infoSection}>
           <h2>情報提供</h2>
           <p>
-            掲載漏れや修正が必要な情報を見つけた場合は、X から連絡してください。
+            掲載漏れや修正が必要な情報を見つけた場合は、Xから連絡してください。
           </p>
           <a
             className={styles.primaryLink}
@@ -67,9 +68,7 @@ export default function AboutPage() {
         </section>
       </div>
 
-      <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
-      </Link>
+      <Link className={styles.textLink} href="/">{eventLinkLabels.allEvents}</Link>
     </main>
   );
 }

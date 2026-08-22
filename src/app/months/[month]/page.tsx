@@ -14,6 +14,7 @@ import {
 } from "../../../utils/months";
 import { SiteAnalytics } from "../../Analytics";
 import { EventDateGroup } from "../../EventDateGroup";
+import { eventLinkLabels } from "../../../utils/eventLinks";
 import styles from "../../page.module.css";
 
 type MonthPageProps = {
@@ -92,9 +93,7 @@ export default async function MonthPage({ params }: MonthPageProps) {
         </div>
       </section>
 
-      <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
-      </Link>
+      <Link className={styles.textLink} href="/">{eventLinkLabels.allEvents}</Link>
 
       <SiteAnalytics />
     </main>

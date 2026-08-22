@@ -16,6 +16,7 @@ import {
 import { EventDateGroup } from "../../EventDateGroup";
 import { PrefectureLink } from "../../PrefectureLink";
 import { SiteAnalytics } from "../../Analytics";
+import { eventLinkLabels } from "../../../utils/eventLinks";
 import styles from "../../page.module.css";
 
 type VenuePageProps = {
@@ -139,9 +140,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
         </section>
       )}
 
-      <Link className={styles.textLink} href="/">
-        イベント一覧へ戻る
-      </Link>
+      <Link className={styles.textLink} href="/">{eventLinkLabels.allEvents}</Link>
 
       <SiteAnalytics />
     </main>
