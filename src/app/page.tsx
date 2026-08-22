@@ -126,6 +126,14 @@ function formatFeaturedArtists(artists: Event["artists"]) {
   return `${artists.slice(0, 2).join(" / ")} ほか${artists.length - 2}組`;
 }
 
+function countEventsByGenre(eventList: typeof events, genreKeyword: string) {
+  return eventList.filter((event) =>
+    event.genres.some((genre) =>
+      genre.toLocaleLowerCase().includes(genreKeyword.toLocaleLowerCase()),
+    ),
+  ).length;
+}
+
 function FeaturedEventCard({ event }: { event: Event }) {
   return (
     <Link className={styles.featuredCard} href={`/events/${event.id}`}>
@@ -177,8 +185,28 @@ export default function Page() {
   const upcomingInternationalCount = allUpcomingEvents.filter(
     (event) => event.isInternational,
   ).length;
+  const currentMonthEvents = allUpcomingEvents.filter(
+    (event) => getEventMonthKey(event.date) === currentMonthKey,
+  );
   const upcomingMonthLinks = getEventMonths(allUpcomingEvents);
   const popularPrefectureLinks = getPopularPrefectureLinks(allUpcomingEvents);
+  const discoveryPrefectures = ["東京都", "大阪府", "神奈川県"]
+    .map((name) => popularPrefectureLinks.find((prefecture) => prefecture.name === name))
+    .filter(
+      (prefecture): prefecture is NonNullable<typeof prefecture> =>
+        Boolean(prefecture && prefecture.count > 0),
+    );
+  const discoveryGenres = [
+    { label: "Death Metal", value: "Death Metal" },
+    { label: "Metalcore", value: "Metalcore" },
+    { label: "Hardcore", value: "Hardcore" },
+    { label: "Heavy Metal", value: "Heavy Metal" },
+  ]
+    .map((genre) => ({
+      ...genre,
+      count: countEventsByGenre(allUpcomingEvents, genre.value),
+    }))
+    .filter((genre) => genre.count > 0);
   const filteredEvents = filterEvents(
     sortedEvents,
     selectedPrefecture,
@@ -201,6 +229,22 @@ export default function Page() {
     setSelectedGenre(ALL_FILTER_VALUE);
     setInternationalOnly(false);
     setSearchQuery("");
+  }
+
+  function applyGenreFilter(genre: string) {
+    setSelectedGenre(genre);
+    setSelectedPrefecture(ALL_FILTER_VALUE);
+    setInternationalOnly(false);
+    setSearchQuery("");
+    setSelectedDate(null);
+  }
+
+  function applyInternationalFilter() {
+    setSelectedGenre(ALL_FILTER_VALUE);
+    setSelectedPrefecture(ALL_FILTER_VALUE);
+    setInternationalOnly(true);
+    setSearchQuery("");
+    setSelectedDate(null);
   }
 
   return (
@@ -240,6 +284,63 @@ export default function Page() {
           </div>
         </div>
       </header>
+
+      <section className={styles.discoveryHub} aria-labelledby="discovery-title">
+        <div className={styles.sectionHeader}>
+          <div>
+            <p className={styles.kicker}>Explore</p>
+            <h2 className={styles.sectionTitle} id="discovery-title">
+              目的からライブを探す
+            </h2>
+            <p className={styles.sectionLead}>
+              日程、地域、来日公演、ジャンルからすぐに絞り込めます。
+            </p>
+          </div>
+        </div>
+
+        <div className={styles.discoveryCardGrid}>
+          <Link
+            className={styles.discoveryCard}
+            href={`/months/${currentMonthKey}`}
+          >
+            <span className={styles.discoveryCardLabel}>今月</span>
+            <strong>{formatCalendarMonth(currentMonthKey)}のライブ</strong>
+            <span>{currentMonthEvents.length}件</span>
+          </Link>
+          <button
+            className={styles.discoveryCard}
+            type="button"
+            onClick={applyInternationalFilter}
+          >
+            <span className={styles.discoveryCardLabel}>来日</span>
+            <strong>来日公演に絞る</strong>
+            <span>{upcomingInternationalCount}件</span>
+          </button>
+          {discoveryPrefectures.map((prefecture) => (
+            <Link
+              className={styles.discoveryCard}
+              href={`/prefectures/${prefecture.slug}`}
+              key={prefecture.slug}
+            >
+              <span className={styles.discoveryCardLabel}>地域</span>
+              <strong>{prefecture.name}のライブ</strong>
+              <span>{prefecture.count}件</span>
+            </Link>
+          ))}
+          {discoveryGenres.map((genre) => (
+            <button
+              className={styles.discoveryCard}
+              key={genre.value}
+              type="button"
+              onClick={() => applyGenreFilter(genre.value)}
+            >
+              <span className={styles.discoveryCardLabel}>ジャンル</span>
+              <strong>{genre.label}</strong>
+              <span>{genre.count}件</span>
+            </button>
+          ))}
+        </div>
+      </section>
 
       <div className={styles.contentLayout}>
         <aside className={styles.sidebar} aria-label="絞り込みと探し方">
