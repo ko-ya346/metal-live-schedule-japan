@@ -21,6 +21,7 @@ import {
   isPastEventDate,
 } from "../utils/date";
 import { getEventMonths } from "../utils/months";
+import { getGenreSlug } from "../utils/genres";
 import { getPrefectures } from "../utils/prefectures";
 import { EventCalendar } from "./EventCalendar";
 import { EventCard } from "./EventCard";
@@ -231,14 +232,6 @@ export default function Page() {
     setSearchQuery("");
   }
 
-  function applyGenreFilter(genre: string) {
-    setSelectedGenre(genre);
-    setSelectedPrefecture(ALL_FILTER_VALUE);
-    setInternationalOnly(false);
-    setSearchQuery("");
-    setSelectedDate(null);
-  }
-
   function applyInternationalFilter() {
     setSelectedGenre(ALL_FILTER_VALUE);
     setSelectedPrefecture(ALL_FILTER_VALUE);
@@ -328,16 +321,15 @@ export default function Page() {
             </Link>
           ))}
           {discoveryGenres.map((genre) => (
-            <button
+            <Link
               className={styles.discoveryCard}
+              href={`/genres/${getGenreSlug(genre.value)}`}
               key={genre.value}
-              type="button"
-              onClick={() => applyGenreFilter(genre.value)}
             >
               <span className={styles.discoveryCardLabel}>ジャンル</span>
               <strong>{genre.label}</strong>
               <span>{genre.count}件</span>
-            </button>
+            </Link>
           ))}
         </div>
       </section>
@@ -394,6 +386,20 @@ export default function Page() {
                       key={prefecture.slug}
                     >
                       {prefecture.name}
+                    </Link>
+                  ))}
+                </div>
+              </div>
+
+              <div className={styles.searchGuideGroup}>
+                <h3>ジャンル別</h3>
+                <div className={styles.searchGuideLinks}>
+                  {discoveryGenres.map((genre) => (
+                    <Link
+                      href={`/genres/${getGenreSlug(genre.value)}`}
+                      key={genre.value}
+                    >
+                      {genre.label}
                     </Link>
                   ))}
                 </div>

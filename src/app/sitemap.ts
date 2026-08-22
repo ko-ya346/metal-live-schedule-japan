@@ -8,6 +8,7 @@ import {
   getEventsByPrefectureSlug,
   getPrefectures,
 } from "../utils/prefectures";
+import { getEventsByGenreSlug, getPageableGenres } from "../utils/genres";
 import { getEventMonths, getEventsByMonthKey } from "../utils/months";
 import { getEventsByVenueSlug, getVenues } from "../utils/venues";
 import { siteUrl } from "./site";
@@ -79,6 +80,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     };
   });
 
+  const genrePages: MetadataRoute.Sitemap = getPageableGenres(
+    publishedEvents,
+  ).map((genre) => {
+    const genreEvents = getEventsByGenreSlug(publishedEvents, genre.slug);
+    const lastModified = getLatestEventModifiedDate(genreEvents);
+
+    return {
+      url: `${siteUrl}/genres/${encodeURIComponent(genre.slug)}`,
+      ...(lastModified ? { lastModified } : {}),
+    };
+  });
+
   const monthPages: MetadataRoute.Sitemap = getEventMonths(publishedEvents).map(
     (month) => {
       const monthEvents = getEventsByMonthKey(publishedEvents, month.key);
@@ -108,6 +121,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...eventPages,
     ...artistPages,
     ...prefecturePages,
+    ...genrePages,
     ...monthPages,
     ...venuePages,
   ];
