@@ -21,6 +21,7 @@ The app should prioritize:
 - Readable code
 - Learning-oriented explanations
 - Small incremental changes
+- Practical progress toward the roadmap
 
 ## Current MVP scope
 
@@ -38,14 +39,15 @@ Do not implement yet:
 - Admin screen
 - Scraping
 - Payment
-- Full design system
+
+These are no longer hard bans. They should still be introduced only when they clearly reduce operational work, improve discovery, or make the product easier to maintain.
 
 ## Coding policy
 
 - Use TypeScript.
 - Keep components small.
 - Prefer simple React state over complex libraries.
-- Do not introduce new packages unless necessary.
+- New packages are allowed when they clearly help the roadmap. Before adding one, prefer established, well-maintained libraries and keep the dependency count small.
 - Explain important changes after editing.
 - After changes, tell me what command to run to verify.
 
@@ -58,7 +60,7 @@ Make small changes and explain the intent.
 For deployment and testing:
 - Target deployment is Vercel.
 - Keep the app statically deployable for now.
-- Do not add a database yet.
+- Prefer keeping the app statically deployable. A database or external service is acceptable if it materially reduces operation cost or unlocks an important workflow, but explain the tradeoff first.
 - Add only lightweight checks.
 - Ensure `npm run build` passes before considering a change done.
 - Do not introduce a test framework yet unless there is a clear need.

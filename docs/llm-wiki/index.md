@@ -26,7 +26,7 @@ Do not turn the site into a generic music news site.
 - Link/copy utilities: `src/utils/eventLinks.ts`
 - Main styling: `src/app/page.module.css`
 
-The site is still mostly static and file-based. Do not add a database unless explicitly requested.
+The site is still mostly static and file-based. Prefer static/file-based changes, but a database or external service is acceptable when it materially reduces operation cost or unlocks an important workflow. Explain the tradeoff first.
 
 ## Human Workflow
 
@@ -78,7 +78,7 @@ Current design direction:
 - event discovery over marketing copy
 - mobile readability first
 
-Do not add new packages for UI polish.
+New packages are allowed when they clearly improve roadmap progress, implementation quality, or maintainability. Keep the dependency count small and prefer established libraries.
 
 ## Copy Rules
 
@@ -122,4 +122,4 @@ Current next priorities:
 - unreviewed publishing
 - thin SEO pages
 - broad refactors
-- adding packages without clear need
+- adding packages without clear product or maintenance value
