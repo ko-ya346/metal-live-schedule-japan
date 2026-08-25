@@ -8449,4 +8449,31 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-08-22",
         reviewedAt: "2026-08-22",
     },
+
+    {
+        id: "carcass-2026-09-18-space-odd",
+        artists: [
+            "CARCASS",
+        ],
+        tourName: "追加公演",
+        date: "2026-09-18",
+        prefecture: "東京都",
+        venue: "SPACE ODD",
+        genres: [
+            "Death Metal",
+            "Grindcore",
+        ],
+        isInternational: true,
+        ticketUrl: "https://eplus.jp/sf/detail/0246900001-P0030017P021001",
+        officialUrl: null,
+        sourceUrl: "https://eplus.jp/sf/detail/0246900001-P0030017P021001",
+        sourceType: "ticket",
+        sourceName: "eplus metal / hardcore page 2",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "Carcassの東京追加公演。公式チケット販売ページ情報で信頼度高い。",
+        collectedAt: "2026-08-25",
+        reviewedAt: null,
+    },
 ];
