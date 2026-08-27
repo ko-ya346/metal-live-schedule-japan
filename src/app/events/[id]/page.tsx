@@ -47,17 +47,6 @@ function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) 
   return `${primaryArtist}のメタルライブ ${eventYear} ${location} ${eventDate} | チケット・会場`;
 }
 
-function getArtistSearchAliases(artists: string[]) {
-  const aliasesByArtist: Record<string, string[]> = {
-    "VIO-LENCE": ["Violence"],
-    "Paradise Lost": ["パラダイスロスト"],
-    "BEAST IN BLACK": ["ビースト・イン・ブラック"],
-    "ALL SHALL PERISH": ["オール・シャル・ペリッシュ"],
-  };
-
-  return artists.flatMap((artist) => aliasesByArtist[artist] ?? []);
-}
-
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {
   const artists = formatArtists(event.artists);
   const primaryArtist = event.artists[0];
@@ -65,9 +54,6 @@ function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEve
     event.artists.length > 1
       ? `出演: ${artists}。`
       : `${primaryArtist}の公演情報。`;
-  const aliasText = getArtistSearchAliases(event.artists);
-  const aliasSentence =
-    aliasText.length > 0 ? `検索表記: ${aliasText.join(" / ")}。` : "";
   const ticketText = event.ticketUrl
     ? "チケット情報あり。"
     : "チケット情報は公式発表を確認してください。";
@@ -77,7 +63,7 @@ function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEve
 
   return `${eventTypeText}${supportText}${event.tourName}は${formatEventDate(
     event.date,
-  )}、${event.prefecture} / ${event.venue}で開催。${ticketText}公式リンク、会場情報、関連ライブを掲載。${aliasSentence}`;
+  )}、${event.prefecture} / ${event.venue}で開催。${ticketText}公式リンク、会場情報、関連ライブを掲載。`;
 }
 
 function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -103,16 +89,20 @@ function formatOperationalDate(date: string | undefined) {
 function formatEventSummary(event: NonNullable<ReturnType<typeof findEvent>>) {
   const artists = formatArtists(event.artists);
   const eventType = event.isInternational ? "来日公演" : "ライブ";
-  const ticketText = event.ticketUrl
-    ? "チケット情報と公式情報へのリンクを掲載しています。"
-    : "公式情報へのリンクを掲載しています。";
-  const aliasText = getArtistSearchAliases(event.artists);
-  const aliasSentence =
-    aliasText.length > 0 ? ` ${aliasText.join(" / ")}表記で探している場合もこのページで確認できます。` : "";
+  const hasEnded = isPastEventDate(event.date);
+  const eventTimingText = hasEnded ? "開催されました" : "開催予定です";
+  const linkTargets = [
+    event.ticketUrl ? "チケット情報" : null,
+    event.officialUrl ? "公式情報" : null,
+  ].filter((target): target is string => Boolean(target));
+  const linkText =
+    linkTargets.length > 0
+      ? `${linkTargets.join("と")}へのリンクを掲載しています。`
+      : "確認できた範囲の公演情報を掲載しています。";
 
   return `${artists}の${eventType}「${event.tourName}」は、${formatEventDate(
     event.date,
-  )}に${event.prefecture}の${event.venue}で開催予定です。${ticketText}${aliasSentence}`;
+  )}に${event.prefecture}の${event.venue}で${eventTimingText}。${linkText}`;
 }
 
 function EventDiscoveryLinks({
@@ -245,7 +235,7 @@ export default async function EventPage({ params }: EventPageProps) {
   )} ${event.prefecture} / ${event.venue} - ${siteName}`;
   const relatedEventCandidates = getRelatedEventCandidates(event, events);
   const publishedDate = formatOperationalDate(event.publishedAt);
-  const updatedDate = formatOperationalDate(event.updatedAt ?? event.publishedAt);
+  const updatedDate = formatOperationalDate(event.updatedAt);
 
   return (
     <main className={styles.page}>
@@ -362,22 +352,23 @@ export default async function EventPage({ params }: EventPageProps) {
         <EventDiscoveryLinks event={event} />
 
         <section className={styles.eventSourceSection}>
-          <h2>掲載情報</h2>
+          <h2>情報確認</h2>
           <dl className={styles.eventSourceMeta}>
-            {publishedDate && (
+            {updatedDate ? (
               <div>
-                <dt>掲載日</dt>
-                <dd>{publishedDate}</dd>
-              </div>
-            )}
-            {updatedDate && (
-              <div>
-                <dt>最終更新</dt>
+                <dt>更新日</dt>
                 <dd>{updatedDate}</dd>
               </div>
+            ) : (
+              publishedDate && (
+                <div>
+                  <dt>掲載日</dt>
+                  <dd>{publishedDate}</dd>
+                </div>
+              )
             )}
             <div>
-              <dt>情報源</dt>
+              <dt>確認リンク</dt>
               <dd>
                 {event.officialUrl ? (
                   <a
@@ -388,21 +379,21 @@ export default async function EventPage({ params }: EventPageProps) {
                   >
                     公式情報
                   </a>
-                ) : (
-                  "公式情報未登録"
-                )}
-                {event.ticketUrl && (
+                ) : null}
+                {event.officialUrl && event.ticketUrl && " / "}
+                {event.ticketUrl ? (
+                  <a
+                    className={styles.inlineLink}
+                    href={event.ticketUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    チケット情報
+                  </a>
+                ) : null}
+                {!event.officialUrl && !event.ticketUrl && (
                   <>
-                    {" "}
-                    /{" "}
-                    <a
-                      className={styles.inlineLink}
-                      href={event.ticketUrl}
-                      target="_blank"
-                      rel="noreferrer"
-                    >
-                      チケット情報
-                    </a>
+                    確認リンク未登録
                   </>
                 )}
               </dd>
@@ -417,7 +408,7 @@ export default async function EventPage({ params }: EventPageProps) {
           <section className={styles.eventArchiveNote}>
             <h2>アーカイブ</h2>
             <p>
-              このライブは終了済みです。過去の公演記録として掲載し、セットリスト検索への導線を残しています。
+              この公演は終了しています。過去の公演記録として掲載し、セットリスト検索への導線を残しています。
             </p>
           </section>
         )}
