@@ -221,15 +221,47 @@ export default function Page() {
   const upcomingEvents = filteredEvents.filter(
     (event) => !isPastEventDate(event.date) && event.date !== selectedDate,
   );
+  const pastFilteredEvents = hasActiveFilters
+    ? filteredEvents
+        .filter((event) => isPastEventDate(event.date) && event.date !== selectedDate)
+        .reverse()
+    : [];
 
   const upcomingEventsByDate = groupEventsByDate(upcomingEvents);
+  const pastFilteredEventsByDate = groupEventsByDate(pastFilteredEvents);
   const upcomingDates = getGroupedEventDates(upcomingEventsByDate);
+  const pastFilteredDates = getGroupedEventDates(pastFilteredEventsByDate).reverse();
+
+  function clearSelectedDate() {
+    setSelectedDate(null);
+  }
+
+  function updateSearchQuery(query: string) {
+    setSearchQuery(query);
+    clearSelectedDate();
+  }
+
+  function updatePrefecture(prefecture: string) {
+    setSelectedPrefecture(prefecture);
+    clearSelectedDate();
+  }
+
+  function updateGenre(genre: string) {
+    setSelectedGenre(genre);
+    clearSelectedDate();
+  }
+
+  function updateInternationalOnly(nextInternationalOnly: boolean) {
+    setInternationalOnly(nextInternationalOnly);
+    clearSelectedDate();
+  }
 
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
     setSelectedGenre(ALL_FILTER_VALUE);
     setInternationalOnly(false);
     setSearchQuery("");
+    clearSelectedDate();
   }
 
   function applyInternationalFilter() {
@@ -344,10 +376,10 @@ export default function Page() {
             internationalOnly={internationalOnly}
             searchQuery={searchQuery}
             canReset={hasActiveFilters}
-            onGenreChange={setSelectedGenre}
-            onPrefectureChange={setSelectedPrefecture}
-            onInternationalOnlyChange={setInternationalOnly}
-            onSearchQueryChange={setSearchQuery}
+            onGenreChange={updateGenre}
+            onPrefectureChange={updatePrefecture}
+            onInternationalOnlyChange={updateInternationalOnly}
+            onSearchQueryChange={updateSearchQuery}
             onReset={resetFilters}
           />
 
@@ -436,7 +468,7 @@ export default function Page() {
             onDateSelect={setSelectedDate}
           />
 
-          {featuredEvents.length > 0 && (
+          {!hasActiveFilters && featuredEvents.length > 0 && (
             <section className={styles.featuredSection}>
               <div className={styles.sectionHeader}>
                 <div>
@@ -463,7 +495,7 @@ export default function Page() {
             </section>
           )}
 
-          {recentlyPublishedEvents.length > 0 && (
+          {!hasActiveFilters && recentlyPublishedEvents.length > 0 && (
             <section className={styles.recentSection}>
               <h2 className={styles.sectionTitle}>最近追加したライブ</h2>
               <div className={styles.eventList}>
@@ -498,11 +530,15 @@ export default function Page() {
           )}
 
           <section className={styles.upcomingSection}>
-            <h2 className={styles.sectionTitle}>今後のライブ</h2>
+            <h2 className={styles.sectionTitle}>
+              {hasActiveFilters ? "絞り込み結果" : "今後のライブ"}
+            </h2>
 
             {upcomingDates.length === 0 ? (
               <p className={styles.empty}>
-                今後のライブはありません。絞り込み条件を変更するか、リセットしてください。
+                {hasActiveFilters
+                  ? "一致する今後のライブはありません。条件を変更するか、リセットしてください。"
+                  : "今後のライブはありません。絞り込み条件を変更するか、リセットしてください。"}
               </p>
             ) : (
               <div className={styles.dateGroups}>
@@ -516,6 +552,21 @@ export default function Page() {
               </div>
             )}
           </section>
+
+          {hasActiveFilters && pastFilteredDates.length > 0 && (
+            <section className={styles.recentSection}>
+              <h2 className={styles.sectionTitle}>過去の一致イベント</h2>
+              <div className={styles.dateGroups}>
+                {pastFilteredDates.map((date) => (
+                  <EventDateGroup
+                    date={date}
+                    events={pastFilteredEventsByDate[date]}
+                    key={date}
+                  />
+                ))}
+              </div>
+            </section>
+          )}
         </div>
       </div>
 
