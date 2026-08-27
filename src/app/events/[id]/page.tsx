@@ -234,7 +234,6 @@ export default async function EventPage({ params }: EventPageProps) {
     event.date,
   )} ${event.prefecture} / ${event.venue} - ${siteName}`;
   const relatedEventCandidates = getRelatedEventCandidates(event, events);
-  const publishedDate = formatOperationalDate(event.publishedAt);
   const updatedDate = formatOperationalDate(event.updatedAt);
 
   return (
@@ -352,53 +351,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <EventDiscoveryLinks event={event} />
 
         <section className={styles.eventSourceSection}>
-          <h2>情報確認</h2>
-          <dl className={styles.eventSourceMeta}>
-            {updatedDate ? (
-              <div>
-                <dt>更新日</dt>
-                <dd>{updatedDate}</dd>
-              </div>
-            ) : (
-              publishedDate && (
-                <div>
-                  <dt>掲載日</dt>
-                  <dd>{publishedDate}</dd>
-                </div>
-              )
-            )}
-            <div>
-              <dt>確認リンク</dt>
-              <dd>
-                {event.officialUrl ? (
-                  <a
-                    className={styles.inlineLink}
-                    href={event.officialUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    公式情報
-                  </a>
-                ) : null}
-                {event.officialUrl && event.ticketUrl && " / "}
-                {event.ticketUrl ? (
-                  <a
-                    className={styles.inlineLink}
-                    href={event.ticketUrl}
-                    target="_blank"
-                    rel="noreferrer"
-                  >
-                    チケット情報
-                  </a>
-                ) : null}
-                {!event.officialUrl && !event.ticketUrl && (
-                  <>
-                    確認リンク未登録
-                  </>
-                )}
-              </dd>
-            </div>
-          </dl>
+          {updatedDate && <p>情報更新日: {updatedDate}</p>}
           <p>
             公演内容は変更される場合があります。来場前に公式情報やチケット販売ページを確認してください。
           </p>
