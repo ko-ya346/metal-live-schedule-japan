@@ -35,27 +35,49 @@ function findEvent(id: string) {
 }
 
 function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) {
-  const artists = formatArtists(event.artists);
+  const primaryArtist = event.artists[0];
   const eventYear = event.date.slice(0, 4);
   const location = event.prefecture.replace(/都|府|県$/, "");
+  const eventDate = event.date.slice(5).replace("-", "/");
 
   if (event.isInternational) {
-    return `${artists} 来日公演 ${eventYear} ${location} | 日程・チケット・会場`;
+    return `${primaryArtist} 来日公演 ${eventYear} ${location} ${eventDate} | チケット・会場`;
   }
 
-  return `${artists}のメタルライブ ${eventYear} ${location} | 日程・チケット・会場`;
+  return `${primaryArtist}のメタルライブ ${eventYear} ${location} ${eventDate} | チケット・会場`;
+}
+
+function getArtistSearchAliases(artists: string[]) {
+  const aliasesByArtist: Record<string, string[]> = {
+    "VIO-LENCE": ["Violence"],
+    "Paradise Lost": ["パラダイスロスト"],
+    "BEAST IN BLACK": ["ビースト・イン・ブラック"],
+    "ALL SHALL PERISH": ["オール・シャル・ペリッシュ"],
+  };
+
+  return artists.flatMap((artist) => aliasesByArtist[artist] ?? []);
 }
 
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {
   const artists = formatArtists(event.artists);
-  const ticketText = event.ticketUrl ? "チケット情報、" : "";
+  const primaryArtist = event.artists[0];
+  const supportText =
+    event.artists.length > 1
+      ? `出演: ${artists}。`
+      : `${primaryArtist}の公演情報。`;
+  const aliasText = getArtistSearchAliases(event.artists);
+  const aliasSentence =
+    aliasText.length > 0 ? `検索表記: ${aliasText.join(" / ")}。` : "";
+  const ticketText = event.ticketUrl
+    ? "チケット情報あり。"
+    : "チケット情報は公式発表を確認してください。";
   const eventTypeText = event.isInternational
-    ? "日本で開催されるメタル・ハードロック系の来日公演情報。"
-    : "日本のメタルライブ情報。";
+    ? `${primaryArtist}の来日公演情報。`
+    : `${primaryArtist}の日本国内メタルライブ情報。`;
 
-  return `${eventTypeText}${artists}「${event.tourName}」のライブ情報。${formatEventDate(
+  return `${eventTypeText}${supportText}${event.tourName}は${formatEventDate(
     event.date,
-  )}、${event.prefecture} / ${event.venue}で開催。${ticketText}公式リンク、会場情報、関連ライブを掲載。Japan tour schedule and ticket links.`;
+  )}、${event.prefecture} / ${event.venue}で開催。${ticketText}公式リンク、会場情報、関連ライブを掲載。${aliasSentence}`;
 }
 
 function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -84,10 +106,13 @@ function formatEventSummary(event: NonNullable<ReturnType<typeof findEvent>>) {
   const ticketText = event.ticketUrl
     ? "チケット情報と公式情報へのリンクを掲載しています。"
     : "公式情報へのリンクを掲載しています。";
+  const aliasText = getArtistSearchAliases(event.artists);
+  const aliasSentence =
+    aliasText.length > 0 ? ` ${aliasText.join(" / ")}表記で探している場合もこのページで確認できます。` : "";
 
   return `${artists}の${eventType}「${event.tourName}」は、${formatEventDate(
     event.date,
-  )}に${event.prefecture}の${event.venue}で開催予定です。${ticketText}`;
+  )}に${event.prefecture}の${event.venue}で開催予定です。${ticketText}${aliasSentence}`;
 }
 
 function EventDiscoveryLinks({

@@ -7,7 +7,7 @@ import {
   getArtists,
   getEventsByArtistSlug,
 } from "../../../utils/artists";
-import { isPastEventDate } from "../../../utils/date";
+import { formatEventDate, isPastEventDate } from "../../../utils/date";
 import {
   getGroupedEventDates,
   groupEventsByDate,
@@ -32,6 +32,65 @@ function decodeArtistSlug(slug: string) {
   }
 }
 
+function formatArtistPageTitle(
+  artistName: string,
+  upcomingEvents: ReturnType<typeof getEventsByArtistSlug>,
+) {
+  const hasInternationalEvent = upcomingEvents.some((event) => event.isInternational);
+
+  if (hasInternationalEvent) {
+    return `${artistName} 来日公演・日本ライブ情報`;
+  }
+
+  return `${artistName}のライブ・イベント情報`;
+}
+
+function formatArtistPageDescription(
+  artistName: string,
+  upcomingEvents: ReturnType<typeof getEventsByArtistSlug>,
+) {
+  if (upcomingEvents.length === 0) {
+    return `${artistName}が出演する日本国内のメタルライブ、来日公演、イベントの日程・会場・チケット情報を掲載しています。`;
+  }
+
+  const nextEvent = upcomingEvents[0];
+  const prefectures = Array.from(
+    new Set(upcomingEvents.map((event) => event.prefecture)),
+  ).slice(0, 3);
+  const eventTypeText = upcomingEvents.some((event) => event.isInternational)
+    ? "来日公演・日本ライブ"
+    : "日本国内ライブ";
+
+  return `${artistName}の${eventTypeText}情報。次回は${formatEventDate(
+    nextEvent.date,
+  )}、${nextEvent.prefecture} / ${nextEvent.venue}で開催予定。${prefectures.join(
+    "、",
+  )}などの日程・会場・チケット情報を掲載しています。`;
+}
+
+function formatArtistPageLead(
+  artistName: string,
+  upcomingEvents: ReturnType<typeof getEventsByArtistSlug>,
+) {
+  if (upcomingEvents.length === 0) {
+    return `${artistName}が出演する日本国内のライブ情報を掲載しています。今後の掲載イベントが見つかり次第、日程・会場・公式情報を追加します。`;
+  }
+
+  const nextEvent = upcomingEvents[0];
+  const prefectures = Array.from(
+    new Set(upcomingEvents.map((event) => event.prefecture)),
+  ).slice(0, 4);
+  const eventTypeText = upcomingEvents.some((event) => event.isInternational)
+    ? "来日公演・日本ライブ"
+    : "日本国内ライブ";
+
+  return `${artistName}の${eventTypeText}を日付順にまとめています。次回は${formatEventDate(
+    nextEvent.date,
+  )}の${nextEvent.prefecture} / ${
+    nextEvent.venue
+  }公演です。掲載地域: ${prefectures.join("、")}。`;
+}
+
 export function generateStaticParams() {
   return getArtists(publishedEvents).map((artist) => ({
     slug: artist.slug,
@@ -51,8 +110,11 @@ export async function generateMetadata({
     };
   }
 
-  const title = `${artist.name}のライブ・来日公演情報`;
-  const description = `${artist.name}が出演する日本国内のメタルライブ、来日公演、イベントの日程・会場・チケット情報を掲載しています。`;
+  const upcomingEvents = sortEventsByDate(
+    getEventsByArtistSlug(publishedEvents, artist.slug),
+  ).filter((event) => !isPastEventDate(event.date));
+  const title = formatArtistPageTitle(artist.name, upcomingEvents);
+  const description = formatArtistPageDescription(artist.name, upcomingEvents);
 
   return {
     title,
@@ -98,6 +160,9 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
         <h1>{artist.name}</h1>
         <p className={styles.summary}>
           今後のライブ {upcomingEvents.length}件 / 掲載イベント全{artistEvents.length}件
+        </p>
+        <p className={styles.lead}>
+          {formatArtistPageLead(artist.name, upcomingEvents)}
         </p>
       </header>
 
