@@ -971,10 +971,11 @@
 }
 
 .eventDetailSummary {
-  max-width: 60rem;
+  max-width: none;
   margin: 0;
   color: #d9d9d4;
   line-height: 1.8;
+  overflow-wrap: anywhere;
 }
 
 .eventDetailMeta {
