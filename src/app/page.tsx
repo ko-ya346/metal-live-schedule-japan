@@ -395,7 +395,7 @@ export default function Page() {
             <div className={styles.searchGuideGroups}>
               <div className={styles.searchGuideGroup}>
                 <h3>来日公演</h3>
-                <Link href="/international">来日メタル公演をみる</Link>
+                <Link href="/international">来日公演</Link>
               </div>
 
               <div className={styles.searchGuideGroup}>

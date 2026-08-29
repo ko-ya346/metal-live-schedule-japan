@@ -59,24 +59,41 @@ export default function InternationalPage() {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
-        <p className={styles.kicker}>International</p>
-        <h1>来日メタル・海外バンド公演</h1>
-        <p className={styles.summary}>
-          {upcomingEvents.length}件の来日・海外アーティスト公演があります
-        </p>
-        <p className={styles.lead}>
-          日本で開催される海外メタル、ハードロック、ラウドロック、メタルコア、ハードコア系アーティストの来日公演・Japan Tour予定をまとめています。
-          公演日、会場、チケットや公式情報は各イベントページから確認できます。
-        </p>
-        <p className={styles.lead} lang="en">
-          Find upcoming international metal, hard rock, metalcore and hardcore
-          shows across Japan. Open an event for ticket and official links.
-        </p>
-      </header>
+      <header className={`${styles.header} ${styles.heroHeader}`}>
+        <div className={styles.heroCopy}>
+          <p className={styles.kicker}>International</p>
+          <h1>来日メタル・海外バンド公演</h1>
+          <p className={styles.summary}>
+            {upcomingEvents.length}件の来日・海外アーティスト公演があります
+          </p>
+          <p className={styles.lead}>
+            日本で開催される海外メタル、ハードロック、ラウドロック、メタルコア、ハードコア系アーティストの来日公演・Japan Tour予定をまとめています。
+            公演日、会場、チケットや公式情報は各イベントページから確認できます。
+          </p>
+          <p className={styles.lead} lang="en">
+            Find upcoming international metal, hard rock, metalcore and hardcore
+            shows across Japan. Open an event for ticket and official links.
+          </p>
+          <div className={styles.heroActions} aria-label="主要ページ">
+            <Link className={styles.primaryLink} href="/">
+              イベント一覧
+            </Link>
+            {monthSummaries[0] && (
+              <Link
+                className={styles.secondaryLink}
+                href={`/months/${monthSummaries[0].monthKey}`}
+              >
+                直近の月別ページ
+              </Link>
+            )}
+          </div>
+        </div>
 
-      <section className={styles.internationalOverview}>
-        <div className={styles.internationalStatGrid}>
+        <div className={styles.heroStats} aria-label="掲載状況">
+          <div>
+            <strong>{upcomingEvents.length}</strong>
+            <span>今後の来日公演</span>
+          </div>
           <div>
             <strong>{nextThreeMonthEvents.length}</strong>
             <span>今後3か月</span>
@@ -90,42 +107,40 @@ export default function InternationalPage() {
             <span>開催地域</span>
           </div>
         </div>
-
-        {featuredEvents.length > 0 && (
-          <div className={styles.internationalQuickList}>
-            <div>
-              <p className={styles.kicker}>Next Shows</p>
-              <h2 className={styles.sectionTitle}>直近の来日公演</h2>
-            </div>
-            <div className={styles.quickEventList}>
-              {featuredEvents.map((event) => (
-                <Link
-                  className={styles.quickEventLink}
-                  href={`/events/${event.id}`}
-                  key={event.id}
-                >
-                  <span>{formatEventDate(event.date)}</span>
-                  <strong>{event.artists.join(" / ")}</strong>
-                  <small>
-                    {event.prefecture} / {event.venue}
-                  </small>
-                </Link>
-              ))}
-            </div>
-          </div>
-        )}
-      </section>
+      </header>
 
       <section className={styles.discoveryHub} aria-labelledby="international-search-heading">
-        <div>
-          <p className={styles.kicker}>Find Japan Tours</p>
-          <h2 className={styles.sectionTitle} id="international-search-heading">
-            来日公演を探す
-          </h2>
-          <p className={styles.sectionLead}>
-            月別、地域別に来日公演を確認できます。気になる公演は個別ページからチケットや公式情報へ進めます。
-          </p>
+        <div className={styles.sectionHeader}>
+          <div>
+            <p className={styles.kicker}>Explore</p>
+            <h2 className={styles.sectionTitle} id="international-search-heading">
+              来日公演を探す
+            </h2>
+            <p className={styles.sectionLead}>
+              直近の公演、月別、地域別に来日公演を確認できます。
+            </p>
+          </div>
         </div>
+
+        {featuredEvents.length > 0 && (
+          <div className={styles.discoveryCardGrid}>
+            {featuredEvents.map((event) => (
+              <Link
+                className={styles.discoveryCard}
+                href={`/events/${event.id}`}
+                key={event.id}
+              >
+                <span className={styles.discoveryCardLabel}>
+                  {formatEventDate(event.date)}
+                </span>
+                <strong>{event.artists.join(" / ")}</strong>
+                <span>
+                  {event.prefecture} / {event.venue}
+                </span>
+              </Link>
+            ))}
+          </div>
+        )}
 
         <div className={styles.searchGuideGroups}>
           <div className={styles.searchGuideGroup}>
