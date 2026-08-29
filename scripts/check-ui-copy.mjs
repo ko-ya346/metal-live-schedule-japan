@@ -13,6 +13,7 @@ const watchedLabels = [
   "来日公演一覧 / Japan tours",
   "イベント一覧へ戻る / All events",
   "アーティスト別にYouTubeで探す / Search YouTube by artist",
+  "YouTubeで探す / Search YouTube",
 ];
 
 async function listFiles(dir) {
@@ -52,7 +53,7 @@ for (const file of await listFiles(sourceDir)) {
 }
 
 if (violations.length > 0) {
-  console.error("UI copy labels should use eventLinkLabels from src/utils/eventLinks.ts.");
+  console.error("Old bilingual UI link labels should not be hardcoded.");
   console.error(violations.join("\n"));
   process.exit(1);
 }

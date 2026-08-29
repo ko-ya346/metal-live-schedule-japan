@@ -39,20 +39,20 @@ export function getXShareUrl(text: string, url: string) {
 }
 
 export const eventLinkLabels = {
-  detail: "詳細 / Details",
-  ticket: "チケット / Tickets",
-  official: "公式 / Official",
-  setlist: "セットリスト / Setlist",
-  share: "Xで共有 / Share",
-  international: "来日公演一覧 / Japan tours",
-  allEvents: "イベント一覧へ戻る / All events",
-  youtubeMenu: "アーティスト別にYouTubeで探す / Search YouTube by artist",
+  detail: "詳細",
+  ticket: "チケット",
+  official: "公式",
+  setlist: "セットリスト",
+  share: "Xで共有",
+  international: "来日公演一覧",
+  allEvents: "イベント一覧へ戻る",
+  youtubeMenu: "アーティスト別にYouTubeで探す",
 } as const;
 
 export function formatYoutubeLinkLabel(artist: string, artistCount: number) {
   if (artistCount === 1) {
-    return "YouTubeで探す / Search YouTube";
+    return "YouTubeで探す";
   }
 
-  return `${artist}をYouTubeで探す / Search ${artist} on YouTube`;
+  return `${artist}をYouTubeで探す`;
 }
