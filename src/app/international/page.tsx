@@ -1,13 +1,20 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { publishedEvents } from "../../data/events";
-import { isPastEventDate } from "../../utils/date";
+import {
+  formatCalendarMonth,
+  formatEventDate,
+  getEventDateTime,
+  getEventMonthKey,
+} from "../../utils/date";
 import { isInternationalEvent } from "../../utils/eventCollections";
 import {
+  getEventPrefectures,
   getGroupedEventDates,
   groupEventsByDate,
   sortEventsByDate,
 } from "../../utils/events";
+import { getPrefectureSlug } from "../../utils/prefectures";
 import { EventDateGroup } from "../EventDateGroup";
 import { SiteAnalytics } from "../Analytics";
 import { eventLinkLabels } from "../../utils/eventLinks";
@@ -33,8 +40,20 @@ export default function InternationalPage() {
     publishedEvents.filter(isInternationalEvent),
   );
   const upcomingEvents = internationalEvents.filter(
-    (event) => !isPastEventDate(event.date),
+    (event) => getEventDateTime(event.date) >= getTodayDateTime(),
   );
+  const threeMonthLimit = getThreeMonthLimitDateTime();
+  const nextThreeMonthEvents = upcomingEvents.filter(
+    (event) => getEventDateTime(event.date) <= threeMonthLimit,
+  );
+  const featuredEvents = upcomingEvents.slice(0, 4);
+  const monthSummaries = getInternationalMonthSummaries(upcomingEvents).slice(
+    0,
+    8,
+  );
+  const prefectureSummaries = getInternationalPrefectureSummaries(upcomingEvents)
+    .filter((summary) => summary.count > 0)
+    .slice(0, 8);
   const eventsByDate = groupEventsByDate(upcomingEvents);
   const dates = getGroupedEventDates(eventsByDate);
 
@@ -55,6 +74,86 @@ export default function InternationalPage() {
           shows across Japan. Open an event for ticket and official links.
         </p>
       </header>
+
+      <section className={styles.internationalOverview}>
+        <div className={styles.internationalStatGrid}>
+          <div>
+            <strong>{nextThreeMonthEvents.length}</strong>
+            <span>今後3か月</span>
+          </div>
+          <div>
+            <strong>{monthSummaries.length}</strong>
+            <span>掲載月</span>
+          </div>
+          <div>
+            <strong>{prefectureSummaries.length}</strong>
+            <span>開催地域</span>
+          </div>
+        </div>
+
+        {featuredEvents.length > 0 && (
+          <div className={styles.internationalQuickList}>
+            <div>
+              <p className={styles.kicker}>Next Shows</p>
+              <h2 className={styles.sectionTitle}>直近の来日公演</h2>
+            </div>
+            <div className={styles.quickEventList}>
+              {featuredEvents.map((event) => (
+                <Link
+                  className={styles.quickEventLink}
+                  href={`/events/${event.id}`}
+                  key={event.id}
+                >
+                  <span>{formatEventDate(event.date)}</span>
+                  <strong>{event.artists.join(" / ")}</strong>
+                  <small>
+                    {event.prefecture} / {event.venue}
+                  </small>
+                </Link>
+              ))}
+            </div>
+          </div>
+        )}
+      </section>
+
+      <section className={styles.discoveryHub} aria-labelledby="international-search-heading">
+        <div>
+          <p className={styles.kicker}>Find Japan Tours</p>
+          <h2 className={styles.sectionTitle} id="international-search-heading">
+            来日公演を探す
+          </h2>
+          <p className={styles.sectionLead}>
+            月別、地域別に来日公演を確認できます。気になる公演は個別ページからチケットや公式情報へ進めます。
+          </p>
+        </div>
+
+        <div className={styles.searchGuideGroups}>
+          <div className={styles.searchGuideGroup}>
+            <h3>月別</h3>
+            <div className={styles.searchGuideLinks}>
+              {monthSummaries.map((summary) => (
+                <Link href={`/months/${summary.monthKey}`} key={summary.monthKey}>
+                  {summary.label} ({summary.count})
+                </Link>
+              ))}
+            </div>
+          </div>
+
+          <div className={styles.searchGuideGroup}>
+            <h3>地域別</h3>
+            <div className={styles.searchGuideLinks}>
+              {prefectureSummaries.map((summary) => (
+                <Link
+                  href={`/prefectures/${getPrefectureSlug(summary.prefecture)}`}
+                  key={summary.prefecture}
+                >
+                  {summary.prefecture} ({summary.count})
+                </Link>
+              ))}
+            </div>
+          </div>
+        </div>
+      </section>
 
       <section className={styles.infoContent}>
         <div className={styles.infoSection}>
@@ -89,4 +188,48 @@ export default function InternationalPage() {
       <SiteAnalytics />
     </main>
   );
+}
+
+function getTodayDateTime() {
+  const today = new Date();
+
+  return new Date(
+    today.getFullYear(),
+    today.getMonth(),
+    today.getDate(),
+  ).getTime();
+}
+
+function getThreeMonthLimitDateTime() {
+  const today = new Date();
+
+  return new Date(
+    today.getFullYear(),
+    today.getMonth() + 3,
+    today.getDate(),
+  ).getTime();
+}
+
+function getInternationalMonthSummaries(events: typeof publishedEvents) {
+  const counts = events.reduce<Record<string, number>>((summaries, event) => {
+    const monthKey = getEventMonthKey(event.date);
+    summaries[monthKey] = (summaries[monthKey] ?? 0) + 1;
+
+    return summaries;
+  }, {});
+
+  return Object.entries(counts)
+    .sort(([a], [b]) => a.localeCompare(b))
+    .map(([monthKey, count]) => ({
+      monthKey,
+      count,
+      label: formatCalendarMonth(monthKey),
+    }));
+}
+
+function getInternationalPrefectureSummaries(events: typeof publishedEvents) {
+  return getEventPrefectures(events).map((prefecture) => ({
+    prefecture,
+    count: events.filter((event) => event.prefecture === prefecture).length,
+  }));
 }

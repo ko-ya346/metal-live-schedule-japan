@@ -120,6 +120,96 @@
   box-shadow: 0 16px 34px rgb(0 0 0 / 0.4);
 }
 
+.internationalOverview {
+  display: grid;
+  grid-template-columns: 300px minmax(0, 1fr);
+  gap: 16px;
+  max-width: 1180px;
+  margin: 0 auto 24px;
+}
+
+.internationalStatGrid {
+  display: grid;
+  gap: 10px;
+}
+
+.internationalStatGrid div {
+  display: grid;
+  gap: 3px;
+  padding: 16px;
+  border: 1px solid #343434;
+  border-radius: 6px;
+  background: #181818;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.36);
+}
+
+.internationalStatGrid strong {
+  color: #ffffff;
+  font-size: 2rem;
+  line-height: 1;
+}
+
+.internationalStatGrid span {
+  color: #b9b9b3;
+  font-size: 0.86rem;
+  font-weight: 800;
+}
+
+.internationalQuickList {
+  display: grid;
+  gap: 14px;
+  padding: 18px;
+  border: 1px solid #4a3434;
+  border-left: 4px solid #c52727;
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, rgb(255 107 107 / 0.08), transparent 42%),
+    #121212;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.36);
+}
+
+.quickEventList {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 10px;
+}
+
+.quickEventLink {
+  display: grid;
+  gap: 6px;
+  min-width: 0;
+  padding: 12px;
+  border: 1px solid #353535;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.26);
+  color: #f2f2ef;
+  text-decoration: none;
+}
+
+.quickEventLink:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+}
+
+.quickEventLink span {
+  color: #ff7777;
+  font-size: 0.8rem;
+  font-weight: 900;
+}
+
+.quickEventLink strong {
+  color: #ffffff;
+  line-height: 1.35;
+  overflow-wrap: anywhere;
+}
+
+.quickEventLink small {
+  color: #b9b9b3;
+  font-size: 0.84rem;
+  line-height: 1.45;
+  overflow-wrap: anywhere;
+}
+
 .discoveryCardGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -1588,6 +1678,8 @@
   .eventCard,
   .discoveryCardGrid,
   .featuredGrid,
+  .internationalOverview,
+  .quickEventList,
   .searchGuideGroups {
     grid-template-columns: 1fr;
   }
