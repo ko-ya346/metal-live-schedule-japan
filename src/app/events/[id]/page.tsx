@@ -122,9 +122,6 @@ function EventDiscoveryLinks({
       <div>
         <p className={styles.kicker}>Discover</p>
         <h2>このライブから探す</h2>
-        <p>
-          気になった出演者、会場、地域から近いライブを続けて探せます。
-        </p>
       </div>
       <div className={styles.discoveryLinks}>
         {links.map((link) => (
@@ -316,8 +313,6 @@ export default async function EventPage({ params }: EventPageProps) {
           <EventShareLinks eventUrl={eventUrl} shareText={shareText} />
         </div>
 
-        <EventDiscoveryLinks event={event} />
-
         <section className={styles.eventSourceSection}>
           {updatedDate && <p>情報更新日: {updatedDate}</p>}
           <p>
@@ -334,6 +329,8 @@ export default async function EventPage({ params }: EventPageProps) {
           </section>
         )}
       </article>
+
+      <EventDiscoveryLinks event={event} />
 
       <RelatedEvents
         currentEvent={event}

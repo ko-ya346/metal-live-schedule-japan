@@ -174,7 +174,6 @@ export function RelatedEvents({
   return (
     <section className={styles.relatedEventsSection}>
       <div>
-        <p className={styles.kicker}>Related</p>
         <h2 className={styles.sectionTitle}>関連ライブ</h2>
       </div>
       <RelatedEventList
