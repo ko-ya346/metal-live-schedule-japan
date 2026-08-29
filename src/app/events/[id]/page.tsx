@@ -9,6 +9,7 @@ import {
   formatArtists,
   formatEventStatus,
   formatYoutubeLinkLabel,
+  getPrimaryEventLinks,
   getSetlistSearchUrl,
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
@@ -207,7 +208,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const eventUrl = `${siteUrl}/events/${event.id}`;
   const isInternational = event.isInternational;
-  const hasPrimaryEventLinks = Boolean(event.ticketUrl || event.officialUrl);
+  const primaryEventLinks = getPrimaryEventLinks(event);
   const eventStructuredData = {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -293,28 +294,23 @@ export default async function EventPage({ params }: EventPageProps) {
         </dl>
 
         <div className={styles.eventDetailLinks}>
-          {hasPrimaryEventLinks && (
+          {primaryEventLinks.length > 0 && (
             <div className={styles.eventPrimaryLinks}>
-              {event.ticketUrl && (
+              {primaryEventLinks.map((link) => (
                 <a
-                  className={styles.primaryLink}
-                  href={event.ticketUrl}
+                  className={
+                    link.variant === "primary"
+                      ? styles.primaryLink
+                      : styles.secondaryLink
+                  }
+                  href={link.href}
+                  key={`${link.label}-${link.href}`}
                   target="_blank"
                   rel="noreferrer"
                 >
-                  {eventLinkLabels.ticket}
+                  {link.label}
                 </a>
-              )}
-              {event.officialUrl && (
-                <a
-                  className={styles.secondaryLink}
-                  href={event.officialUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {eventLinkLabels.official}
-                </a>
-              )}
+              ))}
             </div>
           )}
 

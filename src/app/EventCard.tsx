@@ -7,6 +7,7 @@ import {
   eventLinkLabels,
   formatEventStatus,
   formatYoutubeLinkLabel,
+  getPrimaryEventLinks,
   getSetlistSearchUrl,
   getYoutubeSearchUrl,
 } from "../utils/eventLinks";
@@ -23,6 +24,7 @@ type EventCardProps = {
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
+  const primaryEventLinks = getPrimaryEventLinks(event);
   const [isYoutubeOpen, setIsYoutubeOpen] = useState(false);
   const youtubeDetailsRef = useRef<HTMLDetailsElement>(null);
   const labels = event.isInternational
@@ -98,26 +100,21 @@ export function EventCard({ event }: EventCardProps) {
           <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
             {eventLinkLabels.detail}
           </Link>
-          {event.ticketUrl && (
+          {primaryEventLinks.map((link) => (
             <a
-              className={styles.primaryLink}
-              href={event.ticketUrl}
+              className={
+                link.variant === "primary"
+                  ? styles.primaryLink
+                  : styles.secondaryLink
+              }
+              href={link.href}
+              key={`${link.label}-${link.href}`}
               target="_blank"
               rel="noreferrer"
             >
-              {eventLinkLabels.ticket}
+              {link.label}
             </a>
-          )}
-          {event.officialUrl && (
-            <a
-              className={styles.secondaryLink}
-              href={event.officialUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {eventLinkLabels.official}
-            </a>
-          )}
+          ))}
         </div>
 
         <div className={styles.eventSupportLinks}>

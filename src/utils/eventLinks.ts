@@ -1,5 +1,11 @@
 import type { Event } from "../data/events";
 
+type PrimaryEventLink = {
+  href: string;
+  label: string;
+  variant: "primary" | "secondary";
+};
+
 export function formatArtists(artists: Event["artists"]) {
   return artists.join(" / ");
 }
@@ -48,6 +54,49 @@ export const eventLinkLabels = {
   allEvents: "イベント一覧へ戻る",
   youtubeMenu: "アーティスト別にYouTubeで探す",
 } as const;
+
+function normalizeComparableUrl(url: string) {
+  return url.trim().replace(/\/+$/, "");
+}
+
+export function getPrimaryEventLinks(event: Event): PrimaryEventLink[] {
+  const ticketUrl = event.ticketUrl;
+  const officialUrl = event.officialUrl;
+
+  if (
+    ticketUrl &&
+    officialUrl &&
+    normalizeComparableUrl(ticketUrl) === normalizeComparableUrl(officialUrl)
+  ) {
+    return [
+      {
+        href: ticketUrl,
+        label: eventLinkLabels.ticket,
+        variant: "primary",
+      },
+    ];
+  }
+
+  const links: PrimaryEventLink[] = [];
+
+  if (ticketUrl) {
+    links.push({
+      href: ticketUrl,
+      label: eventLinkLabels.ticket,
+      variant: "primary",
+    });
+  }
+
+  if (officialUrl) {
+    links.push({
+      href: officialUrl,
+      label: eventLinkLabels.official,
+      variant: "secondary",
+    });
+  }
+
+  return links;
+}
 
 export function formatYoutubeLinkLabel(artist: string, artistCount: number) {
   if (artistCount === 1) {
