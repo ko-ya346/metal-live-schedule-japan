@@ -92,16 +92,15 @@ function formatEventSummary(event: NonNullable<ReturnType<typeof findEvent>>) {
   const eventType = event.isInternational ? "来日公演" : "ライブ";
   const hasEnded = isPastEventDate(event.date);
   const eventTimingText = hasEnded ? "開催されました" : "開催予定です";
-  const linkTargets = [
-    event.ticketUrl ? "チケット情報" : null,
-    event.officialUrl ? "公式情報" : null,
-  ].filter((target): target is string => Boolean(target));
+  const linkTargets = getPrimaryEventLinks(event).map((link) =>
+    link.label === eventLinkLabels.ticket ? "チケット情報" : "公式情報",
+  );
   const linkText =
     linkTargets.length > 0
       ? `${linkTargets.join("と")}へのリンクを掲載しています。`
       : "確認できた範囲の公演情報を掲載しています。";
 
-  return `${artists}の${eventType}「${event.tourName}」は、${formatEventDate(
+  return `出演: ${artists}。${eventType}「${event.tourName}」は、${formatEventDate(
     event.date,
   )}に${event.prefecture}の${event.venue}で${eventTimingText}。${linkText}`;
 }
