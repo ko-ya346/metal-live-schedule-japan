@@ -10,7 +10,6 @@ import {
   formatEventStatus,
   formatYoutubeLinkLabel,
   getSetlistSearchUrl,
-  getXShareUrl,
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
 import { getRelatedEventCandidates } from "../../../utils/events";
@@ -21,6 +20,7 @@ import { ArtistLinks } from "../../ArtistLinks";
 import { PrefectureLink } from "../../PrefectureLink";
 import { VenueLink } from "../../VenueLink";
 import { siteName, siteUrl } from "../../site";
+import { EventShareLinks } from "./EventShareLinks";
 import { RelatedEvents } from "./RelatedEvents";
 import styles from "../../page.module.css";
 
@@ -340,20 +340,9 @@ export default async function EventPage({ params }: EventPageProps) {
                 {formatYoutubeLinkLabel(artist, event.artists.length)}
               </a>
             ))}
-            <a
-              className={styles.secondaryLink}
-              href={getXShareUrl(shareText, eventUrl)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {eventLinkLabels.share}
-            </a>
-            {isInternational && (
-              <Link className={styles.secondaryLink} href="/international">
-                {eventLinkLabels.international}
-              </Link>
-            )}
           </div>
+
+          <EventShareLinks eventUrl={eventUrl} shareText={shareText} />
         </div>
 
         <EventDiscoveryLinks event={event} />

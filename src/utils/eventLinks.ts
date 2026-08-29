@@ -43,7 +43,7 @@ export const eventLinkLabels = {
   ticket: "チケット",
   official: "公式",
   setlist: "セットリスト",
-  share: "Xで共有",
+  share: "Xでシェア",
   international: "来日公演一覧",
   allEvents: "イベント一覧へ戻る",
   youtubeMenu: "アーティスト別にYouTubeで探す",

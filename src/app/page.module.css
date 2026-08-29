@@ -1027,6 +1027,47 @@
   font-size: 0.84rem;
 }
 
+.eventUtilityLinks {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 8px;
+  padding-top: 2px;
+  color: #b9b9b3;
+  font-size: 0.86rem;
+}
+
+.shareTextLink,
+.copyLinkButton {
+  display: inline-flex;
+  align-items: center;
+  box-sizing: border-box;
+  justify-content: center;
+  min-height: 32px;
+  border: 1px solid #343434;
+  border-radius: 5px;
+  background: #090909;
+  color: #d4d4cf;
+  font: inherit;
+  font-size: 0.84rem;
+  font-weight: 800;
+  line-height: 1.2;
+  text-decoration: none;
+}
+
+.shareTextLink,
+.copyLinkButton {
+  padding: 0 12px;
+  cursor: pointer;
+}
+
+.shareTextLink:hover,
+.copyLinkButton:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  background: #181010;
+}
+
 .discoverySection {
   display: grid;
   gap: 14px;
