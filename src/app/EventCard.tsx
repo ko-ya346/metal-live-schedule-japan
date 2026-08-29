@@ -94,73 +94,78 @@ export function EventCard({ event }: EventCardProps) {
       </dl>
 
       <div className={styles.eventLinks} aria-label="イベントリンク">
-        <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
-          {eventLinkLabels.detail}
-        </Link>
-        {event.ticketUrl && (
-          <a
-            className={styles.primaryLink}
-            href={event.ticketUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {eventLinkLabels.ticket}
-          </a>
-        )}
-        {event.officialUrl && (
-          <a
-            className={styles.secondaryLink}
-            href={event.officialUrl}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {eventLinkLabels.official}
-          </a>
-        )}
-        {shouldShowSetlistLink && (
-          <a
-            className={styles.secondaryLink}
-            href={getSetlistSearchUrl(event.artists)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {eventLinkLabels.setlist}
-          </a>
-        )}
-        {shouldCollapseYoutubeLinks ? (
-          <details
-            className={styles.youtubeDetails}
-            onToggle={(event) => setIsYoutubeOpen(event.currentTarget.open)}
-            open={isYoutubeOpen}
-            ref={youtubeDetailsRef}
-          >
-            <summary className={styles.secondaryLink}>
-              {eventLinkLabels.youtubeMenu}
-            </summary>
-            <div className={styles.youtubeArtistLinks}>
-              {event.artists.map((artist) => (
-                <a
-                  className={styles.secondaryLink}
-                  href={getYoutubeSearchUrl(artist)}
-                  key={artist}
-                  target="_blank"
-                  rel="noreferrer"
-                >
-                  {formatYoutubeLinkLabel(artist, event.artists.length)}
-                </a>
-              ))}
-            </div>
-          </details>
-        ) : (
-          <a
-            className={styles.secondaryLink}
-            href={getYoutubeSearchUrl(event.artists[0])}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {formatYoutubeLinkLabel(event.artists[0], event.artists.length)}
-          </a>
-        )}
+        <div className={styles.eventPrimaryLinks}>
+          <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
+            {eventLinkLabels.detail}
+          </Link>
+          {event.ticketUrl && (
+            <a
+              className={styles.primaryLink}
+              href={event.ticketUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {eventLinkLabels.ticket}
+            </a>
+          )}
+          {event.officialUrl && (
+            <a
+              className={styles.secondaryLink}
+              href={event.officialUrl}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {eventLinkLabels.official}
+            </a>
+          )}
+        </div>
+
+        <div className={styles.eventSupportLinks}>
+          {shouldShowSetlistLink && (
+            <a
+              className={styles.secondaryLink}
+              href={getSetlistSearchUrl(event.artists)}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {eventLinkLabels.setlist}
+            </a>
+          )}
+          {shouldCollapseYoutubeLinks ? (
+            <details
+              className={styles.youtubeDetails}
+              onToggle={(event) => setIsYoutubeOpen(event.currentTarget.open)}
+              open={isYoutubeOpen}
+              ref={youtubeDetailsRef}
+            >
+              <summary className={styles.secondaryLink}>
+                {eventLinkLabels.youtubeMenu}
+              </summary>
+              <div className={styles.youtubeArtistLinks}>
+                {event.artists.map((artist) => (
+                  <a
+                    className={styles.secondaryLink}
+                    href={getYoutubeSearchUrl(artist)}
+                    key={artist}
+                    target="_blank"
+                    rel="noreferrer"
+                  >
+                    {formatYoutubeLinkLabel(artist, event.artists.length)}
+                  </a>
+                ))}
+              </div>
+            </details>
+          ) : (
+            <a
+              className={styles.secondaryLink}
+              href={getYoutubeSearchUrl(event.artists[0])}
+              target="_blank"
+              rel="noreferrer"
+            >
+              {formatYoutubeLinkLabel(event.artists[0], event.artists.length)}
+            </a>
+          )}
+        </div>
       </div>
     </article>
   );

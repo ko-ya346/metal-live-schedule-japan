@@ -207,6 +207,7 @@ export default async function EventPage({ params }: EventPageProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const eventUrl = `${siteUrl}/events/${event.id}`;
   const isInternational = event.isInternational;
+  const hasPrimaryEventLinks = Boolean(event.ticketUrl || event.officialUrl);
   const eventStructuredData = {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -292,60 +293,67 @@ export default async function EventPage({ params }: EventPageProps) {
         </dl>
 
         <div className={styles.eventDetailLinks}>
-          {event.ticketUrl && (
-            <a
-              className={styles.primaryLink}
-              href={event.ticketUrl}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {eventLinkLabels.ticket}
-            </a>
+          {hasPrimaryEventLinks && (
+            <div className={styles.eventPrimaryLinks}>
+              {event.ticketUrl && (
+                <a
+                  className={styles.primaryLink}
+                  href={event.ticketUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {eventLinkLabels.ticket}
+                </a>
+              )}
+              {event.officialUrl && (
+                <a
+                  className={styles.secondaryLink}
+                  href={event.officialUrl}
+                  target="_blank"
+                  rel="noreferrer"
+                >
+                  {eventLinkLabels.official}
+                </a>
+              )}
+            </div>
           )}
-          {event.officialUrl && (
+
+          <div className={styles.eventSupportLinks}>
+            {shouldShowSetlistLink && (
+              <a
+                className={styles.secondaryLink}
+                href={getSetlistSearchUrl(event.artists)}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {eventLinkLabels.setlist}
+              </a>
+            )}
+            {event.artists.map((artist) => (
+              <a
+                className={styles.secondaryLink}
+                href={getYoutubeSearchUrl(artist)}
+                key={artist}
+                target="_blank"
+                rel="noreferrer"
+              >
+                {formatYoutubeLinkLabel(artist, event.artists.length)}
+              </a>
+            ))}
             <a
               className={styles.secondaryLink}
-              href={event.officialUrl}
+              href={getXShareUrl(shareText, eventUrl)}
               target="_blank"
               rel="noreferrer"
             >
-              {eventLinkLabels.official}
+              {eventLinkLabels.share}
             </a>
-          )}
-          {shouldShowSetlistLink && (
-            <a
-              className={styles.secondaryLink}
-              href={getSetlistSearchUrl(event.artists)}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {eventLinkLabels.setlist}
-            </a>
-          )}
-          {event.artists.map((artist) => (
-            <a
-              className={styles.secondaryLink}
-              href={getYoutubeSearchUrl(artist)}
-              key={artist}
-              target="_blank"
-              rel="noreferrer"
-            >
-              {formatYoutubeLinkLabel(artist, event.artists.length)}
-            </a>
-          ))}
-          <a
-            className={styles.secondaryLink}
-            href={getXShareUrl(shareText, eventUrl)}
-            target="_blank"
-            rel="noreferrer"
-          >
-            {eventLinkLabels.share}
-          </a>
-          {isInternational && (
-            <Link className={styles.secondaryLink} href="/international">
-              {eventLinkLabels.international}
-            </Link>
-          )}
+            {isInternational && (
+              <Link className={styles.secondaryLink} href="/international">
+                {eventLinkLabels.international}
+              </Link>
+            )}
+          </div>
         </div>
 
         <EventDiscoveryLinks event={event} />

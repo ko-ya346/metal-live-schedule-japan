@@ -952,11 +952,9 @@
 }
 
 .eventLinks {
-  display: flex;
-  flex-wrap: wrap;
+  display: grid;
   grid-column: 1 / -1;
-  gap: 8px;
-  justify-content: flex-start;
+  gap: 9px;
   padding-top: 2px;
 }
 
@@ -1004,9 +1002,29 @@
 }
 
 .eventDetailLinks {
+  display: grid;
+  gap: 10px;
+}
+
+.eventPrimaryLinks,
+.eventSupportLinks {
   display: flex;
   flex-wrap: wrap;
   gap: 8px;
+  justify-content: flex-start;
+}
+
+.eventSupportLinks {
+  padding-top: 2px;
+}
+
+.eventSupportLinks .secondaryLink {
+  min-height: 34px;
+  padding: 0 12px;
+  border-color: #343434;
+  background: #0b0b0b;
+  color: #d4d4cf;
+  font-size: 0.84rem;
 }
 
 .discoverySection {
@@ -1642,13 +1660,15 @@
     font-size: 0.68rem;
   }
 
-  .eventLinks {
+  .eventPrimaryLinks,
+  .eventSupportLinks {
     display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     justify-content: stretch;
   }
 
-  .eventLinks > * {
+  .eventPrimaryLinks > *,
+  .eventSupportLinks > * {
     min-width: 0;
   }
 
