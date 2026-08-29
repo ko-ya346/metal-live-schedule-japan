@@ -87,24 +87,6 @@ function formatOperationalDate(date: string | undefined) {
   return formatEventDate(date as `${number}-${number}-${number}`);
 }
 
-function formatEventSummary(event: NonNullable<ReturnType<typeof findEvent>>) {
-  const artists = formatArtists(event.artists);
-  const eventType = event.isInternational ? "来日公演" : "ライブ";
-  const hasEnded = isPastEventDate(event.date);
-  const eventTimingText = hasEnded ? "開催されました" : "開催予定です";
-  const linkTargets = getPrimaryEventLinks(event).map((link) =>
-    link.label === eventLinkLabels.ticket ? "チケット情報" : "公式情報",
-  );
-  const linkText =
-    linkTargets.length > 0
-      ? `${linkTargets.join("と")}へのリンクを掲載しています。`
-      : "確認できた範囲の公演情報を掲載しています。";
-
-  return `出演: ${artists}。${eventType}「${event.tourName}」は、${formatEventDate(
-    event.date,
-  )}に${event.prefecture}の${event.venue}で${eventTimingText}。${linkText}`;
-}
-
 function EventDiscoveryLinks({
   event,
 }: {
@@ -257,8 +239,6 @@ export default async function EventPage({ params }: EventPageProps) {
       </header>
 
       <article className={styles.eventDetail}>
-        <p className={styles.eventDetailSummary}>{formatEventSummary(event)}</p>
-
         <dl className={styles.eventDetailMeta}>
           <div>
             <dt>{isInternational ? "日程 / Date" : "日程"}</dt>

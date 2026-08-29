@@ -970,14 +970,6 @@
   box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
 }
 
-.eventDetailSummary {
-  max-width: none;
-  margin: 0;
-  color: #d9d9d4;
-  line-height: 1.8;
-  overflow-wrap: anywhere;
-}
-
 .eventDetailMeta {
   display: grid;
   gap: 14px;
