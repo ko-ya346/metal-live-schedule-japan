@@ -27,17 +27,6 @@ export function EventCard({ event }: EventCardProps) {
   const primaryEventLinks = getPrimaryEventLinks(event);
   const [isYoutubeOpen, setIsYoutubeOpen] = useState(false);
   const youtubeDetailsRef = useRef<HTMLDetailsElement>(null);
-  const labels = event.isInternational
-    ? {
-        venue: "会場 / Venue",
-        genre: "ジャンル / Genre",
-        status: "状況 / Status",
-      }
-    : {
-        venue: "会場",
-        genre: "ジャンル",
-        status: "状況",
-      };
 
   useEffect(() => {
     if (!isYoutubeOpen) {
@@ -71,7 +60,7 @@ export function EventCard({ event }: EventCardProps) {
 
       <dl className={styles.eventMeta}>
         <div>
-          <dt>{labels.venue}</dt>
+          <dt>会場</dt>
           <dd>
             <PrefectureLink
               className={styles.inlineLink}
@@ -86,11 +75,11 @@ export function EventCard({ event }: EventCardProps) {
           </dd>
         </div>
         <div>
-          <dt>{labels.genre}</dt>
+          <dt>ジャンル</dt>
           <dd>{event.genres.join(", ")}</dd>
         </div>
         <div>
-          <dt>{labels.status}</dt>
+          <dt>状況</dt>
           <dd>{formatEventStatus(event.status)}</dd>
         </div>
       </dl>

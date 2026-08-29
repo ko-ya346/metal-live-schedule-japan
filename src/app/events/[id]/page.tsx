@@ -188,7 +188,6 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const eventUrl = `${siteUrl}/events/${event.id}`;
-  const isInternational = event.isInternational;
   const primaryEventLinks = getPrimaryEventLinks(event);
   const eventStructuredData = {
     "@context": "https://schema.org",
@@ -241,14 +240,11 @@ export default async function EventPage({ params }: EventPageProps) {
       <article className={styles.eventDetail}>
         <dl className={styles.eventDetailMeta}>
           <div>
-            <dt>{isInternational ? "日程 / Date" : "日程"}</dt>
-            <dd>
-              {formatEventDate(event.date)}
-              {isInternational ? ` / ${event.date}` : ""}
-            </dd>
+            <dt>日程</dt>
+            <dd>{formatEventDate(event.date)}</dd>
           </div>
           <div>
-            <dt>{isInternational ? "会場 / Venue" : "会場"}</dt>
+            <dt>会場</dt>
             <dd>
               <PrefectureLink
                 className={styles.inlineLink}
@@ -263,11 +259,11 @@ export default async function EventPage({ params }: EventPageProps) {
             </dd>
           </div>
           <div>
-            <dt>{isInternational ? "ジャンル / Genre" : "ジャンル"}</dt>
+            <dt>ジャンル</dt>
             <dd>{event.genres.join(", ")}</dd>
           </div>
           <div>
-            <dt>{isInternational ? "状況 / Status" : "状況"}</dt>
+            <dt>状況</dt>
             <dd>{formatEventStatus(event.status)}</dd>
           </div>
         </dl>
