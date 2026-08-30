@@ -468,6 +468,29 @@ export default function Page() {
             onDateSelect={setSelectedDate}
           />
 
+          {selectedDate && (
+            <section className={styles.selectedDateSection}>
+              <div className={styles.sectionHeader}>
+                <h2 className={styles.sectionTitle}>選択した日のライブ</h2>
+                <button
+                  className={styles.clearDateButton}
+                  type="button"
+                  onClick={() => setSelectedDate(null)}
+                >
+                  選択を解除
+                </button>
+              </div>
+
+              {selectedDateEvents.length > 0 ? (
+                <EventDateGroup date={selectedDate} events={selectedDateEvents} />
+              ) : (
+                <p className={styles.empty}>
+                  選択した日に一致するライブはありません。
+                </p>
+              )}
+            </section>
+          )}
+
           {!hasActiveFilters && featuredEvents.length > 0 && (
             <section className={styles.featuredSection}>
               <div className={styles.sectionHeader}>
@@ -503,29 +526,6 @@ export default function Page() {
                   <EventCard event={event} key={event.id} />
                 ))}
               </div>
-            </section>
-          )}
-
-          {selectedDate && (
-            <section className={styles.selectedDateSection}>
-              <div className={styles.sectionHeader}>
-                <h2 className={styles.sectionTitle}>選択した日のライブ</h2>
-                <button
-                  className={styles.clearDateButton}
-                  type="button"
-                  onClick={() => setSelectedDate(null)}
-                >
-                  選択を解除
-                </button>
-              </div>
-
-              {selectedDateEvents.length > 0 ? (
-                <EventDateGroup date={selectedDate} events={selectedDateEvents} />
-              ) : (
-                <p className={styles.empty}>
-                  選択した日に一致するライブはありません。
-                </p>
-              )}
             </section>
           )}
 

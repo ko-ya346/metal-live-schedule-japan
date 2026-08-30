@@ -28,6 +28,7 @@ const genreColorRules = [
   { keywords: ["Metal"], color: "#d7d7d2" },
 ];
 const fallbackGenreColor = "#9a9a94";
+const maxVisibleEventsPerDate = 4;
 
 function groupEventsByDate(events: Event[]) {
   return events.reduce<Record<string, Event[]>>((groups, event) => {
@@ -106,6 +107,8 @@ export function EventCalendar({
         {calendarDates.map((date) => {
           const dateKey = formatDateKey(date);
           const dateEvents = eventsByDate[dateKey] ?? [];
+          const visibleDateEvents = dateEvents.slice(0, maxVisibleEventsPerDate);
+          const hiddenEventCount = dateEvents.length - visibleDateEvents.length;
           const isCurrentMonth = dateKey.startsWith(monthKey);
           const isSelected = selectedDate === dateKey;
 
@@ -121,20 +124,34 @@ export function EventCalendar({
                 type="button"
                 onClick={() => onDateSelect(dateKey)}
               >
-                {date.getDate()}
+                <span>{date.getDate()}</span>
+                {dateEvents.length > 0 && (
+                  <span className={styles.calendarDateCount}>
+                    {dateEvents.length}件
+                  </span>
+                )}
               </button>
               <div className={styles.calendarEvents}>
-                {dateEvents.map((event) => (
+                {visibleDateEvents.map((event) => (
                   <Link
                     className={styles.calendarEvent}
                     href={`/events/${event.id}`}
                     key={event.id}
                     style={getCalendarEventStyle(event.genres)}
-                    title={`${event.artists.join(", ")} / ${event.genres.join(", ")}`}
+                    title={`${event.artists.join(", ")} / ${event.tourName}`}
                   >
                     <span>{formatCalendarEventArtists(event.artists)}</span>
                   </Link>
                 ))}
+                {hiddenEventCount > 0 && (
+                  <button
+                    className={styles.calendarMoreButton}
+                    type="button"
+                    onClick={() => onDateSelect(dateKey)}
+                  >
+                    +{hiddenEventCount}件
+                  </button>
+                )}
               </div>
             </div>
           );
