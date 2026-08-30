@@ -76,6 +76,7 @@ export function EventCalendar({
 }: EventCalendarProps) {
   const calendarDates = getCalendarDates(monthKey);
   const eventsByDate = groupEventsByDate(events);
+  const todayKey = formatDateKey(new Date());
 
   return (
     <section className={styles.calendar} aria-label="月間カレンダー">
@@ -111,11 +112,15 @@ export function EventCalendar({
           const hiddenEventCount = dateEvents.length - visibleDateEvents.length;
           const isCurrentMonth = dateKey.startsWith(monthKey);
           const isSelected = selectedDate === dateKey;
+          const isToday = dateKey === todayKey;
+          const isPastDate = dateKey < todayKey;
 
           return (
             <div
               className={`${styles.calendarCell} ${
                 isCurrentMonth ? "" : styles.outsideMonth
+              } ${isPastDate ? styles.pastDate : ""} ${
+                isToday ? styles.todayDate : ""
               } ${isSelected ? styles.selectedDate : ""}`}
               key={dateKey}
             >

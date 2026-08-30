@@ -560,6 +560,44 @@
   background: #241717;
 }
 
+.pastDate {
+  background: #101010;
+}
+
+.pastDate .calendarDateButton {
+  color: #777777;
+}
+
+.pastDate .calendarEvent {
+  border-color: #2b2b2b;
+  border-left-color: #555555;
+  background: #151515;
+  color: #8d8d87;
+}
+
+.pastDate .calendarMoreButton {
+  border-color: #2b2b2b;
+  color: #777777;
+}
+
+.todayDate {
+  position: relative;
+  background:
+    linear-gradient(135deg, rgb(255 107 107 / 0.13), transparent 48%),
+    #201515;
+}
+
+.todayDate .calendarDateButton {
+  padding: 0 8px;
+  border-radius: 999px;
+  background: #c52727;
+  color: #ffffff;
+}
+
+.todayDate .calendarDateCount {
+  color: #ffffff;
+}
+
 .selectedDate {
   outline: 2px solid #ff6b6b;
   outline-offset: -2px;
@@ -657,6 +695,10 @@
 
 .outsideMonth {
   background: #080808;
+}
+
+.outsideMonth.pastDate {
+  background: #070707;
 }
 
 .outsideMonth:hover {
