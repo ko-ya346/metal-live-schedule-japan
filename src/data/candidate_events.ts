@@ -8968,4 +8968,31 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-09-01",
         reviewedAt: null,
     },
+
+    {
+        id: "deviloof-gokuraku-2026-shibuya",
+        artists: [
+            "DEVILOOF",
+        ],
+        tourName: null,
+        date: "2026-12-12",
+        prefecture: "東京都",
+        venue: "SHIBUYA STREAM",
+        genres: [
+            "Extreme Metal",
+            "Death Metal",
+        ],
+        isInternational: false,
+        ticketUrl: null,
+        officialUrl: "https://www.creativeman.co.jp/event/deviloof-gokuraku/",
+        sourceUrl: "https://www.creativeman.co.jp/event/deviloof-gokuraku/",
+        sourceType: "promoter",
+        sourceName: "Creativeman",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "公式プロモーターサイトからの情報で、日付・会場・アーティストが明確。DEVILOOFはデスメタル系バンドで対象ジャンルに合致。",
+        collectedAt: "2026-09-03",
+        reviewedAt: null,
+    },
 ];
