@@ -146,6 +146,11 @@ export function EventCalendar({
                     title={`${event.artists.join(", ")} / ${event.tourName}`}
                   >
                     <span>{formatCalendarEventArtists(event.artists)}</span>
+                    {event.isInternational && (
+                      <span className={styles.calendarInternationalBadge}>
+                        来日
+                      </span>
+                    )}
                   </Link>
                 ))}
                 {hiddenEventCount > 0 && (

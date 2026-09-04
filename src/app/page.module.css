@@ -668,6 +668,24 @@
   min-width: 0;
 }
 
+.calendarInternationalBadge {
+  flex: 0 0 auto;
+  padding: 2px 5px;
+  border: 1px solid rgb(255 107 107 / 0.56);
+  border-radius: 999px;
+  background: rgb(197 39 39 / 0.26);
+  color: #ffdede;
+  font-size: 0.64rem;
+  font-weight: 900;
+  line-height: 1;
+}
+
+.pastDate .calendarInternationalBadge {
+  border-color: #3a3a3a;
+  background: #191919;
+  color: #777777;
+}
+
 .calendarDateCount {
   color: #ff8a8a;
   font-size: 0.72rem;
@@ -1768,6 +1786,11 @@
 
   .calendarDateCount {
     display: none;
+  }
+
+  .calendarInternationalBadge {
+    padding: 2px 4px;
+    font-size: 0.58rem;
   }
 
   .eventPrimaryLinks,
