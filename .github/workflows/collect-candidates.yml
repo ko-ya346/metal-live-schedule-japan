@@ -58,12 +58,19 @@ jobs:
           today="$(TZ=Asia/Tokyo date +%Y-%m-%d)"
 
           {
-            echo "# 候補イベント確認依頼"
+            echo "# 候補イベントの確認"
             echo
-            echo "自動収集で候補イベントを追加しました。"
+            echo "自動収集で候補イベントが追加されました。"
             echo
-            echo "/admin/candidates を開いて、review_needed の候補を確認してください。"
-            echo "人間または LLM が候補を確認し、必要な反映が終わったらこの issue を close してください。"
+            echo "## やること"
+            echo
+            echo "- ローカルで \`/admin/candidates\` を開く"
+            echo "- \`review_needed\` の候補を確認する"
+            echo "- 公開するものは「公開」、対象外は「無視」にする"
+            echo "- 反映後に push する"
+            echo "- この issue の候補がすべて確認済みになったら close する"
+            echo
+            echo "## 今回追加された候補"
             echo
             cat candidate-report.md
           } > candidate-issue.md
