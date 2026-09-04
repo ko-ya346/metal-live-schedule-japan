@@ -30,6 +30,16 @@ const genreColorRules = [
 const fallbackGenreColor = "#9a9a94";
 const maxVisibleEventsPerDate = 4;
 
+function sortCalendarEvents(events: Event[]) {
+  return [...events].sort((a, b) => {
+    if (a.isInternational !== b.isInternational) {
+      return a.isInternational ? -1 : 1;
+    }
+
+    return a.artists[0].localeCompare(b.artists[0], "ja");
+  });
+}
+
 function groupEventsByDate(events: Event[]) {
   return events.reduce<Record<string, Event[]>>((groups, event) => {
     if (!groups[event.date]) {
@@ -107,7 +117,7 @@ export function EventCalendar({
 
         {calendarDates.map((date) => {
           const dateKey = formatDateKey(date);
-          const dateEvents = eventsByDate[dateKey] ?? [];
+          const dateEvents = sortCalendarEvents(eventsByDate[dateKey] ?? []);
           const visibleDateEvents = dateEvents.slice(0, maxVisibleEventsPerDate);
           const hiddenEventCount = dateEvents.length - visibleDateEvents.length;
           const isCurrentMonth = dateKey.startsWith(monthKey);
