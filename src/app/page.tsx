@@ -2,6 +2,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import type { Event, EventDate } from "../data/events";
+import { discoveryPicks } from "../data/discovery";
 import { events } from "../data/events";
 import {
   ALL_FILTER_VALUE,
@@ -27,6 +28,7 @@ import { EventCalendar } from "./EventCalendar";
 import { EventCard } from "./EventCard";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
+import { DiscoveryArtists } from "./DiscoveryArtists";
 import { SiteAnalytics } from "./Analytics";
 import styles from "./page.module.css";
 
@@ -365,6 +367,14 @@ export default function Page() {
           ))}
         </div>
       </section>
+
+      {!hasActiveFilters && (
+        <DiscoveryArtists
+          eventList={allUpcomingEvents}
+          monthKey={currentMonthKey}
+          picks={discoveryPicks}
+        />
+      )}
 
       <div className={styles.contentLayout}>
         <aside className={styles.sidebar} aria-label="絞り込みと探し方">
