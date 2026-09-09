@@ -368,13 +368,11 @@ export default function Page() {
         </div>
       </section>
 
-      {!hasActiveFilters && (
-        <DiscoveryArtists
-          eventList={allUpcomingEvents}
-          monthKey={currentMonthKey}
-          picks={discoveryPicks}
-        />
-      )}
+      <DiscoveryArtists
+        eventList={allUpcomingEvents}
+        monthKey={currentMonthKey}
+        picks={discoveryPicks}
+      />
 
       <div className={styles.contentLayout}>
         <aside className={styles.sidebar} aria-label="絞り込みと探し方">
