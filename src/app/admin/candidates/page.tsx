@@ -31,8 +31,9 @@ export default async function AdminCandidatesPage({
 }: AdminCandidatesPageProps) {
   const resolvedSearchParams = await searchParams;
   const adminMessage = resolvedSearchParams?.adminMessage;
-  const selectedStatus = isCandidateEventStatus(resolvedSearchParams?.status)
-    ? resolvedSearchParams.status
+  const requestedStatus = resolvedSearchParams?.status;
+  const selectedStatus = isCandidateEventStatus(requestedStatus)
+    ? requestedStatus
     : "review_needed";
 
   return (
