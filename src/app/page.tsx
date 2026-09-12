@@ -36,6 +36,12 @@ function formatEventCount(count: number) {
   return `${count}件のライブが見つかりました`;
 }
 
+function formatShortDate(date: string) {
+  const parsedDate = new Date(`${date}T00:00:00+09:00`);
+
+  return `${parsedDate.getMonth() + 1}/${parsedDate.getDate()}`;
+}
+
 function getRecentlyPublishedEvents(eventList: typeof events) {
   return eventList
     .filter((event) => event.publishedAt)
@@ -528,10 +534,30 @@ export default function Page() {
 
           {!hasActiveFilters && recentlyPublishedEvents.length > 0 && (
             <section className={styles.recentSection}>
-              <h2 className={styles.sectionTitle}>最近追加したライブ</h2>
-              <div className={styles.eventList}>
+              <div className={styles.recentHeader}>
+                <h2 className={styles.recentTitle}>最近追加したライブ</h2>
+                <span>{recentlyPublishedEvents.length}件</span>
+              </div>
+              <div className={styles.recentList}>
                 {recentlyPublishedEvents.map((event) => (
-                  <EventCard event={event} key={event.id} />
+                  <Link
+                    className={styles.recentItem}
+                    href={`/events/${event.id}`}
+                    key={event.id}
+                  >
+                    <span className={styles.recentPublishedAt}>
+                      {event.publishedAt
+                        ? `${formatShortDate(event.publishedAt)}追加`
+                        : "追加"}
+                    </span>
+                    <span className={styles.recentItemBody}>
+                      <strong>{event.artists.join(" / ")}</strong>
+                      <span>
+                        {formatShortDate(event.date)} / {event.prefecture} /{" "}
+                        {event.venue}
+                      </span>
+                    </span>
+                  </Link>
                 ))}
               </div>
             </section>
