@@ -621,6 +621,35 @@
   color: #ff6b6b;
 }
 
+.calendarSummary {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: 8px;
+  margin: -4px 0 0;
+}
+
+.calendarSummary div {
+  display: grid;
+  gap: 4px;
+  padding: 12px;
+  border: 1px solid #2f2f2f;
+  border-radius: 6px;
+  background: #141414;
+}
+
+.calendarSummary dt {
+  color: #9d9d96;
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
+.calendarSummary dd {
+  margin: 0;
+  color: #f2f2ef;
+  font-size: 1.05rem;
+  font-weight: 900;
+}
+
 .calendarGrid {
   display: grid;
   grid-template-columns: repeat(7, minmax(0, 1fr));
@@ -639,6 +668,7 @@
   font-size: 0.82rem;
   font-weight: 700;
   text-align: center;
+  white-space: nowrap;
 }
 
 .calendarCell {
@@ -790,6 +820,7 @@
   color: #ff8a8a;
   font-size: 0.72rem;
   font-weight: 900;
+  white-space: nowrap;
 }
 
 .calendarMoreButton {
@@ -804,6 +835,22 @@
   font-weight: 800;
   text-align: left;
   cursor: pointer;
+}
+
+.calendarMobileMoreButton {
+  display: none;
+}
+
+.calendarMobileSummaryButton {
+  display: none;
+}
+
+.calendarMobilePreview {
+  display: none;
+}
+
+.calendarMobileTooltip {
+  display: none;
 }
 
 .calendarMoreButton:hover {
@@ -1951,16 +1998,73 @@
     grid-row: 2;
   }
 
+  .calendarGrid {
+    overflow: visible;
+  }
+
+  .calendarSummary {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .calendarSummary div:last-child {
+    grid-column: 1 / -1;
+  }
+
+  .calendarSummary div {
+    padding: 9px;
+  }
+
+  .calendarSummary dt {
+    font-size: 0.72rem;
+  }
+
+  .calendarSummary dd {
+    font-size: 0.98rem;
+  }
+
   .calendarCell {
-    min-height: 104px;
-    padding: 6px;
+    position: relative;
+    min-height: 68px;
+    padding: 5px 4px;
+  }
+
+  .calendarDateButton {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    justify-items: center;
+    gap: 2px;
+    margin-bottom: 0;
+    padding: 2px 0;
+  }
+
+  .todayDate .calendarDateButton {
+    padding: 2px 0;
+    border-radius: 6px;
+  }
+
+  .calendarEvents {
+    display: none;
   }
 
   .calendarEvent {
-    gap: 3px;
-    min-height: 24px;
-    padding: 3px 4px 3px 5px;
-    font-size: 0.68rem;
+    gap: 0;
+    min-height: 20px;
+    padding: 2px 3px 2px 4px;
+    border-left-width: 2px;
+    font-size: 0.58rem;
+    line-height: 1.2;
+    white-space: nowrap;
+  }
+
+  .calendarEvent:nth-child(n + 3) {
+    display: none;
+  }
+
+  .calendarEvent span:first-child {
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
 
   .calendarDateCount {
@@ -1968,8 +2072,79 @@
   }
 
   .calendarInternationalBadge {
-    padding: 2px 4px;
-    font-size: 0.58rem;
+    display: none;
+  }
+
+  .calendarMoreButton {
+    display: none;
+  }
+
+  .calendarMobilePreview {
+    position: relative;
+    display: block;
+  }
+
+  .calendarMobileSummaryButton {
+    display: block;
+    width: 100%;
+    min-height: 22px;
+    padding: 0 3px;
+    border: 1px solid rgb(255 107 107 / 0.32);
+    border-radius: 999px;
+    background: rgb(197 39 39 / 0.16);
+    color: #ffb3b3;
+    font: inherit;
+    font-size: 0.68rem;
+    font-weight: 900;
+    text-align: center;
+    white-space: nowrap;
+  }
+
+  .calendarMobileSummaryButton:focus-visible,
+  .calendarMobileSummaryButton:hover {
+    border-color: #ff6b6b;
+    color: #ffffff;
+  }
+
+  .mobilePreviewDate .calendarMobileTooltip,
+  .calendarMobilePreview:focus-within .calendarMobileTooltip {
+    position: absolute;
+    z-index: 4;
+    left: 50%;
+    bottom: calc(100% + 6px);
+    display: grid;
+    width: max-content;
+    max-width: min(220px, 72vw);
+    gap: 3px;
+    padding: 8px 10px;
+    border: 1px solid #4a2d2d;
+    border-radius: 6px;
+    background: #201515;
+    box-shadow: 0 12px 30px rgb(0 0 0 / 0.55);
+    color: #f7f7f2;
+    font-size: 0.72rem;
+    font-weight: 700;
+    line-height: 1.35;
+    text-align: left;
+    text-decoration: none;
+    transform: translateX(-50%);
+    white-space: normal;
+  }
+
+  .calendarMobileTooltip span {
+    display: block;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  .calendarMobileTooltip strong {
+    display: block;
+    margin-top: 4px;
+    color: #ffb3b3;
+    font-size: 0.7rem;
+    font-weight: 900;
+    white-space: nowrap;
   }
 
   .eventPrimaryLinks,

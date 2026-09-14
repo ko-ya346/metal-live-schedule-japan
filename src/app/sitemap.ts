@@ -104,6 +104,18 @@ export default function sitemap(): MetadataRoute.Sitemap {
     },
   );
 
+  const datePages: MetadataRoute.Sitemap = Array.from(
+    new Set(publishedEvents.map((event) => event.date)),
+  ).map((date) => {
+    const dateEvents = publishedEvents.filter((event) => event.date === date);
+    const lastModified = getLatestEventModifiedDate(dateEvents);
+
+    return {
+      url: `${siteUrl}/dates/${date}`,
+      ...(lastModified ? { lastModified } : {}),
+    };
+  });
+
   const venuePages: MetadataRoute.Sitemap = getVenues(publishedEvents).map(
     (venue) => {
       const venueEvents = getEventsByVenueSlug(publishedEvents, venue.slug);
@@ -123,6 +135,7 @@ export default function sitemap(): MetadataRoute.Sitemap {
     ...prefecturePages,
     ...genrePages,
     ...monthPages,
+    ...datePages,
     ...venuePages,
   ];
 }

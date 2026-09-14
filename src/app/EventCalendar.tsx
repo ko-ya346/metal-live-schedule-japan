@@ -1,4 +1,4 @@
-import type { CSSProperties } from "react";
+import { useState, type CSSProperties } from "react";
 import Link from "next/link";
 import type { Event } from "../data/events";
 import {
@@ -84,8 +84,15 @@ export function EventCalendar({
   onMonthChange,
   onDateSelect,
 }: EventCalendarProps) {
+  const [previewDate, setPreviewDate] = useState<Event["date"] | null>(null);
   const calendarDates = getCalendarDates(monthKey);
   const eventsByDate = groupEventsByDate(events);
+  const monthlyEvents = events.filter((event) => event.date.startsWith(monthKey));
+  const monthlyLiveDateCount = new Set(monthlyEvents.map((event) => event.date))
+    .size;
+  const monthlyInternationalCount = monthlyEvents.filter(
+    (event) => event.isInternational,
+  ).length;
   const todayKey = formatDateKey(new Date());
 
   return (
@@ -94,7 +101,10 @@ export function EventCalendar({
         <button
           className={styles.monthButton}
           type="button"
-          onClick={() => onMonthChange(getPreviousMonthKey(monthKey))}
+          onClick={() => {
+            setPreviewDate(null);
+            onMonthChange(getPreviousMonthKey(monthKey));
+          }}
         >
           前の月
         </button>
@@ -102,11 +112,32 @@ export function EventCalendar({
         <button
           className={styles.monthButton}
           type="button"
-          onClick={() => onMonthChange(getNextMonthKey(monthKey))}
+          onClick={() => {
+            setPreviewDate(null);
+            onMonthChange(getNextMonthKey(monthKey));
+          }}
         >
           次の月
         </button>
       </div>
+
+      <dl
+        className={styles.calendarSummary}
+        aria-label={`${formatCalendarMonth(monthKey)}の掲載状況`}
+      >
+        <div>
+          <dt>掲載ライブ</dt>
+          <dd>{monthlyEvents.length}件</dd>
+        </div>
+        <div>
+          <dt>来日公演</dt>
+          <dd>{monthlyInternationalCount}件</dd>
+        </div>
+        <div>
+          <dt>開催日</dt>
+          <dd>{monthlyLiveDateCount}日</dd>
+        </div>
+      </dl>
 
       <div className={styles.calendarGrid}>
         {weekDays.map((day) => (
@@ -122,6 +153,7 @@ export function EventCalendar({
           const hiddenEventCount = dateEvents.length - visibleDateEvents.length;
           const isCurrentMonth = dateKey.startsWith(monthKey);
           const isSelected = selectedDate === dateKey;
+          const isPreviewed = previewDate === dateKey;
           const isToday = dateKey === todayKey;
           const isPastDate = dateKey < todayKey;
 
@@ -131,13 +163,18 @@ export function EventCalendar({
                 isCurrentMonth ? "" : styles.outsideMonth
               } ${isPastDate ? styles.pastDate : ""} ${
                 isToday ? styles.todayDate : ""
-              } ${isSelected ? styles.selectedDate : ""}`}
+              } ${isSelected ? styles.selectedDate : ""} ${
+                isPreviewed ? styles.mobilePreviewDate : ""
+              }`}
               key={dateKey}
             >
               <button
                 className={styles.calendarDateButton}
                 type="button"
-                onClick={() => onDateSelect(dateKey)}
+                onClick={() => {
+                  onDateSelect(dateKey);
+                  setPreviewDate(dateEvents.length > 0 ? dateKey : null);
+                }}
               >
                 <span>{date.getDate()}</span>
                 {dateEvents.length > 0 && (
@@ -146,6 +183,35 @@ export function EventCalendar({
                   </span>
                 )}
               </button>
+              {dateEvents.length > 0 && (
+                <div className={styles.calendarMobilePreview}>
+                  <button
+                    className={styles.calendarMobileSummaryButton}
+                    type="button"
+                    onClick={() => {
+                      onDateSelect(dateKey);
+                      setPreviewDate(dateKey);
+                    }}
+                  >
+                    {dateEvents.length}件
+                  </button>
+                  <Link
+                    className={styles.calendarMobileTooltip}
+                    href={`/dates/${dateKey}`}
+                    role="tooltip"
+                  >
+                    {dateEvents.slice(0, 3).map((event) => (
+                      <span key={event.id}>
+                        {formatCalendarEventArtists(event.artists)}
+                      </span>
+                    ))}
+                    {dateEvents.length > 3 && (
+                      <span>ほか{dateEvents.length - 3}件</span>
+                    )}
+                    <strong>この日のライブを見る</strong>
+                  </Link>
+                </div>
+              )}
               <div className={styles.calendarEvents}>
                 {visibleDateEvents.map((event) => (
                   <Link
