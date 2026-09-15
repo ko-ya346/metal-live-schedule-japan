@@ -169,7 +169,13 @@ function checkDuplicateEvents() {
         continue;
       }
 
-      warnings.push(`${left.label}:${left.id} may duplicate ${right.label}:${right.id}`);
+      const message = `${left.label}:${left.id} may duplicate ${right.label}:${right.id}`;
+
+      if (left.label === "events" && right.label === "events") {
+        warnings.push(message);
+      } else {
+        errors.push(message);
+      }
     }
   }
 }
