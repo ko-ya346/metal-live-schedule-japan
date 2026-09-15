@@ -108,9 +108,9 @@
 
 .discoveryHub {
   display: grid;
-  gap: 14px;
+  gap: 10px;
   max-width: 1180px;
-  padding: 18px;
+  padding: 14px;
   margin: 0 auto 24px;
   border: 1px solid #343434;
   border-radius: 6px;
@@ -123,15 +123,15 @@
 .discoveryCardGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: 10px;
+  gap: 8px;
 }
 
 .discoveryCard {
   display: grid;
   align-content: start;
-  gap: 7px;
-  min-height: 112px;
-  padding: 14px;
+  gap: 3px;
+  min-height: 58px;
+  padding: 8px 10px;
   border: 1px solid #353535;
   border-left: 3px solid #c52727;
   border-radius: 6px;
@@ -150,21 +150,21 @@
 
 .discoveryCard strong {
   color: #ffffff;
-  font-size: 1.02rem;
-  line-height: 1.35;
+  font-size: 0.84rem;
+  line-height: 1.2;
   overflow-wrap: anywhere;
 }
 
 .discoveryCard span:last-child {
   margin-top: auto;
   color: #b9b9b3;
-  font-size: 0.88rem;
+  font-size: 0.72rem;
   font-weight: 800;
 }
 
 .discoveryCardLabel {
   color: #ff7777;
-  font-size: 0.76rem;
+  font-size: 0.62rem;
   font-weight: 900;
   text-transform: uppercase;
 }
@@ -691,23 +691,23 @@
 }
 
 .pastDate {
-  background: #101010;
+  background: #0b0b0b;
 }
 
 .pastDate .calendarDateButton {
-  color: #777777;
+  color: #565650;
 }
 
 .pastDate .calendarEvent {
-  border-color: #2b2b2b;
-  border-left-color: #555555;
-  background: #151515;
-  color: #8d8d87;
+  border-color: #202020;
+  border-left-color: #363636;
+  background: #101010;
+  color: #666660;
 }
 
 .pastDate .calendarMoreButton {
-  border-color: #2b2b2b;
-  color: #777777;
+  border-color: #202020;
+  color: #5f5f59;
 }
 
 .todayDate {
@@ -1914,36 +1914,116 @@
 
 @media (max-width: 720px) {
   .page {
-    padding-top: 32px;
+    display: flex;
+    flex-direction: column;
+    padding-top: 18px;
   }
 
   .heroHeader {
+    order: 1;
     grid-template-columns: 1fr;
-    gap: 20px;
-    padding: 22px 18px;
+    gap: 14px;
+    padding: 16px;
+    margin-bottom: 18px;
+  }
+
+  .kicker {
+    margin-bottom: 6px;
+    font-size: 0.72rem;
+  }
+
+  .header h1 {
+    font-size: 2.35rem;
+    line-height: 0.95;
+  }
+
+  .summary {
+    margin-top: 8px;
+    font-size: 0.88rem;
+  }
+
+  .lead {
+    display: -webkit-box;
+    margin-top: 8px;
+    overflow: hidden;
+    color: #c8c8c2;
+    font-size: 0.9rem;
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  .heroActions {
+    gap: 8px;
+    margin-top: 12px;
+  }
+
+  .heroActions a {
+    min-height: 38px;
+    padding: 0 12px;
+    font-size: 0.86rem;
   }
 
   .heroStats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 6px;
   }
 
   .heroStats div {
-    padding: 12px 10px;
+    padding: 8px 7px;
   }
 
   .heroStats strong {
-    font-size: 1.45rem;
+    font-size: 1.15rem;
+  }
+
+  .heroStats span {
+    font-size: 0.68rem;
   }
 
   .contentLayout {
-    grid-template-areas:
-      "sidebar"
-      "main";
-    grid-template-columns: 1fr;
+    order: 2;
+    display: contents;
+  }
+
+  .discoveryHub {
+    order: 5;
+    gap: 8px;
+    padding: 12px;
+    margin-bottom: 18px;
+  }
+
+  .artistDiscovery {
+    order: 6;
+  }
+
+  .mainColumn {
+    display: contents;
   }
 
   .sidebar {
+    order: 4;
     position: static;
+  }
+
+  .calendar {
+    order: 2;
+  }
+
+  .selectedDateSection {
+    order: 3;
+  }
+
+  .featuredSection {
+    order: 7;
+  }
+
+  .recentSection {
+    order: 8;
+  }
+
+  .upcomingSection {
+    order: 9;
   }
 
   .filters,
@@ -1953,6 +2033,25 @@
   .featuredGrid,
   .searchGuideGroups {
     grid-template-columns: 1fr;
+  }
+
+  .discoveryCardGrid {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px;
+  }
+
+  .discoveryCard {
+    min-height: 48px;
+    padding: 7px 9px;
+  }
+
+  .discoveryCard strong {
+    font-size: 0.8rem;
+    word-break: keep-all;
+  }
+
+  .discoveryCard span:last-child {
+    font-size: 0.68rem;
   }
 
   .artistDiscovery {
@@ -2003,24 +2102,32 @@
   }
 
   .calendarSummary {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: 6px;
+    display: flex;
+    flex-wrap: wrap;
+    gap: 5px;
   }
 
   .calendarSummary div:last-child {
-    grid-column: 1 / -1;
+    grid-column: auto;
   }
 
   .calendarSummary div {
-    padding: 9px;
+    display: inline-flex;
+    flex: 1 1 auto;
+    align-items: baseline;
+    justify-content: center;
+    gap: 4px;
+    min-width: 88px;
+    padding: 7px 8px;
+    border-radius: 999px;
   }
 
   .calendarSummary dt {
-    font-size: 0.72rem;
+    font-size: 0.68rem;
   }
 
   .calendarSummary dd {
-    font-size: 0.98rem;
+    font-size: 0.78rem;
   }
 
   .calendarCell {
@@ -2098,6 +2205,12 @@
     font-weight: 900;
     text-align: center;
     white-space: nowrap;
+  }
+
+  .pastDate .calendarMobileSummaryButton {
+    border-color: #252525;
+    background: #101010;
+    color: #5f5f59;
   }
 
   .calendarMobileSummaryButton:focus-visible,
