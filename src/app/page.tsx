@@ -25,7 +25,6 @@ import { getEventMonths } from "../utils/months";
 import { getGenreSlug } from "../utils/genres";
 import { getPrefectures } from "../utils/prefectures";
 import { EventCalendar } from "./EventCalendar";
-import { EventCard } from "./EventCard";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
 import { DiscoveryArtists } from "./DiscoveryArtists";

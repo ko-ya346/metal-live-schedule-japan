@@ -42,6 +42,8 @@ Normal data flow:
 
 Do not auto-publish crawled or LLM-generated data.
 
+Candidate review issues are notifications only. Do not treat GitHub issues as a second review queue; keep the human workflow centered on `/admin/candidates`.
+
 ## Candidate Collection
 
 Preferred sources:
@@ -66,6 +68,7 @@ Quality rule:
 - Prefer fewer reliable candidates over many weak candidates.
 - Always include `sourceUrl`, `confidence`, and `reviewNotes`.
 - Avoid duplicates with existing published events and existing candidates.
+- For discovery/news sources, require a clear heavy-music signal from artist, event title, source URL, or notes before adding a candidate.
 
 ## UI Direction
 

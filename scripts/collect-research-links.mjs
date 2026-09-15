@@ -1,4 +1,5 @@
 import { candidateEvents } from "../src/data/candidate_events.ts";
+import { crawlTargets } from "../src/data/crawlTargets.ts";
 import { events } from "../src/data/events.ts";
 
 const today = new Intl.DateTimeFormat("sv-SE", {
@@ -8,7 +9,7 @@ const today = new Intl.DateTimeFormat("sv-SE", {
   day: "2-digit",
 }).format(new Date());
 
-const sources = [
+const curatedSources = [
   {
     name: "Creativeman",
     url: "https://www.creativeman.co.jp/news/",
@@ -74,6 +75,18 @@ const sources = [
     url: "https://otsukadeepa.jp/",
     maxLinks: 4,
   },
+];
+
+const curatedSourceUrls = new Set(curatedSources.map((source) => source.url));
+const sources = [
+  ...curatedSources,
+  ...crawlTargets
+    .filter((target) => target.enabled && !curatedSourceUrls.has(target.url))
+    .map((target) => ({
+      name: target.name,
+      url: target.url,
+      maxLinks: target.priority === "high" ? 6 : 4,
+    })),
 ];
 
 const includeKeywords = [

@@ -49,6 +49,23 @@ jobs:
           git push
           echo "committed=true" >> "$GITHUB_OUTPUT"
 
+      - name: Close older candidate review issues
+        if: steps.candidate_commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          for issue in $(gh issue list \
+            --repo "$GH_REPO" \
+            --state open \
+            --search "候補イベント確認 in:title" \
+            --json number \
+            --jq '.[].number'); do
+            gh issue close "$issue" \
+              --repo "$GH_REPO" \
+              --comment "最新の候補は /admin/candidates に集約されています。新しい候補確認 issue を作成するため、この古い通知 issue は閉じます。"
+          done
+
       - name: Create candidate review issue
         if: steps.candidate_commit.outputs.committed == 'true'
         env:
@@ -60,15 +77,18 @@ jobs:
           {
             echo "# 候補イベントの確認"
             echo
-            echo "自動収集で候補イベントが追加されました。"
+            echo "自動収集で候補イベントが追加されました。この issue は通知用です。レビューは /admin/candidates だけで行います。"
+            echo
+            echo "## 確認場所"
+            echo
+            echo "- /admin/candidates?status=review_needed"
             echo
             echo "## やること"
             echo
-            echo "- ローカルで \`/admin/candidates\` を開く"
             echo "- \`review_needed\` の候補を確認する"
             echo "- 公開するものは「公開」、対象外は「無視」にする"
             echo "- 反映後に push する"
-            echo "- この issue の候補がすべて確認済みになったら close する"
+            echo "- 確認が終わったらこの issue を close する"
             echo
             echo "## 今回追加された候補"
             echo

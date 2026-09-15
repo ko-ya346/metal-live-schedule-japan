@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useMemo, useState } from "react";
+import { useMemo, useState } from "react";
 import type { Event, EventDate } from "../../../data/events";
 import {
   formatDateKey,
@@ -144,17 +144,9 @@ export function RelatedEvents({
   currentEvent,
   relatedEventCandidates,
 }: RelatedEventsProps) {
-  const [todayDate, setTodayDate] = useState<EventDate | null>(null);
-
-  useEffect(() => {
-    setTodayDate(formatDateKey(new Date()));
-  }, []);
+  const [todayDate] = useState<EventDate>(() => formatDateKey(new Date()));
 
   const relatedEvents = useMemo(() => {
-    if (!todayDate) {
-      return null;
-    }
-
     return selectRelatedEventsAt(
       currentEvent,
       relatedEventCandidates,
@@ -163,10 +155,9 @@ export function RelatedEvents({
   }, [currentEvent, relatedEventCandidates, todayDate]);
 
   if (
-    !relatedEvents ||
-    (relatedEvents.sameArtists.length === 0 &&
+    relatedEvents.sameArtists.length === 0 &&
       relatedEvents.sameVenue.length === 0 &&
-      relatedEvents.samePrefecture.length === 0)
+      relatedEvents.samePrefecture.length === 0
   ) {
     return null;
   }

@@ -197,6 +197,111 @@ function normalizeForMatch(value) {
     .replace(/[\s　"'“”‘’・･.,，.()（）\-ー]/g, "");
 }
 
+const heavySignalKeywords = [
+  "metal",
+  "heavy",
+  "hard rock",
+  "hardcore",
+  "metalcore",
+  "death",
+  "black metal",
+  "thrash",
+  "doom",
+  "grindcore",
+  "loud",
+  "メタル",
+  "ヘヴィ",
+  "ヘビー",
+  "ハードロック",
+  "ハードコア",
+  "ラウド",
+  "デスメタル",
+  "ブラックメタル",
+  "スラッシュ",
+  "SEX MACHINEGUNS",
+  "人間椅子",
+  "アイリフドーパ",
+  "FASTKILL",
+  "LOUDNESS",
+  "NEMOPHILA",
+  "LOVEBITES",
+  "BRIDEAR",
+  "SABLE HILLS",
+  "CRYSTAL LAKE",
+  "DEVILOOF",
+  "HANABIE",
+  "花冷え",
+  "THE HAUNTED",
+  "CARCASS",
+  "BRUJERIA",
+  "THE CROWN",
+  "LORNA SHORE",
+  "MAYHEM",
+  "MORBIDFEST",
+];
+
+function inferSourceType(sourceType, sourceUrl) {
+  let host = "";
+
+  try {
+    host = new URL(sourceUrl).hostname.toLowerCase();
+  } catch {
+    return sourceType;
+  }
+
+  if (/amass\.jp|heavy-metal-tour\.com|metal100\.com/.test(host)) {
+    return "manual";
+  }
+
+  if (/eplus\.jp|l-tike\.com|t\.pia\.jp|ticket\.rakuten\.co\.jp/.test(host)) {
+    return "ticket";
+  }
+
+  if (/clubcitta\.co\.jp|antiknock\.net|zirco-tokyo\.jp|otsukadeepa\.jp|club-quattro\.com/.test(host)) {
+    return "venue";
+  }
+
+  if (/creativeman\.co\.jp|udo\.jp|hipjpn\.co\.jp|livenationhip\.co\.jp|evp\.jp|smash-jpn\.com/.test(host)) {
+    return "promoter";
+  }
+
+  if (/x\.com|twitter\.com|instagram\.com/.test(host)) {
+    return "sns";
+  }
+
+  return sourceType;
+}
+
+function isDiscoverySource(candidate) {
+  const sourceName = normalizeForMatch(candidate.sourceName);
+  const sourceUrl = normalizeForMatch(candidate.sourceUrl);
+
+  return (
+    candidate.sourceType === "manual" ||
+    sourceName.includes("amass") ||
+    sourceName.includes("metal100") ||
+    sourceUrl.includes("amassjp") ||
+    sourceUrl.includes("heavymetaltourcom") ||
+    sourceUrl.includes("metal100com")
+  );
+}
+
+function hasNonGenreHeavySignal(candidate) {
+  const haystack = [
+    candidate.artists.join(" "),
+    candidate.tourName ?? "",
+    candidate.sourceName,
+    candidate.sourceUrl,
+    candidate.reviewNotes,
+  ]
+    .join(" ")
+    .toLowerCase();
+
+  return heavySignalKeywords.some((keyword) =>
+    haystack.includes(keyword.toLowerCase()),
+  );
+}
+
 function buildKnownEvents() {
   return [...events, ...candidateEvents].map((event) => ({
     id: event.id,
@@ -436,6 +541,23 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
     return null;
   }
 
+  const requestedSourceType =
+    candidate.sourceType === "promoter" ||
+    candidate.sourceType === "venue" ||
+    candidate.sourceType === "band_official" ||
+    candidate.sourceType === "ticket" ||
+    candidate.sourceType === "sns"
+      ? candidate.sourceType
+      : "manual";
+  const sourceName = toNullableString(candidate.sourceName) ?? "Automated research";
+  const sourceType = inferSourceType(requestedSourceType, sourceUrl);
+  const isDiscovery = sourceType === "manual";
+  const confidence =
+    candidate.confidence === "high" ||
+    candidate.confidence === "medium" ||
+    candidate.confidence === "low"
+      ? candidate.confidence
+      : "medium";
   const normalizedCandidate = {
     id,
     artists,
@@ -453,21 +575,9 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
       ? normalizeUrl(String(candidate.officialUrl))
       : null,
     sourceUrl,
-    sourceType:
-      candidate.sourceType === "promoter" ||
-      candidate.sourceType === "venue" ||
-      candidate.sourceType === "band_official" ||
-      candidate.sourceType === "ticket" ||
-      candidate.sourceType === "sns"
-        ? candidate.sourceType
-        : "manual",
-    sourceName: toNullableString(candidate.sourceName) ?? "Automated research",
-    confidence:
-      candidate.confidence === "high" ||
-      candidate.confidence === "medium" ||
-      candidate.confidence === "low"
-        ? candidate.confidence
-        : "medium",
+    sourceType,
+    sourceName,
+    confidence: isDiscovery && confidence === "high" ? "medium" : confidence,
     eventStatus:
       candidate.eventStatus === "cancelled" || candidate.eventStatus === "postponed"
         ? candidate.eventStatus
@@ -477,6 +587,10 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
     collectedAt: today,
     reviewedAt: null,
   };
+
+  if (isDiscoverySource(normalizedCandidate) && !hasNonGenreHeavySignal(normalizedCandidate)) {
+    return null;
+  }
 
   if (isKnownEvent(normalizedCandidate, knownEvents)) {
     return null;
@@ -551,6 +665,7 @@ function buildPrompt(summaries, knownSummary) {
     "- SNS-only items must be official and low confidence.",
     "- Do not use fan speculation.",
     "- If the page is mainly blues, jazz, funk, psychedelic, pop, idol, or non-heavy rock, exclude it unless the page clearly has a metal/heavy co-performing artist.",
+    "- Do not infer Heavy Metal or Hard Rock genres only because a Japan tour is listed on a music news page. The page text must clearly connect the event to heavy music or a known watch artist.",
     "- When unsure whether the artist belongs to the project's scope, prefer excluding it over adding noisy candidates.",
     "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible.",
     "- Set isInternational to true when the main purpose is a visiting international artist's Japan show. Domestic-only events should be false.",
@@ -598,10 +713,12 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason }
     "",
     "このレポートは自動生成です。公開イベントには直接反映していません。",
     "",
-    `- 調査ソース数: ${sections.length}`,
+    `- 候補リンクがあったソース数: ${sections.length}`,
     `- 取得ページ数: ${summaries.length}`,
     `- 追加候補数: ${candidates.length}`,
     `- 重複/不正で除外: ${skipped}`,
+    "",
+    "発見用ニュースサイト由来の候補は、アーティスト名や公演名にヘヴィ系の手がかりがない場合は自動で除外します。",
     "",
   ];
 
