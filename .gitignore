@@ -25,6 +25,8 @@
 *.pem
 docs/*.zip
 docs/*.csv
+/candidate-report.md
+/research-links.md
 
 # debug
 npm-debug.log*
