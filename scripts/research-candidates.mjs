@@ -150,7 +150,7 @@ function formatCandidateObject(candidate) {
 function parseResearchSections(markdown) {
   const sections = [];
   const sectionPattern =
-    /### ([^\n]+)\n\n([\s\S]*?)(?=\n### |\n## 作業後チェック|\n$)/g;
+    /#### ([^\n]+)\n\n([\s\S]*?)(?=\n#### |\n### |\n## 作業後チェック|\n$)/g;
   let match;
 
   while ((match = sectionPattern.exec(markdown)) !== null) {

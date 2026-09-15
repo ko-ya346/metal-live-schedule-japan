@@ -63,6 +63,14 @@ Preferred watch artists:
 
 Also collect reliable candidates for visiting international and domestic heavy music events.
 
+Regional collection buckets:
+
+- `kanto`: Tokyo, Kanagawa, Saitama, Chiba.
+- `kansai`: Osaka, Kyoto, Hyogo, Shiga, Nara, Wakayama. Prioritize Osaka because `/prefectures/osaka` has search demand.
+- `tokai`: Aichi, Gifu, Mie, Shizuoka.
+- `other`: other Japanese regions.
+- `nationwide`: promoter, ticket, and official tour pages that cut across regions.
+
 Quality rule:
 
 - Prefer fewer reliable candidates over many weak candidates.

@@ -13,66 +13,79 @@ const curatedSources = [
   {
     name: "Creativeman",
     url: "https://www.creativeman.co.jp/news/",
+    region: "nationwide",
     maxLinks: 6,
   },
   {
     name: "Creativeman artists",
     url: "https://www.creativeman.co.jp/artist/",
+    region: "nationwide",
     maxLinks: 8,
   },
   {
     name: "UDO",
     url: "https://www.udo.jp/concert",
+    region: "nationwide",
     maxLinks: 5,
   },
   {
     name: "H.I.P.",
     url: "https://www.hipjpn.co.jp/",
+    region: "nationwide",
     maxLinks: 5,
   },
   {
     name: "SMASH",
     url: "https://smash-jpn.com/",
+    region: "nationwide",
     maxLinks: 5,
   },
   {
     name: "Evoken / EVP",
     url: "https://evp.jp/",
+    region: "nationwide",
     maxLinks: 5,
   },
   {
     name: "eplus metal / hardcore",
     url: "https://eplus.jp/sf/live/metal-core",
+    region: "nationwide",
     maxLinks: 8,
   },
   {
     name: "eplus metal / hardcore page 2",
     url: "https://eplus.jp/sf/live/metal-core/p2",
+    region: "nationwide",
     maxLinks: 8,
   },
   {
     name: "amass live news",
     url: "https://amass.jp/",
+    region: "nationwide",
     maxLinks: 6,
   },
   {
     name: "Club Citta",
     url: "https://clubcitta.co.jp/",
+    region: "kanto",
     maxLinks: 4,
   },
   {
     name: "SHINJUKU ANTIKNOCK",
     url: "https://www.antiknock.net/",
+    region: "kanto",
     maxLinks: 4,
   },
   {
     name: "Zirco Tokyo",
     url: "https://zirco-tokyo.jp/",
+    region: "kanto",
     maxLinks: 4,
   },
   {
     name: "大塚Deepa",
     url: "https://otsukadeepa.jp/",
+    region: "kanto",
     maxLinks: 4,
   },
 ];
@@ -85,18 +98,36 @@ const sources = [
     .map((target) => ({
       name: target.name,
       url: target.url,
-      maxLinks: target.priority === "high" ? 6 : 4,
+      region: target.region,
+      maxLinks:
+        target.region === "kansai"
+          ? target.priority === "high"
+            ? 10
+            : 6
+          : target.priority === "high"
+            ? 6
+            : 4,
     })),
 ];
+
+const regionLabels = {
+  kanto: "関東首都圏",
+  kansai: "大阪近辺",
+  tokai: "名古屋・東海",
+  other: "その他地域",
+  nationwide: "全国・来日",
+};
+
+const regionOrder = ["nationwide", "kanto", "kansai", "tokai", "other"];
 
 const includeKeywords = [
   "metal",
   "heavy",
   "hardcore",
+  "metalcore",
   "loud",
   "death",
   "thrash",
-  "core",
   "punk",
   "新規公演",
   "来日",
@@ -138,6 +169,7 @@ const includeKeywords = [
 
 const excludePatterns = [
   /facebook\.com/i,
+  /line\.me/i,
   /twitter\.com/i,
   /x\.com/i,
   /instagram\.com/i,
@@ -151,6 +183,9 @@ const excludePatterns = [
   /\/faq/i,
   /\/company/i,
   /\/access/i,
+  /\/equipment/i,
+  /\/blog/i,
+  /\/news/i,
   /\/login/i,
   /\/mypage/i,
   /\/register/i,
@@ -161,6 +196,7 @@ const excludePatterns = [
   /\/category\//i,
   /hb\.afl\.rakuten\.co\.jp/i,
   /backnumber/i,
+  /\/schedule\/cancel\/?$/i,
   /^会員メニュー$/,
   /^メタル･ハードコアのワード一覧$/,
   /^ジャンルで探す$/,
@@ -173,6 +209,18 @@ const excludePatterns = [
   /^Tour Date$/i,
   /^WOM$/i,
   /^About$/i,
+  /^Home$/i,
+  /^News$/i,
+  /^Schedule$/i,
+  /^Equipment$/i,
+  /^BLOG$/i,
+  /^Prev\.Month$/i,
+  /^Next\.Month$/i,
+  /^&nbsp;$/i,
+  /^一覧$/i,
+  /^[一-龥ぁ-んァ-ン]+府$/,
+  /^[一-龥ぁ-んァ-ン]+県$/,
+  /周辺$/,
   /^[0-9]+$/,
 ];
 
@@ -342,29 +390,49 @@ function renderMarkdown(results) {
     "",
   ];
 
-  for (const result of results) {
-    lines.push(`### ${result.source.name}`);
-    lines.push("");
+  for (const region of regionOrder) {
+    const regionResults = results.filter(
+      (result) => (result.source.region ?? "nationwide") === region,
+    );
 
-    if (result.error) {
-      lines.push(`- 取得失敗: ${result.error}`);
-      lines.push("");
+    if (regionResults.length === 0) {
       continue;
     }
 
-    if (result.links.length === 0) {
-      lines.push("- 新しい調査リンク候補なし");
-      lines.push("");
-      continue;
-    }
+    const linkCount = regionResults.reduce(
+      (count, result) => count + result.links.length,
+      0,
+    );
 
-    for (const link of result.links) {
-      lines.push(`- ${link.title}`);
-      lines.push(`  ${link.url}`);
-      lines.push(`  keywords: ${link.matchedKeywords.join(", ")}`);
-    }
-
+    lines.push(`### ${regionLabels[region]}`);
     lines.push("");
+    lines.push(`候補リンク数: ${linkCount}`);
+    lines.push("");
+
+    for (const result of regionResults) {
+      lines.push(`#### ${result.source.name}`);
+      lines.push("");
+
+      if (result.error) {
+        lines.push(`- 取得失敗: ${result.error}`);
+        lines.push("");
+        continue;
+      }
+
+      if (result.links.length === 0) {
+        lines.push("- 新しい調査リンク候補なし");
+        lines.push("");
+        continue;
+      }
+
+      for (const link of result.links) {
+        lines.push(`- ${link.title}`);
+        lines.push(`  ${link.url}`);
+        lines.push(`  keywords: ${link.matchedKeywords.join(", ")}`);
+      }
+
+      lines.push("");
+    }
   }
 
   lines.push("## 作業後チェック");
