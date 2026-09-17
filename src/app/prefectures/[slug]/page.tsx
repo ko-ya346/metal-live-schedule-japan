@@ -24,6 +24,8 @@ type PrefecturePageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getPrefectures(publishedEvents).map((prefecture) => ({
     slug: prefecture.slug,

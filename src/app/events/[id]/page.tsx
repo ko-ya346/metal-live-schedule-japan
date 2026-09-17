@@ -31,6 +31,8 @@ type EventPageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 function findEvent(id: string) {
   return events.find((event) => event.id === id);
 }

@@ -24,6 +24,8 @@ type GenrePageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getPageableGenres(publishedEvents).map((genre) => ({
     slug: genre.slug,

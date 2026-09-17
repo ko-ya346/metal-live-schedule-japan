@@ -25,6 +25,8 @@ type VenuePageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 function decodeVenueSlug(slug: string) {
   try {
     return decodeURIComponent(slug);

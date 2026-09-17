@@ -15,6 +15,8 @@ type DatePageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 function getEventsByDate(date: string) {
   return sortEventsByDate(
     publishedEvents.filter((event) => event.date === date),

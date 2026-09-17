@@ -23,6 +23,8 @@ type MonthPageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 export function generateStaticParams() {
   return getEventMonths(publishedEvents).map((month) => ({
     month: month.key,

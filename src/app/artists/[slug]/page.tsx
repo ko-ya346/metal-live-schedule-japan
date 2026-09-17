@@ -26,6 +26,8 @@ type ArtistPageProps = {
   }>;
 };
 
+export const dynamicParams = false;
+
 function decodeArtistSlug(slug: string) {
   try {
     return decodeURIComponent(slug);
