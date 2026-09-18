@@ -120,6 +120,12 @@
   box-shadow: 0 16px 34px rgb(0 0 0 / 0.4);
 }
 
+.sidebar .discoveryHub {
+  max-width: none;
+  padding: 14px;
+  margin: 0;
+}
+
 .discoveryCardGrid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
@@ -180,6 +186,12 @@
   border-radius: 6px;
   background: #131313;
   box-shadow: 0 16px 34px rgb(0 0 0 / 0.42);
+}
+
+.sidebar .artistDiscovery {
+  max-width: none;
+  padding: 14px;
+  margin: 0;
 }
 
 .artistDiscoveryGrid {
@@ -420,10 +432,10 @@
   width: 100%;
 }
 
-@media (min-width: 1520px) {
+@media (min-width: 1100px) {
   .contentLayout {
     grid-template-areas: "main sidebar";
-    grid-template-columns: minmax(0, 1180px) 300px;
+    grid-template-columns: minmax(0, 1fr) 300px;
   }
 
   .sidebar {
@@ -433,6 +445,25 @@
 
   .sidebar .filters {
     grid-template-columns: 1fr;
+  }
+
+  .sidebar .discoveryCardGrid,
+  .sidebar .artistDiscoveryGrid,
+  .sidebar .searchGuideGroups {
+    grid-template-columns: 1fr;
+  }
+
+  .sidebar .sectionLead,
+  .sidebar .artistDiscoveryDescription {
+    display: none;
+  }
+
+  .sidebar .artistDiscoveryCard {
+    padding: 12px;
+  }
+
+  .sidebar .artistDiscoveryCard:nth-child(n + 3) {
+    display: none;
   }
 }
 

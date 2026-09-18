@@ -317,68 +317,6 @@ export default function Page() {
         </div>
       </header>
 
-      <section className={styles.discoveryHub} aria-labelledby="discovery-title">
-        <div className={styles.sectionHeader}>
-          <div>
-            <p className={styles.kicker}>Explore</p>
-            <h2 className={styles.sectionTitle} id="discovery-title">
-              目的からライブを探す
-            </h2>
-            <p className={styles.sectionLead}>
-              日程、地域、来日公演、ジャンルからすぐに絞り込めます。
-            </p>
-          </div>
-        </div>
-
-        <div className={styles.discoveryCardGrid}>
-          <Link
-            className={styles.discoveryCard}
-            href={`/months/${currentMonthKey}`}
-          >
-            <span className={styles.discoveryCardLabel}>今月</span>
-            <strong>{formatCalendarMonth(currentMonthKey)}のライブ</strong>
-            <span>{currentMonthEvents.length}件</span>
-          </Link>
-          <button
-            className={styles.discoveryCard}
-            type="button"
-            onClick={applyInternationalFilter}
-          >
-            <span className={styles.discoveryCardLabel}>来日</span>
-            <strong>来日公演に絞る</strong>
-            <span>{upcomingInternationalCount}件</span>
-          </button>
-          {discoveryPrefectures.map((prefecture) => (
-            <Link
-              className={styles.discoveryCard}
-              href={`/prefectures/${prefecture.slug}`}
-              key={prefecture.slug}
-            >
-              <span className={styles.discoveryCardLabel}>地域</span>
-              <strong>{prefecture.name}のライブ</strong>
-              <span>{prefecture.count}件</span>
-            </Link>
-          ))}
-          {discoveryGenres.map((genre) => (
-            <Link
-              className={styles.discoveryCard}
-              href={`/genres/${getGenreSlug(genre.value)}`}
-              key={genre.value}
-            >
-              <span className={styles.discoveryCardLabel}>ジャンル</span>
-              <strong>{genre.label}</strong>
-              <span>{genre.count}件</span>
-            </Link>
-          ))}
-        </div>
-      </section>
-
-      <DiscoveryArtists
-        eventList={allUpcomingEvents}
-        monthKey={currentMonthKey}
-        picks={discoveryPicks}
-      />
-
       <div className={styles.contentLayout}>
         <aside className={styles.sidebar} aria-label="絞り込みと探し方">
           <EventFilters
@@ -394,6 +332,65 @@ export default function Page() {
             onInternationalOnlyChange={updateInternationalOnly}
             onSearchQueryChange={updateSearchQuery}
             onReset={resetFilters}
+          />
+
+          <section className={styles.discoveryHub} aria-labelledby="discovery-title">
+            <div className={styles.sectionHeader}>
+              <div>
+                <p className={styles.kicker}>Explore</p>
+                <h2 className={styles.sectionTitle} id="discovery-title">
+                  目的から探す
+                </h2>
+              </div>
+            </div>
+
+            <div className={styles.discoveryCardGrid}>
+              <Link
+                className={styles.discoveryCard}
+                href={`/months/${currentMonthKey}`}
+              >
+                <span className={styles.discoveryCardLabel}>今月</span>
+                <strong>{formatCalendarMonth(currentMonthKey)}</strong>
+                <span>{currentMonthEvents.length}件</span>
+              </Link>
+              <button
+                className={styles.discoveryCard}
+                type="button"
+                onClick={applyInternationalFilter}
+              >
+                <span className={styles.discoveryCardLabel}>来日</span>
+                <strong>来日公演</strong>
+                <span>{upcomingInternationalCount}件</span>
+              </button>
+              {discoveryPrefectures.map((prefecture) => (
+                <Link
+                  className={styles.discoveryCard}
+                  href={`/prefectures/${prefecture.slug}`}
+                  key={prefecture.slug}
+                >
+                  <span className={styles.discoveryCardLabel}>地域</span>
+                  <strong>{prefecture.name}</strong>
+                  <span>{prefecture.count}件</span>
+                </Link>
+              ))}
+              {discoveryGenres.map((genre) => (
+                <Link
+                  className={styles.discoveryCard}
+                  href={`/genres/${getGenreSlug(genre.value)}`}
+                  key={genre.value}
+                >
+                  <span className={styles.discoveryCardLabel}>ジャンル</span>
+                  <strong>{genre.label}</strong>
+                  <span>{genre.count}件</span>
+                </Link>
+              ))}
+            </div>
+          </section>
+
+          <DiscoveryArtists
+            eventList={allUpcomingEvents}
+            monthKey={currentMonthKey}
+            picks={discoveryPicks}
           />
 
           <section
