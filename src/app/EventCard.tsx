@@ -50,13 +50,18 @@ export function EventCard({ event }: EventCardProps) {
   return (
     <article className={styles.eventCard}>
       <div className={styles.eventCardHeader}>
-        <p className={styles.artist}>
-          <ArtistLinks
-            artists={event.artists}
-            className={styles.eventTitleLink}
-          />
-        </p>
-        <p className={styles.tourName}>{event.tourName}</p>
+        <div>
+          <p className={styles.artist}>
+            <ArtistLinks
+              artists={event.artists}
+              className={styles.eventTitleLink}
+            />
+          </p>
+          <p className={styles.tourName}>{event.tourName}</p>
+        </div>
+        <span className={styles.eventStatusBadge}>
+          {formatEventStatus(event.status)}
+        </span>
       </div>
 
       <dl className={styles.eventMeta}>
@@ -78,10 +83,6 @@ export function EventCard({ event }: EventCardProps) {
         <div>
           <dt>ジャンル</dt>
           <dd>{event.genres.join(", ")}</dd>
-        </div>
-        <div>
-          <dt>状況</dt>
-          <dd>{formatEventStatus(event.status)}</dd>
         </div>
       </dl>
 

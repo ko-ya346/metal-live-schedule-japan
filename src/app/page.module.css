@@ -1353,15 +1353,15 @@
 
 .eventList {
   display: grid;
-  gap: 12px;
+  gap: 10px;
 }
 
 .eventCard {
   display: grid;
   grid-template-columns: 1fr;
-  gap: 16px;
+  gap: 12px;
   align-items: start;
-  padding: 20px;
+  padding: 16px;
   border: 1px solid #343434;
   border-left: 4px solid #c52727;
   border-radius: 6px;
@@ -1372,15 +1372,17 @@
 }
 
 .eventCardHeader {
-  display: grid;
-  gap: 7px;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 14px;
 }
 
 .artist {
   margin: 0;
-  font-size: 1.24rem;
+  font-size: 1.12rem;
   font-weight: 900;
-  line-height: 1.35;
+  line-height: 1.3;
   color: #ffffff;
   overflow-wrap: anywhere;
 }
@@ -1407,41 +1409,54 @@
 }
 
 .tourName {
-  margin: 0;
+  margin: 5px 0 0;
   color: #b9b9b3;
-  line-height: 1.55;
+  font-size: 0.92rem;
+  line-height: 1.45;
   overflow-wrap: anywhere;
 }
 
+.eventStatusBadge {
+  flex: 0 0 auto;
+  padding: 4px 8px;
+  border: 1px solid #5a3a3a;
+  border-radius: 999px;
+  background: #211212;
+  color: #ffdede;
+  font-size: 0.74rem;
+  font-weight: 900;
+  line-height: 1.1;
+  white-space: nowrap;
+}
+
 .eventMeta {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: 8px;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px 16px;
   margin: 0;
+  padding: 9px 0 0;
+  border-top: 1px solid #2a2a2a;
 }
 
 .eventMeta div {
-  display: grid;
-  align-content: start;
-  gap: 5px;
-  min-height: 74px;
-  padding: 10px 12px;
-  border: 1px solid #2d2d2d;
-  border-radius: 6px;
-  background: rgb(0 0 0 / 0.22);
+  display: inline-flex;
+  align-items: baseline;
+  gap: 6px;
+  min-width: 0;
 }
 
 .eventMeta dt {
+  flex: 0 0 auto;
   color: #ff7777;
-  font-size: 0.78rem;
+  font-size: 0.74rem;
   font-weight: 800;
-  text-transform: uppercase;
 }
 
 .eventMeta dd {
   margin: 0;
-  color: #f2f2ef;
-  line-height: 1.45;
+  color: #d9d9d4;
+  font-size: 0.9rem;
+  line-height: 1.35;
   overflow-wrap: anywhere;
 }
 
