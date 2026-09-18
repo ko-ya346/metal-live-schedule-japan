@@ -3,6 +3,7 @@ import type { Event } from "../data/events";
 type PrimaryEventLink = {
   href: string;
   label: string;
+  linkType: "ticket" | "official" | "combined";
   variant: "primary" | "secondary";
 };
 
@@ -72,6 +73,7 @@ export function getPrimaryEventLinks(event: Event): PrimaryEventLink[] {
       {
         href: ticketUrl,
         label: eventLinkLabels.ticket,
+        linkType: "combined",
         variant: "primary",
       },
     ];
@@ -83,6 +85,7 @@ export function getPrimaryEventLinks(event: Event): PrimaryEventLink[] {
     links.push({
       href: ticketUrl,
       label: eventLinkLabels.ticket,
+      linkType: "ticket",
       variant: "primary",
     });
   }
@@ -91,6 +94,7 @@ export function getPrimaryEventLinks(event: Event): PrimaryEventLink[] {
     links.push({
       href: officialUrl,
       label: eventLinkLabels.official,
+      linkType: "official",
       variant: "secondary",
     });
   }

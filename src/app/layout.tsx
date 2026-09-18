@@ -1,5 +1,6 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
+import { GoogleAnalytics } from "./GoogleAnalytics";
 import styles from "./page.module.css";
 import { siteDescription, siteName, siteTitle, siteUrl } from "./site";
 
@@ -71,6 +72,7 @@ export default function RootLayout({
             __html: JSON.stringify(websiteStructuredData),
           }}
         />
+        <GoogleAnalytics />
         {children}
         <footer className={styles.siteFooter}>
           <nav className={styles.footerNav} aria-label="フッターナビゲーション">

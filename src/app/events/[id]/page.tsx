@@ -23,6 +23,7 @@ import { VenueLink } from "../../VenueLink";
 import { siteName, siteUrl } from "../../site";
 import { EventShareLinks } from "./EventShareLinks";
 import { RelatedEvents } from "./RelatedEvents";
+import { TrackedExternalLink } from "../../TrackedExternalLink";
 import styles from "../../page.module.css";
 
 type EventPageProps = {
@@ -271,19 +272,20 @@ export default async function EventPage({ params }: EventPageProps) {
           {primaryEventLinks.length > 0 && (
             <div className={styles.eventPrimaryLinks}>
               {primaryEventLinks.map((link) => (
-                <a
+                <TrackedExternalLink
                   className={
                     link.variant === "primary"
                       ? styles.primaryLink
                       : styles.secondaryLink
                   }
+                  event={event}
                   href={link.href}
                   key={`${link.label}-${link.href}`}
-                  target="_blank"
-                  rel="noreferrer"
+                  linkType={link.linkType}
+                  sourceSurface="event_detail"
                 >
                   {link.label}
-                </a>
+                </TrackedExternalLink>
               ))}
             </div>
           )}

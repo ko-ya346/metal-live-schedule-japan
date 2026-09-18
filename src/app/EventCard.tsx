@@ -15,6 +15,7 @@ import styles from "./page.module.css";
 import { useEffect, useRef, useState } from "react";
 import { ArtistLinks } from "./ArtistLinks";
 import { PrefectureLink } from "./PrefectureLink";
+import { TrackedExternalLink } from "./TrackedExternalLink";
 import { VenueLink } from "./VenueLink";
 
 type EventCardProps = {
@@ -90,19 +91,20 @@ export function EventCard({ event }: EventCardProps) {
             {eventLinkLabels.detail}
           </Link>
           {primaryEventLinks.map((link) => (
-            <a
+            <TrackedExternalLink
               className={
                 link.variant === "primary"
                   ? styles.primaryLink
                   : styles.secondaryLink
               }
+              event={event}
               href={link.href}
               key={`${link.label}-${link.href}`}
-              target="_blank"
-              rel="noreferrer"
+              linkType={link.linkType}
+              sourceSurface="event_card"
             >
               {link.label}
-            </a>
+            </TrackedExternalLink>
           ))}
         </div>
 
