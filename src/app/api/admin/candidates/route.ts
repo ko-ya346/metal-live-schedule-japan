@@ -93,9 +93,11 @@ function formatObject(
 ) {
   const indent = " ".repeat(indentLevel);
   const childIndent = " ".repeat(indentLevel + 4);
-  const lines = keys.map(
-    (key) => `${childIndent}${key}: ${formatValue(object[key], indentLevel + 4)},`,
-  );
+  const lines = keys
+    .filter((key) => object[key] !== undefined)
+    .map(
+      (key) => `${childIndent}${key}: ${formatValue(object[key], indentLevel + 4)},`,
+    );
 
   return `${indent}{\n${lines.join("\n")}\n${indent}}`;
 }
@@ -111,6 +113,7 @@ function formatCandidateObject(candidate: CandidateEvent) {
     "genres",
     "isInternational",
     "ticketUrl",
+    "ticketLinks",
     "officialUrl",
     "sourceUrl",
     "sourceType",
@@ -137,6 +140,7 @@ function formatEventObject(candidate: CandidateEvent): Event {
     genres: candidate.genres,
     isInternational: candidate.isInternational,
     ticketUrl: candidate.ticketUrl,
+    ticketLinks: candidate.ticketLinks,
     officialUrl: candidate.officialUrl,
     status: candidate.eventStatus,
     candidateCreatedAt: candidate.collectedAt,
@@ -244,6 +248,7 @@ async function appendEventFile(candidate: CandidateEvent) {
       "genres",
       "isInternational",
       "ticketUrl",
+      "ticketLinks",
       "officialUrl",
       "status",
       "candidateCreatedAt",
@@ -271,6 +276,10 @@ function normalizeCandidate(candidate: CandidateEvent, action: AdminAction) {
     genres: candidate.genres.filter(Boolean),
     isInternational: candidate.isInternational,
     ticketUrl: candidate.ticketUrl || null,
+    ticketLinks:
+      candidate.ticketLinks && candidate.ticketLinks.length > 0
+        ? candidate.ticketLinks
+        : undefined,
     officialUrl: candidate.officialUrl || null,
     tourName: candidate.tourName || null,
     date: candidate.date || null,

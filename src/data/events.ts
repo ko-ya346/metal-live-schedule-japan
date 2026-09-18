@@ -1,5 +1,20 @@
 export type EventDate = `${number}-${number}-${number}`;
 export type EventStatus = "scheduled" | "cancelled" | "postponed";
+export type TicketSaleStatus =
+    | "on_sale"
+    | "presale"
+    | "sold_out"
+    | "not_started"
+    | "unknown";
+
+export type TicketLink = {
+    provider: string;
+    url: string;
+    affiliateUrl?: string | null;
+    saleStatus?: TicketSaleStatus;
+    saleEndsAt?: string | null;
+    priority?: number;
+};
 
 export type Event = {
     id: string;
@@ -13,8 +28,10 @@ export type Event = {
     genres: string[];
     // True when the main purpose is a visiting international artist's Japan show.
     isInternational: boolean;
-    // Use null when ticket information is not published yet.
+    // Use null when ticket information is not published yet. Keep this for compatibility.
     ticketUrl: string | null;
+    // Optional normalized ticket links. Prefer this when multiple providers are known.
+    ticketLinks?: TicketLink[];
     // Artist, venue, or organizer event page used to verify event details.
     officialUrl: string | null;
     status: EventStatus;
@@ -35,6 +52,32 @@ const sampleEvents: Event[] = [
         genres: ["Heavy Metal"],
         isInternational: false,
         ticketUrl: null,
+        ticketLinks: [
+            {
+                provider: "eplus",
+                url: "https://eplus.jp/",
+                affiliateUrl: null,
+                saleStatus: "on_sale",
+                saleEndsAt: null,
+                priority: 1,
+            },
+            {
+                provider: "pia",
+                url: "https://t.pia.jp/",
+                affiliateUrl: null,
+                saleStatus: "presale",
+                saleEndsAt: null,
+                priority: 2,
+            },
+            {
+                provider: "lawson",
+                url: "https://l-tike.com/",
+                affiliateUrl: null,
+                saleStatus: "unknown",
+                saleEndsAt: null,
+                priority: 3,
+            },
+        ],
         officialUrl: null,
         status: "scheduled",
     },

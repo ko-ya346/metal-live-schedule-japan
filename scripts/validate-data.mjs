@@ -4,6 +4,13 @@ import { events } from "../src/data/events.ts";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const eventStatuses = new Set(["scheduled", "cancelled", "postponed"]);
+const ticketSaleStatuses = new Set([
+  "on_sale",
+  "presale",
+  "sold_out",
+  "not_started",
+  "unknown",
+]);
 const reviewStatuses = new Set(["review_needed", "published", "ignored"]);
 const confidences = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["promoter", "venue", "band_official", "ticket", "sns", "manual"]);
@@ -95,6 +102,59 @@ function checkUniqueIds(items, label) {
 
     seen.add(item.id);
   }
+}
+
+function checkTicketLinks(item, label) {
+  if (item.ticketLinks === undefined) {
+    return;
+  }
+
+  if (!Array.isArray(item.ticketLinks)) {
+    errors.push(`${label}:${item.id}: ticketLinks must be an array`);
+    return;
+  }
+
+  item.ticketLinks.forEach((ticketLink, index) => {
+    const ticketLabel = `${label}:${item.id}: ticketLinks[${index}]`;
+
+    if (!isNonEmptyString(ticketLink.provider)) {
+      errors.push(`${ticketLabel}: provider must not be empty`);
+    }
+
+    if (!isValidUrl(ticketLink.url)) {
+      errors.push(`${ticketLabel}: invalid url`);
+    }
+
+    if (
+      ticketLink.affiliateUrl !== undefined &&
+      ticketLink.affiliateUrl !== null &&
+      !isValidUrl(ticketLink.affiliateUrl)
+    ) {
+      errors.push(`${ticketLabel}: invalid affiliateUrl`);
+    }
+
+    if (
+      ticketLink.saleStatus !== undefined &&
+      !ticketSaleStatuses.has(ticketLink.saleStatus)
+    ) {
+      errors.push(`${ticketLabel}: invalid saleStatus`);
+    }
+
+    if (
+      ticketLink.saleEndsAt !== undefined &&
+      ticketLink.saleEndsAt !== null &&
+      (!isNonEmptyString(ticketLink.saleEndsAt) || !isValidDate(ticketLink.saleEndsAt))
+    ) {
+      errors.push(`${ticketLabel}: saleEndsAt must be a valid YYYY-MM-DD date`);
+    }
+
+    if (
+      ticketLink.priority !== undefined &&
+      (!Number.isInteger(ticketLink.priority) || ticketLink.priority < 1)
+    ) {
+      errors.push(`${ticketLabel}: priority must be a positive integer`);
+    }
+  });
 }
 
 function normalizeForDuplicateCheck(value) {
@@ -208,6 +268,8 @@ for (const event of events) {
     }
   }
 
+  checkTicketLinks(event, "events");
+
   for (const field of ["candidateCreatedAt", "publishedAt", "updatedAt"]) {
     checkOptionalDate(event, "events", field);
   }
@@ -261,6 +323,8 @@ for (const candidate of candidateEvents) {
       errors.push(`candidateEvents:${candidate.id}: invalid ${field}`);
     }
   }
+
+  checkTicketLinks(candidate, "candidateEvents");
 
   const publishedEvent = events.find((event) => event.id === candidate.id);
 

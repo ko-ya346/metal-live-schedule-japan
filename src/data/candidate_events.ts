@@ -1,4 +1,4 @@
-import type { EventStatus } from "./events";
+import type { EventStatus, TicketLink } from "./events";
 
 export type CandidateEventStatus = "review_needed" | "published" | "ignored";
 export type CandidateEventConfidence = "high" | "medium" | "low";
@@ -23,6 +23,7 @@ export type CandidateEvent = {
     // True when the main purpose is a visiting international artist's Japan show.
     isInternational: boolean;
     ticketUrl: string | null;
+    ticketLinks?: TicketLink[];
     officialUrl: string | null;
     sourceUrl: string;
     sourceType: CandidateEventSourceType;

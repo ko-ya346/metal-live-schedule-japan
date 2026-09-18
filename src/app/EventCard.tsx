@@ -5,10 +5,13 @@ import Link from "next/link";
 import { isPastEventDate } from "../utils/date";
 import {
   eventLinkLabels,
+  formatTicketProvider,
+  formatTicketSaleStatus,
   formatEventStatus,
   formatYoutubeLinkLabel,
   getPrimaryEventLinks,
   getSetlistSearchUrl,
+  getTicketLinks,
   getYoutubeSearchUrl,
 } from "../utils/eventLinks";
 import styles from "./page.module.css";
@@ -25,27 +28,35 @@ type EventCardProps = {
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
+  const ticketLinks = getTicketLinks(event);
+  const shouldCollapseTicketLinks = ticketLinks.length > 1;
   const primaryEventLinks = getPrimaryEventLinks(event);
+  const [isTicketOpen, setIsTicketOpen] = useState(false);
   const [isYoutubeOpen, setIsYoutubeOpen] = useState(false);
+  const ticketDetailsRef = useRef<HTMLDetailsElement>(null);
   const youtubeDetailsRef = useRef<HTMLDetailsElement>(null);
 
   useEffect(() => {
-    if (!isYoutubeOpen) {
+    if (!isTicketOpen && !isYoutubeOpen) {
       return;
     }
 
-    function closeYoutubeLinks(event: PointerEvent) {
-      if (!youtubeDetailsRef.current?.contains(event.target as Node)) {
+    function closeOpenMenus(pointerEvent: PointerEvent) {
+      if (!ticketDetailsRef.current?.contains(pointerEvent.target as Node)) {
+        setIsTicketOpen(false);
+      }
+
+      if (!youtubeDetailsRef.current?.contains(pointerEvent.target as Node)) {
         setIsYoutubeOpen(false);
       }
     }
 
-    document.addEventListener("pointerdown", closeYoutubeLinks);
+    document.addEventListener("pointerdown", closeOpenMenus);
 
     return () => {
-      document.removeEventListener("pointerdown", closeYoutubeLinks);
+      document.removeEventListener("pointerdown", closeOpenMenus);
     };
-  }, [isYoutubeOpen]);
+  }, [isTicketOpen, isYoutubeOpen]);
 
   return (
     <article className={styles.eventCard}>
@@ -91,6 +102,35 @@ export function EventCard({ event }: EventCardProps) {
           <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
             {eventLinkLabels.detail}
           </Link>
+          {shouldCollapseTicketLinks && (
+            <details
+              className={styles.ticketDetails}
+              onToggle={(event) => setIsTicketOpen(event.currentTarget.open)}
+              open={isTicketOpen}
+              ref={ticketDetailsRef}
+            >
+              <summary className={styles.primaryLink}>
+                {eventLinkLabels.ticketMenu}（{ticketLinks.length}）
+              </summary>
+              <div className={styles.ticketProviderLinks}>
+                {ticketLinks.map((ticketLink) => (
+                  <TrackedExternalLink
+                    className={styles.ticketProviderLink}
+                    event={event}
+                    href={ticketLink.href}
+                    isAffiliate={Boolean(ticketLink.affiliateUrl)}
+                    key={`${ticketLink.provider}-${ticketLink.url}`}
+                    linkType="ticket"
+                    sourceSurface="event_card"
+                    ticketProvider={ticketLink.provider}
+                  >
+                    <span>{formatTicketProvider(ticketLink.provider)}</span>
+                    <span>{formatTicketSaleStatus(ticketLink.saleStatus)} →</span>
+                  </TrackedExternalLink>
+                ))}
+              </div>
+            </details>
+          )}
           {primaryEventLinks.map((link) => (
             <TrackedExternalLink
               className={
@@ -103,6 +143,10 @@ export function EventCard({ event }: EventCardProps) {
               key={`${link.label}-${link.href}`}
               linkType={link.linkType}
               sourceSurface="event_card"
+              ticketProvider={link.linkType === "ticket" ? ticketLinks[0]?.provider : undefined}
+              isAffiliate={
+                link.linkType === "ticket" ? Boolean(ticketLinks[0]?.affiliateUrl) : false
+              }
             >
               {link.label}
             </TrackedExternalLink>

@@ -111,6 +111,103 @@ function formValueToList(formData: FormData, key: string) {
     .filter(Boolean);
 }
 
+function inferTicketProvider(url: string) {
+  try {
+    const hostname = new URL(url).hostname.toLowerCase();
+
+    if (hostname.includes("eplus.jp")) {
+      return "eplus";
+    }
+
+    if (hostname.includes("pia.jp") || hostname.includes("t.pia.jp")) {
+      return "pia";
+    }
+
+    if (hostname.includes("l-tike.com")) {
+      return "lawson";
+    }
+
+    if (hostname.includes("livepocket.jp")) {
+      return "livepocket";
+    }
+
+    if (hostname.includes("ticket.rakuten.co.jp")) {
+      return "rakuten";
+    }
+
+    if (hostname.includes("creativeman.co.jp")) {
+      return "creativeman";
+    }
+
+    if (hostname.includes("smash-jpn.com")) {
+      return "smash";
+    }
+
+    if (hostname.includes("evp.jp")) {
+      return "evp";
+    }
+  } catch {
+    return "other";
+  }
+
+  return "other";
+}
+
+function ticketLinksToText(ticketLinks: CandidateEvent["ticketLinks"]) {
+  return (ticketLinks ?? [])
+    .map((ticketLink) => {
+      if (!ticketLink.provider || ticketLink.provider === inferTicketProvider(ticketLink.url)) {
+        return ticketLink.url;
+      }
+
+      return `${ticketLink.provider} ${ticketLink.url}`;
+    })
+    .join("\n");
+}
+
+function formValueToTicketLinks(formData: FormData): CandidateEvent["ticketLinks"] {
+  const value = formValueToString(formData, "ticketLinks");
+
+  if (!value) {
+    return undefined;
+  }
+
+  if (value.startsWith("[")) {
+    const parsed = JSON.parse(value) as unknown;
+
+    if (!Array.isArray(parsed)) {
+      throw new Error("チケットリンクは配列JSON、または1行1URLで入力してください");
+    }
+
+    return parsed as CandidateEvent["ticketLinks"];
+  }
+
+  return value
+    .split(/\n/)
+    .map((line, index) => {
+      const trimmedLine = line.trim();
+
+      if (!trimmedLine) {
+        return null;
+      }
+
+      const [firstValue, ...restValues] = trimmedLine.split(/\s+/);
+      const explicitUrl = restValues.join(" ");
+      const url = explicitUrl || firstValue;
+      const provider = explicitUrl ? firstValue : inferTicketProvider(url);
+
+      return {
+        provider,
+        url,
+        affiliateUrl: null,
+        priority: index + 1,
+      };
+    })
+    .filter((ticketLink): ticketLink is NonNullable<typeof ticketLink> =>
+      Boolean(ticketLink),
+    );
+}
+
 function formDataToCandidate(
   candidate: CandidateEvent,
   formData: FormData,
@@ -125,6 +222,7 @@ function formDataToCandidate(
     genres: formValueToList(formData, "genres"),
     isInternational: formData.get("isInternational") === "on",
     ticketUrl: formValueToString(formData, "ticketUrl") || null,
+    ticketLinks: formValueToTicketLinks(formData),
     officialUrl: formValueToString(formData, "officialUrl") || null,
     reviewNotes: formValueToString(formData, "reviewNotes"),
   };
@@ -346,6 +444,14 @@ export function CandidatesReview({
                     <input
                       defaultValue={candidate.ticketUrl ?? ""}
                       name="ticketUrl"
+                    />
+                  </label>
+                  <label>
+                    チケットリンク
+                    <textarea
+                      defaultValue={ticketLinksToText(candidate.ticketLinks)}
+                      name="ticketLinks"
+                      placeholder={"https://eplus.jp/...\npia https://t.pia.jp/...\nlawson https://l-tike.com/..."}
                     />
                   </label>
                   <label>

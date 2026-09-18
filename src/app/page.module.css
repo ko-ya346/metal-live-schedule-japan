@@ -1781,6 +1781,13 @@
   cursor: pointer;
 }
 
+.linkSubLabel {
+  margin-left: 6px;
+  color: rgb(255 255 255 / 0.74);
+  font-size: 0.76rem;
+  font-weight: 800;
+}
+
 .secondaryLink:hover {
   border-color: #ff6b6b;
   color: #ff6b6b;
@@ -1788,19 +1795,23 @@
   transform: translateY(-1px);
 }
 
+.ticketDetails,
 .youtubeDetails {
   position: relative;
 }
 
+.ticketDetails summary,
 .youtubeDetails summary {
   list-style: none;
   cursor: pointer;
 }
 
+.ticketDetails summary::-webkit-details-marker,
 .youtubeDetails summary::-webkit-details-marker {
   display: none;
 }
 
+.ticketProviderLinks,
 .youtubeArtistLinks {
   position: absolute;
   z-index: 1;
@@ -1814,6 +1825,38 @@
   border-radius: 6px;
   background: #181818;
   box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
+}
+
+.ticketProviderLinks {
+  min-width: 230px;
+}
+
+.ticketProviderLink {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  min-height: 38px;
+  padding: 0 10px;
+  border: 1px solid #343434;
+  border-radius: 5px;
+  background: #0b0b0b;
+  color: #f2f2ef;
+  font-size: 0.84rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.ticketProviderLink:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  background: #181010;
+}
+
+.ticketProviderLink span:last-child {
+  flex: 0 0 auto;
+  color: #b9b9b3;
+  font-size: 0.76rem;
 }
 
 .pendingLinks {

@@ -116,9 +116,11 @@ function formatValue(value, indentLevel) {
 function formatObject(object, keys, indentLevel = 4) {
   const indent = " ".repeat(indentLevel);
   const childIndent = " ".repeat(indentLevel + 4);
-  const lines = keys.map(
-    (key) => `${childIndent}${key}: ${formatValue(object[key], indentLevel + 4)},`,
-  );
+  const lines = keys
+    .filter((key) => object[key] !== undefined)
+    .map(
+      (key) => `${childIndent}${key}: ${formatValue(object[key], indentLevel + 4)},`,
+    );
 
   return `${indent}{\n${lines.join("\n")}\n${indent}}`;
 }
@@ -134,6 +136,7 @@ function formatCandidateObject(candidate) {
     "genres",
     "isInternational",
     "ticketUrl",
+    "ticketLinks",
     "officialUrl",
     "sourceUrl",
     "sourceType",
@@ -571,6 +574,27 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
         : ["Heavy Metal"],
     isInternational: candidate.isInternational === true,
     ticketUrl: candidate.ticketUrl ? normalizeUrl(String(candidate.ticketUrl)) : null,
+    ticketLinks: Array.isArray(candidate.ticketLinks)
+      ? candidate.ticketLinks
+          .map((ticketLink) => ({
+            provider: toNullableString(ticketLink.provider) ?? "other",
+            url: ticketLink.url ? normalizeUrl(String(ticketLink.url)) : null,
+            affiliateUrl: ticketLink.affiliateUrl
+              ? normalizeUrl(String(ticketLink.affiliateUrl))
+              : null,
+            saleStatus:
+              ticketLink.saleStatus === "on_sale" ||
+              ticketLink.saleStatus === "presale" ||
+              ticketLink.saleStatus === "sold_out" ||
+              ticketLink.saleStatus === "not_started" ||
+              ticketLink.saleStatus === "unknown"
+                ? ticketLink.saleStatus
+                : "unknown",
+            saleEndsAt: toNullableString(ticketLink.saleEndsAt),
+            priority: Number.isInteger(ticketLink.priority) ? ticketLink.priority : undefined,
+          }))
+          .filter((ticketLink) => ticketLink.url)
+      : undefined,
     officialUrl: candidate.officialUrl
       ? normalizeUrl(String(candidate.officialUrl))
       : null,
@@ -685,6 +709,7 @@ function buildPrompt(summaries, knownSummary) {
       "genres": ["Heavy Metal"],
       "isInternational": true,
       "ticketUrl": null,
+      "ticketLinks": null,
       "officialUrl": null,
       "sourceUrl": "https://...",
       "sourceType": "promoter|venue|band_official|ticket|sns|manual",

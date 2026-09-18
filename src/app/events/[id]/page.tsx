@@ -8,9 +8,12 @@ import {
   eventLinkLabels,
   formatArtists,
   formatEventStatus,
+  formatTicketSaleStatus,
   formatYoutubeLinkLabel,
-  getPrimaryEventLinks,
+  getOfficialEventLink,
   getSetlistSearchUrl,
+  getTicketLinkLabel,
+  getTicketLinks,
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
 import { getRelatedEventCandidates } from "../../../utils/events";
@@ -58,7 +61,7 @@ function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEve
     event.artists.length > 1
       ? `出演: ${artists}。`
       : `${primaryArtist}の公演情報。`;
-  const ticketText = event.ticketUrl
+  const ticketText = getTicketLinks(event).length > 0
     ? "チケット情報あり。"
     : "チケット情報は公式発表を確認してください。";
   const eventTypeText = event.isInternational
@@ -188,7 +191,8 @@ export default async function EventPage({ params }: EventPageProps) {
 
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const eventUrl = `${siteUrl}/events/${event.id}`;
-  const primaryEventLinks = getPrimaryEventLinks(event);
+  const ticketLinks = getTicketLinks(event);
+  const officialLink = getOfficialEventLink(event);
   const eventStructuredData = {
     "@context": "https://schema.org",
     "@type": "Event",
@@ -269,24 +273,38 @@ export default async function EventPage({ params }: EventPageProps) {
         </dl>
 
         <div className={styles.eventDetailLinks}>
-          {primaryEventLinks.length > 0 && (
+          {(ticketLinks.length > 0 || officialLink) && (
             <div className={styles.eventPrimaryLinks}>
-              {primaryEventLinks.map((link) => (
+              {ticketLinks.map((ticketLink) => (
                 <TrackedExternalLink
-                  className={
-                    link.variant === "primary"
-                      ? styles.primaryLink
-                      : styles.secondaryLink
-                  }
+                  className={styles.primaryLink}
                   event={event}
-                  href={link.href}
-                  key={`${link.label}-${link.href}`}
-                  linkType={link.linkType}
+                  href={ticketLink.href}
+                  isAffiliate={Boolean(ticketLink.affiliateUrl)}
+                  key={`${ticketLink.provider}-${ticketLink.url}`}
+                  linkType="ticket"
                   sourceSurface="event_detail"
+                  ticketProvider={ticketLink.provider}
                 >
-                  {link.label}
+                  <span>{getTicketLinkLabel(ticketLink)}</span>
+                  {ticketLinks.length > 1 && (
+                    <span className={styles.linkSubLabel}>
+                      {formatTicketSaleStatus(ticketLink.saleStatus)}
+                    </span>
+                  )}
                 </TrackedExternalLink>
               ))}
+              {officialLink && (
+                <TrackedExternalLink
+                  className={styles.secondaryLink}
+                  event={event}
+                  href={officialLink}
+                  linkType="official"
+                  sourceSurface="event_detail"
+                >
+                  {eventLinkLabels.official}
+                </TrackedExternalLink>
+              )}
             </div>
           )}
 

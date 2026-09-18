@@ -10,6 +10,8 @@ type TrackedExternalLinkProps = {
   href: string;
   linkType: "ticket" | "official" | "combined";
   sourceSurface: "event_card" | "event_detail";
+  ticketProvider?: string;
+  isAffiliate?: boolean;
 };
 
 function getDestinationDomain(href: string) {
@@ -23,8 +25,10 @@ function getDestinationDomain(href: string) {
 function trackEventLinkClick({
   event,
   href,
+  isAffiliate,
   linkType,
   sourceSurface,
+  ticketProvider,
 }: Omit<TrackedExternalLinkProps, "children" | "className">) {
   if (typeof window === "undefined" || !window.gtag) {
     return;
@@ -41,7 +45,9 @@ function trackEventLinkClick({
     link_type: linkType,
     prefecture: event.prefecture,
     primary_artist: event.artists[0],
+    is_affiliate: isAffiliate ?? false,
     source_surface: sourceSurface,
+    ticket_provider: ticketProvider ?? null,
     venue: event.venue,
   });
 }
@@ -51,15 +57,19 @@ export function TrackedExternalLink({
   className,
   event,
   href,
+  isAffiliate,
   linkType,
   sourceSurface,
+  ticketProvider,
 }: TrackedExternalLinkProps) {
   function handleClick(clickEvent: MouseEvent<HTMLAnchorElement>) {
     trackEventLinkClick({
       event,
       href,
+      isAffiliate,
       linkType,
       sourceSurface,
+      ticketProvider,
     });
   }
 
@@ -75,4 +85,3 @@ export function TrackedExternalLink({
     </a>
   );
 }
-
