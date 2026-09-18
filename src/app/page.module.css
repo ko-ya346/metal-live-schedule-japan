@@ -25,12 +25,12 @@
 
 .heroHeader {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) 300px;
-  gap: 28px;
-  align-items: end;
-  padding: 28px;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: center;
+  padding: 14px 16px;
   border: 1px solid #35302c;
-  border-top: 5px solid #e23232;
+  border-top: 3px solid #e23232;
   border-radius: 6px;
   background:
     linear-gradient(135deg, rgb(226 50 50 / 0.16), transparent 42%),
@@ -49,10 +49,10 @@
 .header h1 {
   margin: 0;
   color: #ffffff;
-  font-size: clamp(2.3rem, 6vw, 5rem);
+  font-size: clamp(1.45rem, 3vw, 2.1rem);
   font-weight: 900;
   letter-spacing: 0;
-  line-height: 0.92;
+  line-height: 1;
 }
 
 .summary {
@@ -72,11 +72,46 @@
   min-width: 0;
 }
 
+.heroBrand {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  min-width: 0;
+}
+
+.heroBrand img {
+  width: 42px;
+  height: 42px;
+  flex: 0 0 auto;
+  border-radius: 8px;
+}
+
+.heroBrand p {
+  margin: 4px 0 0;
+  color: #d9d9d4;
+  font-size: 0.92rem;
+  font-weight: 800;
+  line-height: 1.35;
+}
+
 .heroActions {
   display: flex;
   flex-wrap: wrap;
   gap: 10px;
   margin-top: 20px;
+}
+
+.heroCount {
+  margin: 0;
+  padding: 10px 12px;
+  border: 1px solid #3a2d2d;
+  border-radius: 6px;
+  background: rgb(0 0 0 / 0.34);
+  color: #f2f2ef;
+  font-size: 0.9rem;
+  font-weight: 900;
+  text-align: right;
+  white-space: nowrap;
 }
 
 .heroStats {
@@ -118,6 +153,101 @@
     linear-gradient(135deg, rgb(255 107 107 / 0.07), transparent 40%),
     #101010;
   box-shadow: 0 16px 34px rgb(0 0 0 / 0.4);
+}
+
+.topSearchPanel {
+  display: grid;
+  gap: 12px;
+  max-width: 1180px;
+  padding: 14px;
+  margin: -10px auto 18px;
+  border: 1px solid #343434;
+  border-radius: 6px;
+  background: #101010;
+  box-shadow: 0 16px 34px rgb(0 0 0 / 0.38);
+}
+
+.topSearchPanel .filters {
+  grid-template-columns: minmax(220px, 1.4fr) minmax(140px, 0.8fr) minmax(150px, 0.8fr) auto auto;
+  align-items: end;
+  gap: 10px;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  background: transparent;
+  box-shadow: none;
+}
+
+.topSearchPanel .filterField {
+  gap: 5px;
+  font-size: 0.74rem;
+}
+
+.topSearchPanel .filterField input,
+.topSearchPanel .searchField input {
+  min-height: 36px;
+  padding: 8px 12px;
+  font-size: 0.88rem;
+}
+
+.topSearchPanel .searchField {
+  grid-column: auto;
+}
+
+.topSearchPanel .filterCheckboxField {
+  min-height: 36px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.topSearchPanel .filterActions {
+  justify-content: stretch;
+}
+
+.topSearchPanel .resetButton {
+  min-height: 36px;
+  padding: 0 10px;
+  white-space: nowrap;
+}
+
+.topSearchPanel .activeFilters {
+  grid-column: 1 / -1;
+}
+
+.searchControlBar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  flex-wrap: wrap;
+  padding-top: 10px;
+  border-top: 1px solid #2c2c2c;
+}
+
+.segmentedControl {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+}
+
+.segmentedControl button {
+  min-height: 34px;
+  padding: 0 12px;
+  border: 1px solid #3c3c3c;
+  border-radius: 6px;
+  background: #050505;
+  color: #d9d9d4;
+  font: inherit;
+  font-size: 0.86rem;
+  font-weight: 800;
+  cursor: pointer;
+}
+
+.segmentedControl button:hover,
+.segmentedControl .segmentActive {
+  border-color: #ff6b6b;
+  background: #271414;
+  color: #ffffff;
 }
 
 .sidebar .discoveryHub {
@@ -302,6 +432,27 @@
   grid-area: sidebar;
   gap: 16px;
   min-width: 0;
+  scrollbar-color: #7f1d1d #101010;
+  scrollbar-width: thin;
+}
+
+.sidebar::-webkit-scrollbar {
+  width: 10px;
+}
+
+.sidebar::-webkit-scrollbar-track {
+  background: #101010;
+  border-radius: 999px;
+}
+
+.sidebar::-webkit-scrollbar-thumb {
+  border: 2px solid #101010;
+  border-radius: 999px;
+  background: #7f1d1d;
+}
+
+.sidebar::-webkit-scrollbar-thumb:hover {
+  background: #c52727;
 }
 
 .searchGuide {
@@ -441,6 +592,10 @@
   .sidebar {
     position: sticky;
     top: 16px;
+    max-height: calc(100vh - 32px);
+    overflow-y: auto;
+    padding-right: 4px;
+    scrollbar-gutter: stable;
   }
 
   .sidebar .filters {
@@ -1953,9 +2108,9 @@
   .heroHeader {
     order: 1;
     grid-template-columns: 1fr;
-    gap: 14px;
-    padding: 16px;
-    margin-bottom: 18px;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
   }
 
   .kicker {
@@ -1964,8 +2119,8 @@
   }
 
   .header h1 {
-    font-size: 2.35rem;
-    line-height: 0.95;
+    font-size: 1.45rem;
+    line-height: 1;
   }
 
   .summary {
@@ -1984,6 +2139,21 @@
     -webkit-line-clamp: 2;
   }
 
+  .heroBrand {
+    gap: 10px;
+  }
+
+  .heroBrand img {
+    width: 34px;
+    height: 34px;
+    border-radius: 7px;
+  }
+
+  .heroBrand p {
+    margin-top: 2px;
+    font-size: 0.78rem;
+  }
+
   .heroActions {
     gap: 8px;
     margin-top: 12px;
@@ -1993,6 +2163,12 @@
     min-height: 38px;
     padding: 0 12px;
     font-size: 0.86rem;
+  }
+
+  .heroCount {
+    padding: 8px 10px;
+    font-size: 0.82rem;
+    text-align: left;
   }
 
   .heroStats {
@@ -2013,8 +2189,47 @@
   }
 
   .contentLayout {
-    order: 2;
+    order: 3;
     display: contents;
+  }
+
+  .topSearchPanel {
+    order: 2;
+    gap: 10px;
+    padding: 12px;
+    margin: 0 0 14px;
+  }
+
+  .topSearchPanel .filters {
+    grid-template-columns: 1fr 1fr;
+    gap: 8px;
+  }
+
+  .topSearchPanel .searchField,
+  .topSearchPanel .activeFilters,
+  .topSearchPanel .filterActions {
+    grid-column: 1 / -1;
+  }
+
+  .topSearchPanel .filterCheckboxField {
+    min-height: 34px;
+    font-size: 0.82rem;
+  }
+
+  .searchControlBar {
+    align-items: stretch;
+    gap: 8px;
+  }
+
+  .segmentedControl {
+    width: 100%;
+  }
+
+  .segmentedControl button {
+    flex: 1 1 auto;
+    min-height: 34px;
+    padding: 0 9px;
+    font-size: 0.8rem;
   }
 
   .discoveryHub {

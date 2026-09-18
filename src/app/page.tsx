@@ -142,6 +142,121 @@ function countEventsByGenre(eventList: typeof events, genreKeyword: string) {
   ).length;
 }
 
+type QuickRange = "all" | "today" | "weekend" | "currentMonth" | "nextMonth";
+type ViewMode = "list" | "calendar";
+
+function getJapanDateKey(date: Date) {
+  const parts = new Intl.DateTimeFormat("en-CA", {
+    day: "2-digit",
+    month: "2-digit",
+    timeZone: "Asia/Tokyo",
+    year: "numeric",
+  }).formatToParts(date);
+  const values = Object.fromEntries(
+    parts.map((part) => [part.type, part.value]),
+  );
+
+  return `${values.year}-${values.month}-${values.day}`;
+}
+
+function getJapanTodayDateKey() {
+  return getJapanDateKey(new Date());
+}
+
+function addDaysToEventDate(date: string, days: number) {
+  const parsedDate = new Date(`${date}T00:00:00+09:00`);
+  const nextDate = new Date(parsedDate.getTime() + days * 24 * 60 * 60 * 1000);
+
+  return getJapanDateKey(nextDate);
+}
+
+function getJapanWeekday(date: string) {
+  const parsedDate = new Date(`${date}T00:00:00+09:00`);
+  const weekday = new Intl.DateTimeFormat("en-US", {
+    timeZone: "Asia/Tokyo",
+    weekday: "short",
+  }).format(parsedDate);
+  const weekdayIndexes: Record<string, number> = {
+    Sun: 0,
+    Mon: 1,
+    Tue: 2,
+    Wed: 3,
+    Thu: 4,
+    Fri: 5,
+    Sat: 6,
+  };
+
+  return weekdayIndexes[weekday] ?? 0;
+}
+
+function getWeekendDateKeys(today: string) {
+  const weekday = getJapanWeekday(today);
+
+  if (weekday === 0) {
+    return new Set([today]);
+  }
+
+  const saturdayOffset = (6 - weekday + 7) % 7;
+  const saturday = addDaysToEventDate(today, saturdayOffset);
+
+  return new Set([saturday, addDaysToEventDate(saturday, 1)]);
+}
+
+function getNextMonthKey(monthKey: string) {
+  const [year, month] = monthKey.split("-").map(Number);
+  const nextMonth = month === 12 ? 1 : month + 1;
+  const nextYear = month === 12 ? year + 1 : year;
+
+  return `${nextYear}-${String(nextMonth).padStart(2, "0")}`;
+}
+
+function matchesQuickRange(
+  event: Event,
+  quickRange: QuickRange,
+  today: string,
+  weekendDates: Set<string>,
+  currentMonthKey: string,
+  nextMonthKey: string,
+) {
+  if (quickRange === "today") {
+    return event.date === today;
+  }
+
+  if (quickRange === "weekend") {
+    return weekendDates.has(event.date);
+  }
+
+  if (quickRange === "currentMonth") {
+    return getEventMonthKey(event.date) === currentMonthKey;
+  }
+
+  if (quickRange === "nextMonth") {
+    return getEventMonthKey(event.date) === nextMonthKey;
+  }
+
+  return true;
+}
+
+function formatQuickRangeTitle(quickRange: QuickRange) {
+  if (quickRange === "today") {
+    return "今日のライブ";
+  }
+
+  if (quickRange === "weekend") {
+    return "今週末のライブ";
+  }
+
+  if (quickRange === "currentMonth") {
+    return "今月のライブ";
+  }
+
+  if (quickRange === "nextMonth") {
+    return "来月のライブ";
+  }
+
+  return "今後のライブ";
+}
+
 function FeaturedEventCard({ event }: { event: Event }) {
   return (
     <Link className={styles.featuredCard} href={`/events/${event.id}`}>
@@ -174,16 +289,22 @@ export default function Page() {
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<EventDate | null>(null);
   const [visibleMonth, setVisibleMonth] = useState(getCurrentMonthKey);
+  const [quickRange, setQuickRange] = useState<QuickRange>("all");
+  const [viewMode, setViewMode] = useState<ViewMode>("list");
   const hasActiveFilters =
     selectedPrefecture !== ALL_FILTER_VALUE ||
     selectedGenre !== ALL_FILTER_VALUE ||
     internationalOnly ||
-    searchQuery.trim() !== "";
+    searchQuery.trim() !== "" ||
+    quickRange !== "all";
 
   const filterGenres = getEventGenres(events);
   const filterPrefectures = getEventPrefectures(events);
   const recentlyPublishedEvents = getRecentlyPublishedEvents(events);
   const currentMonthKey = getCurrentMonthKey();
+  const nextMonthKey = getNextMonthKey(currentMonthKey);
+  const todayDate = getJapanTodayDateKey();
+  const weekendDates = getWeekendDateKeys(todayDate);
   const featuredEvents = getFeaturedEvents(events, currentMonthKey);
 
   const sortedEvents = sortEventsByDate(events);
@@ -222,14 +343,24 @@ export default function Page() {
     searchQuery,
     internationalOnly,
   );
+  const rangedFilteredEvents = filteredEvents.filter((event) =>
+    matchesQuickRange(
+      event,
+      quickRange,
+      todayDate,
+      weekendDates,
+      currentMonthKey,
+      nextMonthKey,
+    ),
+  );
   const selectedDateEvents = selectedDate
-    ? filteredEvents.filter((event) => event.date === selectedDate)
+    ? rangedFilteredEvents.filter((event) => event.date === selectedDate)
     : [];
-  const upcomingEvents = filteredEvents.filter(
+  const upcomingEvents = rangedFilteredEvents.filter(
     (event) => !isPastEventDate(event.date) && event.date !== selectedDate,
   );
   const pastFilteredEvents = hasActiveFilters
-    ? filteredEvents
+    ? rangedFilteredEvents
         .filter((event) => isPastEventDate(event.date) && event.date !== selectedDate)
         .reverse()
     : [];
@@ -263,11 +394,25 @@ export default function Page() {
     clearSelectedDate();
   }
 
+  function updateQuickRange(nextQuickRange: QuickRange) {
+    setQuickRange(nextQuickRange);
+    clearSelectedDate();
+
+    if (nextQuickRange === "currentMonth") {
+      setVisibleMonth(currentMonthKey);
+    }
+
+    if (nextQuickRange === "nextMonth") {
+      setVisibleMonth(nextMonthKey);
+    }
+  }
+
   function resetFilters() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
     setSelectedGenre(ALL_FILTER_VALUE);
     setInternationalOnly(false);
     setSearchQuery("");
+    setQuickRange("all");
     clearSelectedDate();
   }
 
@@ -276,6 +421,7 @@ export default function Page() {
     setSelectedPrefecture(ALL_FILTER_VALUE);
     setInternationalOnly(true);
     setSearchQuery("");
+    setQuickRange("all");
     setSelectedDate(null);
   }
 
@@ -283,57 +429,78 @@ export default function Page() {
     <main className={styles.page}>
       <header className={`${styles.header} ${styles.heroHeader}`}>
         <div className={styles.heroCopy}>
-          <p className={styles.kicker}>日本のメタルライブ・来日公演予定</p>
-          <h1>Metals Calendar</h1>
-          <p className={styles.summary}>
-            {formatEventCount(filteredEvents.length)}
-          </p>
+          <div className={styles.heroBrand}>
+            <img src="/images/favicon.png" alt="" aria-hidden="true" />
+            <div>
+              <h1>Metals Calendar</h1>
+              <p>日本のメタルライブ・来日公演を探す</p>
+            </div>
+          </div>
           <p className={styles.lead}>
-            来日公演から国内バンドの小規模ライブまで、日本で観られるヘヴィミュージックの予定をまとめています。
-            行ける日、行ける場所、気になるバンドから次のライブを探せます。
+            日程、地域、ジャンルから次のライブを探せます。
           </p>
-          <div className={styles.heroActions} aria-label="主要ページ">
-            <Link className={styles.primaryLink} href={`/months/${currentMonthKey}`}>
-              今月のライブ
-            </Link>
-            <Link className={styles.secondaryLink} href="/international">
-              来日公演
-            </Link>
-          </div>
         </div>
-        <div className={styles.heroStats} aria-label="掲載状況">
-          <div>
-            <strong>{allUpcomingEvents.length}</strong>
-            <span>今後のライブ</span>
-          </div>
-          <div>
-            <strong>{upcomingInternationalCount}</strong>
-            <span>来日公演</span>
-          </div>
-          <div>
-            <strong>{upcomingMonthLinks.length}</strong>
-            <span>掲載月</span>
-          </div>
-        </div>
+        <p className={styles.heroCount}>{formatEventCount(rangedFilteredEvents.length)}</p>
       </header>
+
+      <section className={styles.topSearchPanel} aria-label="ライブ検索">
+        <EventFilters
+          genres={filterGenres}
+          prefectures={filterPrefectures}
+          selectedGenre={selectedGenre}
+          selectedPrefecture={selectedPrefecture}
+          internationalOnly={internationalOnly}
+          searchQuery={searchQuery}
+          canReset={hasActiveFilters}
+          onGenreChange={updateGenre}
+          onPrefectureChange={updatePrefecture}
+          onInternationalOnlyChange={updateInternationalOnly}
+          onSearchQueryChange={updateSearchQuery}
+          onReset={resetFilters}
+        />
+
+        <div className={styles.searchControlBar}>
+          <div className={styles.segmentedControl} aria-label="期間">
+            {[
+              ["all", "すべて"],
+              ["today", "今日"],
+              ["weekend", "今週末"],
+              ["currentMonth", "今月"],
+              ["nextMonth", "来月"],
+            ].map(([value, label]) => (
+              <button
+                aria-pressed={quickRange === value}
+                className={quickRange === value ? styles.segmentActive : undefined}
+                key={value}
+                type="button"
+                onClick={() => updateQuickRange(value as QuickRange)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+
+          <div className={styles.segmentedControl} aria-label="表示形式">
+            {[
+              ["list", "リスト表示"],
+              ["calendar", "カレンダー表示"],
+            ].map(([value, label]) => (
+              <button
+                aria-pressed={viewMode === value}
+                className={viewMode === value ? styles.segmentActive : undefined}
+                key={value}
+                type="button"
+                onClick={() => setViewMode(value as ViewMode)}
+              >
+                {label}
+              </button>
+            ))}
+          </div>
+        </div>
+      </section>
 
       <div className={styles.contentLayout}>
         <aside className={styles.sidebar} aria-label="絞り込みと探し方">
-          <EventFilters
-            genres={filterGenres}
-            prefectures={filterPrefectures}
-            selectedGenre={selectedGenre}
-            selectedPrefecture={selectedPrefecture}
-            internationalOnly={internationalOnly}
-            searchQuery={searchQuery}
-            canReset={hasActiveFilters}
-            onGenreChange={updateGenre}
-            onPrefectureChange={updatePrefecture}
-            onInternationalOnlyChange={updateInternationalOnly}
-            onSearchQueryChange={updateSearchQuery}
-            onReset={resetFilters}
-          />
-
           <section className={styles.discoveryHub} aria-labelledby="discovery-title">
             <div className={styles.sectionHeader}>
               <div>
@@ -470,13 +637,15 @@ export default function Page() {
         </aside>
 
         <div className={styles.mainColumn}>
-          <EventCalendar
-            events={filteredEvents}
-            monthKey={visibleMonth}
-            selectedDate={selectedDate}
-            onMonthChange={setVisibleMonth}
-            onDateSelect={setSelectedDate}
-          />
+          {viewMode === "calendar" && (
+            <EventCalendar
+              events={rangedFilteredEvents}
+              monthKey={visibleMonth}
+              selectedDate={selectedDate}
+              onMonthChange={setVisibleMonth}
+              onDateSelect={setSelectedDate}
+            />
+          )}
 
           {selectedDate && (
             <section className={styles.selectedDateSection}>
@@ -500,6 +669,32 @@ export default function Page() {
               )}
             </section>
           )}
+
+          <section className={styles.upcomingSection}>
+            <h2 className={styles.sectionTitle}>
+              {hasActiveFilters
+                ? `${formatQuickRangeTitle(quickRange)}・絞り込み結果`
+                : formatQuickRangeTitle(quickRange)}
+            </h2>
+
+            {upcomingDates.length === 0 ? (
+              <p className={styles.empty}>
+                {hasActiveFilters
+                  ? "一致する今後のライブはありません。条件を変更するか、リセットしてください。"
+                  : "今後のライブはありません。絞り込み条件を変更するか、リセットしてください。"}
+              </p>
+            ) : (
+              <div className={styles.dateGroups}>
+                {upcomingDates.map((date) => (
+                  <EventDateGroup
+                    date={date}
+                    events={upcomingEventsByDate[date]}
+                    key={date}
+                  />
+                ))}
+              </div>
+            )}
+          </section>
 
           {!hasActiveFilters && featuredEvents.length > 0 && (
             <section className={styles.featuredSection}>
@@ -558,30 +753,6 @@ export default function Page() {
               </div>
             </section>
           )}
-
-          <section className={styles.upcomingSection}>
-            <h2 className={styles.sectionTitle}>
-              {hasActiveFilters ? "絞り込み結果" : "今後のライブ"}
-            </h2>
-
-            {upcomingDates.length === 0 ? (
-              <p className={styles.empty}>
-                {hasActiveFilters
-                  ? "一致する今後のライブはありません。条件を変更するか、リセットしてください。"
-                  : "今後のライブはありません。絞り込み条件を変更するか、リセットしてください。"}
-              </p>
-            ) : (
-              <div className={styles.dateGroups}>
-                {upcomingDates.map((date) => (
-                  <EventDateGroup
-                    date={date}
-                    events={upcomingEventsByDate[date]}
-                    key={date}
-                  />
-                ))}
-              </div>
-            )}
-          </section>
 
           {hasActiveFilters && pastFilteredDates.length > 0 && (
             <section className={styles.recentSection}>
