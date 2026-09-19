@@ -11267,4 +11267,30 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-09-19",
         reviewedAt: "2026-09-19",
     },
+
+    {
+        id: "death-cab-for-cutie-japan-tour-2026-osaka",
+        artists: [
+            "Death Cab for Cutie",
+        ],
+        tourName: "I Built You A Tower Tour",
+        date: "2026-11-08",
+        prefecture: "大阪府",
+        venue: "松下IMPホール",
+        genres: [
+            "Indie Rock",
+        ],
+        isInternational: true,
+        ticketUrl: "https://eplus.tickets/dcfc/",
+        officialUrl: "https://www.creativeman.co.jp/event/death-cab-for-cutie_2026/",
+        sourceUrl: "https://www.creativeman.co.jp/event/death-cab-for-cutie_2026/",
+        sourceType: "promoter",
+        sourceName: "Creativeman",
+        confidence: "medium",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "Death Cab for Cutieはインディロックであり、メタル・ハードロックではないため、メタルカレンダーの対象外の可能性が高い。来日公演は確定しているがジャンル的に除外推奨。",
+        collectedAt: "2026-09-19",
+        reviewedAt: null,
+    },
 ];
