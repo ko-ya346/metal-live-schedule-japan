@@ -26,6 +26,7 @@
 docs/*.zip
 docs/*.csv
 docs/search-console-reports/*.md
+docs/analytics-reports/*.md
 /candidate-report.md
 /research-links.md
 

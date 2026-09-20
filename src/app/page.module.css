@@ -1378,6 +1378,13 @@
   gap: 14px;
 }
 
+.eventHeaderActions {
+  display: inline-flex;
+  align-items: center;
+  flex: 0 0 auto;
+  gap: 8px;
+}
+
 .artist {
   margin: 0;
   font-size: 1.12rem;
@@ -1477,6 +1484,22 @@
   border-radius: 6px;
   background: #181818;
   box-shadow: 0 12px 24px rgb(0 0 0 / 0.38);
+}
+
+.eventBackLink {
+  justify-self: start;
+  color: #b9b9b3;
+  font-size: 0.9rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.eventBackLink::before {
+  content: "← ";
+}
+
+.eventBackLink:hover {
+  color: #ff6b6b;
 }
 
 .eventDetailMeta {
@@ -1793,6 +1816,38 @@
   color: #ff6b6b;
   background: #181010;
   transform: translateY(-1px);
+}
+
+.infoLink {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  box-sizing: border-box;
+  width: 28px;
+  min-width: 28px;
+  min-height: 28px;
+  border: 1px solid #454545;
+  border-radius: 999px;
+  background: #111111;
+  color: #f2f2ef;
+  text-decoration: none;
+  font-size: 0.86rem;
+  font-weight: 900;
+  line-height: 1;
+  transition:
+    background 150ms ease,
+    border-color 150ms ease,
+    color 150ms ease;
+}
+
+.infoLink span {
+  transform: translateY(-0.5px);
+}
+
+.infoLink:hover {
+  border-color: #ff6b6b;
+  color: #ff6b6b;
+  background: #181010;
 }
 
 .ticketDetails,

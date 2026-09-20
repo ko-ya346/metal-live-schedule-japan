@@ -70,9 +70,19 @@ export function EventCard({ event }: EventCardProps) {
           </p>
           <p className={styles.tourName}>{event.tourName}</p>
         </div>
-        <span className={styles.eventStatusBadge}>
-          {formatEventStatus(event.status)}
-        </span>
+        <div className={styles.eventHeaderActions}>
+          <span className={styles.eventStatusBadge}>
+            {formatEventStatus(event.status)}
+          </span>
+          <Link
+            aria-label={`${event.artists.join(" / ")} ${event.tourName}の詳細を見る`}
+            className={styles.infoLink}
+            href={`/events/${event.id}`}
+            title="詳細を見る"
+          >
+            <span aria-hidden="true">i</span>
+          </Link>
+        </div>
       </div>
 
       <dl className={styles.eventMeta}>
@@ -99,9 +109,6 @@ export function EventCard({ event }: EventCardProps) {
 
       <div className={styles.eventLinks} aria-label="イベントリンク">
         <div className={styles.eventPrimaryLinks}>
-          <Link className={styles.secondaryLink} href={`/events/${event.id}`}>
-            {eventLinkLabels.detail}
-          </Link>
           {shouldCollapseTicketLinks && (
             <details
               className={styles.ticketDetails}
