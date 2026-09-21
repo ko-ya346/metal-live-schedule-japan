@@ -1742,25 +1742,20 @@
   align-items: center;
   justify-content: center;
   box-sizing: border-box;
-  width: 28px;
-  min-width: 28px;
-  min-height: 28px;
+  min-height: 30px;
+  padding: 0 10px;
   border: 1px solid #454545;
-  border-radius: 999px;
+  border-radius: 5px;
   background: #111111;
   color: #f2f2ef;
   text-decoration: none;
-  font-size: 0.86rem;
-  font-weight: 900;
-  line-height: 1;
+  font-size: 0.78rem;
+  font-weight: 800;
+  line-height: 1.2;
   transition:
     background 150ms ease,
     border-color 150ms ease,
     color 150ms ease;
-}
-
-.infoLink span {
-  transform: translateY(-0.5px);
 }
 
 .infoLink:hover {
@@ -2589,6 +2584,22 @@
     width: 100%;
   }
 
+  .eventLinks .primaryLink,
+  .eventLinks .secondaryLink {
+    width: auto;
+    flex: 1 1 132px;
+  }
+
+  .eventPrimaryLinks,
+  .eventSupportLinks {
+    width: 100%;
+  }
+
+  .eventLinks .infoLink {
+    flex: 0 0 auto;
+    min-width: 64px;
+  }
+
   .youtubeArtistLinks {
     position: static;
     width: 100%;
@@ -2599,8 +2610,9 @@
     grid-template-columns: 1fr;
   }
 
-  .youtubeDetails {
-    width: 100%;
+  .eventLinks .youtubeDetails {
+    width: auto;
+    flex: 1 1 172px;
   }
 
   .pendingLinks {

@@ -70,19 +70,13 @@ export function EventCard({ event }: EventCardProps) {
           </p>
           <p className={styles.tourName}>{event.tourName}</p>
         </div>
-        <div className={styles.eventHeaderActions}>
-          <span className={styles.eventStatusBadge}>
-            {formatEventStatus(event.status)}
-          </span>
-          <Link
-            aria-label={`${event.artists.join(" / ")} ${event.tourName}の詳細を見る`}
-            className={styles.infoLink}
-            href={`/events/${event.id}`}
-            title="詳細を見る"
-          >
-            <span aria-hidden="true">i</span>
-          </Link>
-        </div>
+        {event.status !== "scheduled" && (
+          <div className={styles.eventHeaderActions}>
+            <span className={styles.eventStatusBadge}>
+              {formatEventStatus(event.status)}
+            </span>
+          </div>
+        )}
       </div>
 
       <dl className={styles.eventMeta}>
@@ -205,6 +199,14 @@ export function EventCard({ event }: EventCardProps) {
               {formatYoutubeLinkLabel(event.artists[0], event.artists.length)}
             </a>
           )}
+          <Link
+            aria-label={`${event.artists.join(" / ")} ${event.tourName}の詳細を見る`}
+            className={styles.infoLink}
+            href={`/events/${event.id}`}
+            title="詳細を見る"
+          >
+            詳細
+          </Link>
         </div>
       </div>
     </article>
