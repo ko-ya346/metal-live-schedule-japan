@@ -11288,9 +11288,9 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "Creativeman",
         confidence: "medium",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "Death Cab for Cutieはインディロックであり、メタル・ハードロックではないため、メタルカレンダーの対象外の可能性が高い。来日公演は確定しているがジャンル的に除外推奨。",
         collectedAt: "2026-09-19",
-        reviewedAt: null,
+        reviewedAt: "2026-09-21",
     },
 ];
