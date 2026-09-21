@@ -5,9 +5,9 @@ import Link from "next/link";
 import { isPastEventDate } from "../utils/date";
 import {
   eventLinkLabels,
+  formatEventDisplayStatus,
   formatTicketProvider,
   formatTicketSaleStatus,
-  formatEventStatus,
   formatYoutubeLinkLabel,
   getPrimaryEventLinks,
   getSetlistSearchUrl,
@@ -27,6 +27,8 @@ type EventCardProps = {
 
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
+  const shouldShowStatusBadge =
+    event.status !== "scheduled" || shouldShowSetlistLink;
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
   const ticketLinks = getTicketLinks(event);
   const shouldCollapseTicketLinks = ticketLinks.length > 1;
@@ -70,10 +72,10 @@ export function EventCard({ event }: EventCardProps) {
           </p>
           <p className={styles.tourName}>{event.tourName}</p>
         </div>
-        {event.status !== "scheduled" && (
+        {shouldShowStatusBadge && (
           <div className={styles.eventHeaderActions}>
             <span className={styles.eventStatusBadge}>
-              {formatEventStatus(event.status)}
+              {formatEventDisplayStatus(event)}
             </span>
           </div>
         )}
