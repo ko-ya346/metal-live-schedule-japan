@@ -26,10 +26,6 @@ import { DiscoveryArtists } from "./DiscoveryArtists";
 import { SiteAnalytics } from "./Analytics";
 import styles from "./page.module.css";
 
-function formatEventCount(count: number) {
-  return `${count}件のライブが見つかりました`;
-}
-
 function formatShortDate(date: string) {
   const parsedDate = new Date(`${date}T00:00:00+09:00`);
 
@@ -351,60 +347,55 @@ export default function Page() {
               <p>日本のメタルライブ・来日公演を探す</p>
             </div>
           </div>
-          <p className={styles.lead}>
-            日程、地域、ジャンルから次のライブを探せます。
-          </p>
         </div>
-        <p className={styles.heroCount}>{formatEventCount(rangedFilteredEvents.length)}</p>
+        <section className={styles.topSearchPanel} aria-label="ライブ検索">
+          <EventFilters
+            internationalOnly={internationalOnly}
+            searchQuery={searchQuery}
+            onInternationalOnlyChange={updateInternationalOnly}
+            onSearchQueryChange={updateSearchQuery}
+          />
+
+          <div className={styles.searchControlBar}>
+            <div className={styles.segmentedControl} aria-label="期間">
+              {[
+                ["all", "すべて"],
+                ["today", "今日"],
+                ["weekend", "今週末"],
+                ["currentMonth", "今月"],
+                ["nextMonth", "来月"],
+              ].map(([value, label]) => (
+                <button
+                  aria-pressed={quickRange === value}
+                  className={quickRange === value ? styles.segmentActive : undefined}
+                  key={value}
+                  type="button"
+                  onClick={() => updateQuickRange(value as QuickRange)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+
+            <div className={styles.segmentedControl} aria-label="表示形式">
+              {[
+                ["list", "リスト"],
+                ["calendar", "カレンダー"],
+              ].map(([value, label]) => (
+                <button
+                  aria-pressed={viewMode === value}
+                  className={viewMode === value ? styles.segmentActive : undefined}
+                  key={value}
+                  type="button"
+                  onClick={() => setViewMode(value as ViewMode)}
+                >
+                  {label}
+                </button>
+              ))}
+            </div>
+          </div>
+        </section>
       </header>
-
-      <section className={styles.topSearchPanel} aria-label="ライブ検索">
-        <EventFilters
-          internationalOnly={internationalOnly}
-          searchQuery={searchQuery}
-          onInternationalOnlyChange={updateInternationalOnly}
-          onSearchQueryChange={updateSearchQuery}
-        />
-
-        <div className={styles.searchControlBar}>
-          <div className={styles.segmentedControl} aria-label="期間">
-            {[
-              ["all", "すべて"],
-              ["today", "今日"],
-              ["weekend", "今週末"],
-              ["currentMonth", "今月"],
-              ["nextMonth", "来月"],
-            ].map(([value, label]) => (
-              <button
-                aria-pressed={quickRange === value}
-                className={quickRange === value ? styles.segmentActive : undefined}
-                key={value}
-                type="button"
-                onClick={() => updateQuickRange(value as QuickRange)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-
-          <div className={styles.segmentedControl} aria-label="表示形式">
-            {[
-              ["list", "リスト表示"],
-              ["calendar", "カレンダー表示"],
-            ].map(([value, label]) => (
-              <button
-                aria-pressed={viewMode === value}
-                className={viewMode === value ? styles.segmentActive : undefined}
-                key={value}
-                type="button"
-                onClick={() => setViewMode(value as ViewMode)}
-              >
-                {label}
-              </button>
-            ))}
-          </div>
-        </div>
-      </section>
 
       <div className={styles.contentLayout}>
         <aside className={styles.sidebar} aria-label="注目ライブと探し方">
