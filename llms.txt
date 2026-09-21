@@ -6,8 +6,9 @@ Read in this order:
 
 1. `docs/llm-wiki/index.md` - compact working context for LLM agents
 2. `AGENTS.md` - full project rules and crawling policy
-3. `docs/project-roadmap.md` - product direction and next milestones
-4. `docs/event-data-workflow.md` - candidate collection/review workflow
+3. `docs/ROADMAP.md` - product strategy and phase gates
+4. `docs/project-roadmap.md` - implementation milestones
+5. `docs/event-data-workflow.md` - candidate collection/review workflow
 
 Common tasks:
 

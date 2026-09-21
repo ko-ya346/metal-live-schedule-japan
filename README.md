@@ -9,7 +9,7 @@
 - 日付、地域、ジャンルでライブ情報を探せるようにする
 - 手作業で確認しながら、公開前の候補イベントを管理しやすくする
 
-プロダクトの長期方針は [`ROADMAP.md`](ROADMAP.md) にまとめています。
+プロダクトの長期方針は [`docs/ROADMAP.md`](docs/ROADMAP.md) にまとめています。
 実装マイルストーンは [`docs/project-roadmap.md`](docs/project-roadmap.md) にまとめています。
 LLM向けの短い作業コンテキストは [`llms.txt`](llms.txt) と [`docs/llm-wiki/index.md`](docs/llm-wiki/index.md) にあります。
 
