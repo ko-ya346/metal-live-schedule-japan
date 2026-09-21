@@ -26,10 +26,6 @@ import { DiscoveryArtists } from "./DiscoveryArtists";
 import { SiteAnalytics } from "./Analytics";
 import styles from "./page.module.css";
 
-function formatEventCount(count: number) {
-  return `${count}件のライブが見つかりました`;
-}
-
 function formatShortDate(date: string) {
   const parsedDate = new Date(`${date}T00:00:00+09:00`);
 
@@ -399,7 +395,6 @@ export default function Page() {
             </div>
           </div>
         </section>
-        <p className={styles.heroCount}>{formatEventCount(rangedFilteredEvents.length)}</p>
       </header>
 
       <div className={styles.contentLayout}>

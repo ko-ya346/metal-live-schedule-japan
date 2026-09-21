@@ -101,19 +101,6 @@
   margin-top: 20px;
 }
 
-.heroCount {
-  margin: 0;
-  padding: 8px 10px;
-  border: 1px solid #3a2d2d;
-  border-radius: 6px;
-  background: rgb(0 0 0 / 0.34);
-  color: #f2f2ef;
-  font-size: 0.78rem;
-  font-weight: 900;
-  text-align: right;
-  white-space: nowrap;
-}
-
 .heroStats {
   display: grid;
   grid-template-columns: 1fr;
@@ -2210,12 +2197,6 @@
     font-size: 0.86rem;
   }
 
-  .heroCount {
-    padding: 8px 10px;
-    font-size: 0.82rem;
-    text-align: left;
-  }
-
   .heroStats {
     grid-template-columns: repeat(3, minmax(0, 1fr));
     gap: 6px;
@@ -2247,7 +2228,7 @@
   }
 
   .topSearchPanel .filters {
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: 1fr;
     gap: 8px;
   }
 
@@ -2262,19 +2243,29 @@
   }
 
   .searchControlBar {
+    display: grid;
+    grid-template-columns: 1fr;
     align-items: stretch;
     gap: 8px;
   }
 
   .segmentedControl {
+    display: grid;
     width: 100%;
   }
 
+  .segmentedControl:first-child {
+    grid-template-columns: repeat(5, minmax(0, 1fr));
+  }
+
+  .segmentedControl:last-child {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
   .segmentedControl button {
-    flex: 1 1 auto;
     min-height: 34px;
-    padding: 0 9px;
-    font-size: 0.8rem;
+    padding: 0 5px;
+    font-size: 0.76rem;
   }
 
   .discoveryHub {
@@ -2293,7 +2284,7 @@
   }
 
   .sidebar {
-    order: 4;
+    order: 8;
     position: static;
   }
 
@@ -2306,15 +2297,15 @@
   }
 
   .featuredSection {
-    order: 7;
+    order: 5;
   }
 
   .recentSection {
-    order: 8;
+    order: 6;
   }
 
   .upcomingSection {
-    order: 9;
+    order: 4;
   }
 
   .filters,
