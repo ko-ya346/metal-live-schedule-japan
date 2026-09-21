@@ -7,9 +7,7 @@ import { events } from "../data/events";
 import {
   ALL_FILTER_VALUE,
   filterEvents,
-  getEventGenres,
   getGroupedEventDates,
-  getEventPrefectures,
   groupEventsByDate,
   sortEventsByDate,
 } from "../utils/events";
@@ -21,9 +19,6 @@ import {
   getEventMonthKey,
   isPastEventDate,
 } from "../utils/date";
-import { getEventMonths } from "../utils/months";
-import { getGenreSlug } from "../utils/genres";
-import { getPrefectures } from "../utils/prefectures";
 import { EventCalendar } from "./EventCalendar";
 import { EventDateGroup } from "./EventDateGroup";
 import { EventFilters } from "./EventFilters";
@@ -100,46 +95,12 @@ function getFeaturedEvents(eventList: typeof events, monthKey: string) {
     .map((item) => item.event);
 }
 
-function getPopularPrefectureLinks(eventList: typeof events) {
-  const eventCountByPrefecture = new Map<string, number>();
-
-  eventList.forEach((event) => {
-    eventCountByPrefecture.set(
-      event.prefecture,
-      (eventCountByPrefecture.get(event.prefecture) ?? 0) + 1,
-    );
-  });
-
-  return getPrefectures(eventList)
-    .map((prefecture) => ({
-      ...prefecture,
-      count: eventCountByPrefecture.get(prefecture.name) ?? 0,
-    }))
-    .sort((a, b) => {
-      const countDiff = b.count - a.count;
-
-      if (countDiff !== 0) {
-        return countDiff;
-      }
-
-      return a.name.localeCompare(b.name, "ja");
-    });
-}
-
 function formatFeaturedArtists(artists: Event["artists"]) {
   if (artists.length <= 2) {
     return artists.join(" / ");
   }
 
   return `${artists.slice(0, 2).join(" / ")} ほか${artists.length - 2}組`;
-}
-
-function countEventsByGenre(eventList: typeof events, genreKeyword: string) {
-  return eventList.filter((event) =>
-    event.genres.some((genre) =>
-      genre.toLocaleLowerCase().includes(genreKeyword.toLocaleLowerCase()),
-    ),
-  ).length;
 }
 
 type QuickRange = "all" | "today" | "weekend" | "currentMonth" | "nextMonth";
@@ -283,8 +244,6 @@ function FeaturedEventCard({ event }: { event: Event }) {
 }
 
 export default function Page() {
-  const [selectedPrefecture, setSelectedPrefecture] = useState(ALL_FILTER_VALUE);
-  const [selectedGenre, setSelectedGenre] = useState(ALL_FILTER_VALUE);
   const [internationalOnly, setInternationalOnly] = useState(false);
   const [searchQuery, setSearchQuery] = useState("");
   const [selectedDate, setSelectedDate] = useState<EventDate | null>(null);
@@ -292,14 +251,10 @@ export default function Page() {
   const [quickRange, setQuickRange] = useState<QuickRange>("all");
   const [viewMode, setViewMode] = useState<ViewMode>("list");
   const hasActiveFilters =
-    selectedPrefecture !== ALL_FILTER_VALUE ||
-    selectedGenre !== ALL_FILTER_VALUE ||
     internationalOnly ||
     searchQuery.trim() !== "" ||
     quickRange !== "all";
 
-  const filterGenres = getEventGenres(events);
-  const filterPrefectures = getEventPrefectures(events);
   const recentlyPublishedEvents = getRecentlyPublishedEvents(events);
   const currentMonthKey = getCurrentMonthKey();
   const nextMonthKey = getNextMonthKey(currentMonthKey);
@@ -317,23 +272,10 @@ export default function Page() {
   const currentMonthEvents = allUpcomingEvents.filter(
     (event) => getEventMonthKey(event.date) === currentMonthKey,
   );
-  const upcomingMonthLinks = getEventMonths(allUpcomingEvents);
-  const popularPrefectureLinks = getPopularPrefectureLinks(allUpcomingEvents);
-  const discoveryGenres = [
-    { label: "Death Metal", value: "Death Metal" },
-    { label: "Metalcore", value: "Metalcore" },
-    { label: "Hardcore", value: "Hardcore" },
-    { label: "Heavy Metal", value: "Heavy Metal" },
-  ]
-    .map((genre) => ({
-      ...genre,
-      count: countEventsByGenre(allUpcomingEvents, genre.value),
-    }))
-    .filter((genre) => genre.count > 0);
   const filteredEvents = filterEvents(
     sortedEvents,
-    selectedPrefecture,
-    selectedGenre,
+    ALL_FILTER_VALUE,
+    ALL_FILTER_VALUE,
     searchQuery,
     internationalOnly,
   );
@@ -373,16 +315,6 @@ export default function Page() {
     clearSelectedDate();
   }
 
-  function updatePrefecture(prefecture: string) {
-    setSelectedPrefecture(prefecture);
-    clearSelectedDate();
-  }
-
-  function updateGenre(genre: string) {
-    setSelectedGenre(genre);
-    clearSelectedDate();
-  }
-
   function updateInternationalOnly(nextInternationalOnly: boolean) {
     setInternationalOnly(nextInternationalOnly);
     clearSelectedDate();
@@ -401,18 +333,7 @@ export default function Page() {
     }
   }
 
-  function resetFilters() {
-    setSelectedPrefecture(ALL_FILTER_VALUE);
-    setSelectedGenre(ALL_FILTER_VALUE);
-    setInternationalOnly(false);
-    setSearchQuery("");
-    setQuickRange("all");
-    clearSelectedDate();
-  }
-
   function applyInternationalFilter() {
-    setSelectedGenre(ALL_FILTER_VALUE);
-    setSelectedPrefecture(ALL_FILTER_VALUE);
     setInternationalOnly(true);
     setSearchQuery("");
     setQuickRange("all");
@@ -439,18 +360,10 @@ export default function Page() {
 
       <section className={styles.topSearchPanel} aria-label="ライブ検索">
         <EventFilters
-          genres={filterGenres}
-          prefectures={filterPrefectures}
-          selectedGenre={selectedGenre}
-          selectedPrefecture={selectedPrefecture}
           internationalOnly={internationalOnly}
           searchQuery={searchQuery}
-          canReset={hasActiveFilters}
-          onGenreChange={updateGenre}
-          onPrefectureChange={updatePrefecture}
           onInternationalOnlyChange={updateInternationalOnly}
           onSearchQueryChange={updateSearchQuery}
-          onReset={resetFilters}
         />
 
         <div className={styles.searchControlBar}>
@@ -546,62 +459,6 @@ export default function Page() {
             monthKey={currentMonthKey}
             picks={discoveryPicks}
           />
-
-          <section
-            className={styles.searchGuide}
-            aria-labelledby="search-guide-title"
-          >
-            <div>
-              <p className={styles.kicker}>Search</p>
-              <h2 id="search-guide-title">目的別に探す</h2>
-            </div>
-
-            <div className={styles.searchGuideGroups}>
-              <div className={styles.searchGuideGroup}>
-                <h3>来日公演</h3>
-                <Link href="/international">来日公演</Link>
-              </div>
-
-              <div className={styles.searchGuideGroup}>
-                <h3>月別</h3>
-                <div className={styles.searchGuideLinks}>
-                  {upcomingMonthLinks.map((month) => (
-                    <Link href={`/months/${month.key}`} key={month.key}>
-                      {month.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.searchGuideGroup}>
-                <h3>地域別</h3>
-                <div className={styles.searchGuideLinks}>
-                  {popularPrefectureLinks.map((prefecture) => (
-                    <Link
-                      href={`/prefectures/${prefecture.slug}`}
-                      key={prefecture.slug}
-                    >
-                      {prefecture.name}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-
-              <div className={styles.searchGuideGroup}>
-                <h3>ジャンル別</h3>
-                <div className={styles.searchGuideLinks}>
-                  {discoveryGenres.map((genre) => (
-                    <Link
-                      href={`/genres/${getGenreSlug(genre.value)}`}
-                      key={genre.value}
-                    >
-                      {genre.label}
-                    </Link>
-                  ))}
-                </div>
-              </div>
-            </div>
-          </section>
 
           <section className={styles.feedbackBanner}>
             <div>
