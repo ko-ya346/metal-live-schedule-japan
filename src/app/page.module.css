@@ -144,8 +144,9 @@
 
 .topSearchPanel {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 8px;
+  grid-template-columns: minmax(0, 1fr) minmax(210px, auto);
+  gap: 10px;
+  align-items: end;
   max-width: none;
   padding: 0;
   margin: 0;
@@ -194,11 +195,11 @@
 }
 
 .searchControlBar {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: 8px;
-  flex-wrap: wrap;
+  display: grid;
+  grid-template-columns: 1fr;
+  align-items: stretch;
+  justify-items: end;
+  gap: 5px;
   padding-top: 0;
   border-top: 0;
 }
