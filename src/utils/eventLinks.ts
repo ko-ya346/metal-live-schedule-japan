@@ -1,4 +1,5 @@
 import type { Event, TicketLink } from "../data/events";
+import { isPastEventDate } from "./date";
 
 type PrimaryEventLink = {
   href: string;
@@ -25,6 +26,18 @@ export function formatEventStatus(status: Event["status"]) {
   }
 
   return "開催予定";
+}
+
+export function formatEventDisplayStatus(event: Event) {
+  if (event.status !== "scheduled") {
+    return formatEventStatus(event.status);
+  }
+
+  if (isPastEventDate(event.date)) {
+    return "開催終了";
+  }
+
+  return formatEventStatus(event.status);
 }
 
 export function getSetlistSearchUrl(artists: Event["artists"]) {

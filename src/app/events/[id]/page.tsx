@@ -7,7 +7,7 @@ import { formatEventDate, isPastEventDate } from "../../../utils/date";
 import {
   eventLinkLabels,
   formatArtists,
-  formatEventStatus,
+  formatEventDisplayStatus,
   formatTicketSaleStatus,
   formatYoutubeLinkLabel,
   getOfficialEventLink,
@@ -80,6 +80,10 @@ function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) 
 
   if (event.status === "postponed") {
     return "https://schema.org/EventPostponed";
+  }
+
+  if (isPastEventDate(event.date)) {
+    return "https://schema.org/EventCompleted";
   }
 
   return "https://schema.org/EventScheduled";
@@ -272,7 +276,7 @@ export default async function EventPage({ params }: EventPageProps) {
           </div>
           <div>
             <dt>状況</dt>
-            <dd>{formatEventStatus(event.status)}</dd>
+            <dd>{formatEventDisplayStatus(event)}</dd>
           </div>
         </dl>
 
