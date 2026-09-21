@@ -200,16 +200,6 @@
   white-space: nowrap;
 }
 
-.topSearchPanel .filterActions {
-  justify-content: stretch;
-}
-
-.topSearchPanel .resetButton {
-  min-height: 36px;
-  padding: 0 10px;
-  white-space: nowrap;
-}
-
 .topSearchPanel .activeFilters {
   grid-column: 1 / -1;
 }
@@ -2259,8 +2249,7 @@
   }
 
   .topSearchPanel .searchField,
-  .topSearchPanel .activeFilters,
-  .topSearchPanel .filterActions {
+  .topSearchPanel .activeFilters {
     grid-column: 1 / -1;
   }
 

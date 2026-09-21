@@ -333,13 +333,6 @@ export default function Page() {
     }
   }
 
-  function resetFilters() {
-    setInternationalOnly(false);
-    setSearchQuery("");
-    setQuickRange("all");
-    clearSelectedDate();
-  }
-
   function applyInternationalFilter() {
     setInternationalOnly(true);
     setSearchQuery("");
@@ -369,10 +362,8 @@ export default function Page() {
         <EventFilters
           internationalOnly={internationalOnly}
           searchQuery={searchQuery}
-          canReset={hasActiveFilters}
           onInternationalOnlyChange={updateInternationalOnly}
           onSearchQueryChange={updateSearchQuery}
-          onReset={resetFilters}
         />
 
         <div className={styles.searchControlBar}>

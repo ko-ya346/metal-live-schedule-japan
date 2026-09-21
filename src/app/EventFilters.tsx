@@ -3,19 +3,15 @@ import styles from "./page.module.css";
 type EventFiltersProps = {
   internationalOnly: boolean;
   searchQuery: string;
-  canReset: boolean;
   onInternationalOnlyChange: (internationalOnly: boolean) => void;
   onSearchQueryChange: (query: string) => void;
-  onReset: () => void;
 };
 
 export function EventFilters({
   internationalOnly,
   searchQuery,
-  canReset,
   onInternationalOnlyChange,
   onSearchQueryChange,
-  onReset,
 }: EventFiltersProps) {
   const activeFilters = [
     searchQuery.trim()
@@ -56,17 +52,6 @@ export function EventFilters({
         />
         <span>来日公演に絞る</span>
       </label>
-
-      <div className={styles.filterActions}>
-        <button
-          className={styles.resetButton}
-          type="button"
-          onClick={onReset}
-          disabled={!canReset}
-        >
-          絞り込みをリセット
-        </button>
-      </div>
 
       {activeFilters.length > 0 && (
         <div className={styles.activeFilters} aria-label="適用中の絞り込み">
