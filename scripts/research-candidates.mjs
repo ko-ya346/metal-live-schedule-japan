@@ -3,6 +3,52 @@ import { readFile, writeFile } from "node:fs/promises";
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { events } from "../src/data/events.ts";
 
+async function loadDotEnvFile(filePath) {
+  let content;
+
+  try {
+    content = await readFile(filePath, "utf8");
+  } catch (error) {
+    if (error.code === "ENOENT") {
+      return;
+    }
+
+    throw error;
+  }
+
+  const existingKeys = new Set(Object.keys(process.env));
+
+  for (const line of content.split("\n")) {
+    const trimmedLine = line.trim();
+
+    if (!trimmedLine || trimmedLine.startsWith("#")) {
+      continue;
+    }
+
+    const separatorIndex = trimmedLine.indexOf("=");
+
+    if (separatorIndex === -1) {
+      continue;
+    }
+
+    const key = trimmedLine.slice(0, separatorIndex).trim();
+    let value = trimmedLine.slice(separatorIndex + 1).trim();
+
+    if (
+      (value.startsWith('"') && value.endsWith('"')) ||
+      (value.startsWith("'") && value.endsWith("'"))
+    ) {
+      value = value.slice(1, -1);
+    }
+
+    if (!existingKeys.has(key)) {
+      process.env[key] = value.replaceAll("\\n", "\n");
+    }
+  }
+}
+
+await loadDotEnvFile(".env.local");
+
 const args = new Map();
 for (const arg of process.argv.slice(2)) {
   const match = arg.match(/^--([^=]+)=(.*)$/);

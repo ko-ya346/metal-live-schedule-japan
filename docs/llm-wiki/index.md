@@ -117,7 +117,7 @@ For docs-only changes, `git diff --check` is usually enough.
 
 ## Roadmap Pointers
 
-Use `docs/project-roadmap.md` for product direction.
+Use `docs/ROADMAP.md` for product strategy and `docs/project-roadmap.md` for implementation milestones.
 
 Current next priorities:
 

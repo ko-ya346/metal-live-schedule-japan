@@ -9017,6 +9017,26 @@ const realEvents: Event[] = [
         publishedAt: "2026-09-19",
         updatedAt: "2026-09-19",
     },
+    {
+        id: "death-cab-for-cutie-japan-tour-2026-osaka",
+        artists: [
+            "Death Cab for Cutie",
+        ],
+        tourName: "I Built You A Tower Tour",
+        date: "2026-11-08",
+        prefecture: "大阪府",
+        venue: "松下IMPホール",
+        genres: [
+            "Indie Rock",
+        ],
+        isInternational: true,
+        ticketUrl: "https://eplus.tickets/dcfc/",
+        officialUrl: "https://www.creativeman.co.jp/event/death-cab-for-cutie_2026/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-09-19",
+        publishedAt: "2026-09-21",
+        updatedAt: "2026-09-21",
+    },
 ];
 
 export const publishedEvents = realEvents;
