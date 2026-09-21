@@ -8,7 +8,7 @@
 .page {
   max-width: 1504px;
   margin: 0 auto;
-  padding: 48px 20px 64px;
+  padding: 28px 20px 64px;
   color: #f2f2ef;
   background: #000000;
   font-family: Arial, Helvetica, sans-serif;
@@ -25,17 +25,17 @@
 
 .heroHeader {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
-  gap: 14px;
-  align-items: center;
-  padding: 14px 16px;
+  grid-template-columns: minmax(168px, 0.48fr) minmax(0, 1.4fr) auto;
+  gap: 12px;
+  align-items: end;
+  padding: 10px 12px;
   border: 1px solid #35302c;
-  border-top: 3px solid #e23232;
+  border-top: 2px solid #e23232;
   border-radius: 6px;
   background:
     linear-gradient(135deg, rgb(226 50 50 / 0.16), transparent 42%),
     #111111;
-  box-shadow: 0 24px 58px rgb(0 0 0 / 0.52);
+  box-shadow: 0 14px 32px rgb(0 0 0 / 0.44);
 }
 
 .kicker {
@@ -49,7 +49,7 @@
 .header h1 {
   margin: 0;
   color: #ffffff;
-  font-size: clamp(1.45rem, 3vw, 2.1rem);
+  font-size: clamp(1.02rem, 1.7vw, 1.35rem);
   font-weight: 900;
   letter-spacing: 0;
   line-height: 1;
@@ -75,23 +75,23 @@
 .heroBrand {
   display: flex;
   align-items: center;
-  gap: 12px;
+  gap: 8px;
   min-width: 0;
 }
 
 .heroBrand img {
-  width: 42px;
-  height: 42px;
+  width: 30px;
+  height: 30px;
   flex: 0 0 auto;
-  border-radius: 8px;
+  border-radius: 6px;
 }
 
 .heroBrand p {
-  margin: 4px 0 0;
+  margin: 2px 0 0;
   color: #d9d9d4;
-  font-size: 0.92rem;
+  font-size: 0.72rem;
   font-weight: 800;
-  line-height: 1.35;
+  line-height: 1.2;
 }
 
 .heroActions {
@@ -103,12 +103,12 @@
 
 .heroCount {
   margin: 0;
-  padding: 10px 12px;
+  padding: 8px 10px;
   border: 1px solid #3a2d2d;
   border-radius: 6px;
   background: rgb(0 0 0 / 0.34);
   color: #f2f2ef;
-  font-size: 0.9rem;
+  font-size: 0.78rem;
   font-weight: 900;
   text-align: right;
   white-space: nowrap;
@@ -157,18 +157,19 @@
 
 .topSearchPanel {
   display: grid;
-  gap: 12px;
-  max-width: 1180px;
-  padding: 14px;
-  margin: -10px auto 18px;
-  border: 1px solid #343434;
-  border-radius: 6px;
-  background: #101010;
-  box-shadow: 0 16px 34px rgb(0 0 0 / 0.38);
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 8px;
+  max-width: none;
+  padding: 0;
+  margin: 0;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  box-shadow: none;
 }
 
 .topSearchPanel .filters {
-  grid-template-columns: minmax(260px, 1fr) auto auto;
+  grid-template-columns: minmax(220px, 1fr) auto;
   align-items: end;
   gap: 8px;
   padding: 0;
@@ -179,15 +180,15 @@
 }
 
 .topSearchPanel .filterField {
-  gap: 5px;
-  font-size: 0.74rem;
+  gap: 4px;
+  font-size: 0.68rem;
 }
 
 .topSearchPanel .filterField input,
 .topSearchPanel .searchField input {
-  min-height: 40px;
-  padding: 9px 13px;
-  font-size: 0.95rem;
+  min-height: 34px;
+  padding: 7px 11px;
+  font-size: 0.86rem;
 }
 
 .topSearchPanel .searchField {
@@ -195,8 +196,9 @@
 }
 
 .topSearchPanel .filterCheckboxField {
-  min-height: 36px;
-  padding: 0 10px;
+  min-height: 34px;
+  padding: 0 9px;
+  font-size: 0.78rem;
   white-space: nowrap;
 }
 
@@ -207,28 +209,28 @@
 .searchControlBar {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 12px;
+  justify-content: flex-end;
+  gap: 8px;
   flex-wrap: wrap;
-  padding-top: 10px;
-  border-top: 1px solid #2c2c2c;
+  padding-top: 0;
+  border-top: 0;
 }
 
 .segmentedControl {
   display: flex;
   flex-wrap: wrap;
-  gap: 6px;
+  gap: 4px;
 }
 
 .segmentedControl button {
-  min-height: 34px;
-  padding: 0 12px;
+  min-height: 32px;
+  padding: 0 9px;
   border: 1px solid #3c3c3c;
   border-radius: 6px;
   background: #050505;
   color: #d9d9d4;
   font: inherit;
-  font-size: 0.86rem;
+  font-size: 0.78rem;
   font-weight: 800;
   cursor: pointer;
 }
@@ -2162,7 +2164,7 @@
   }
 
   .header h1 {
-    font-size: 1.45rem;
+    font-size: 1.08rem;
     line-height: 1;
   }
 
@@ -2183,18 +2185,18 @@
   }
 
   .heroBrand {
-    gap: 10px;
+    gap: 8px;
   }
 
   .heroBrand img {
-    width: 34px;
-    height: 34px;
-    border-radius: 7px;
+    width: 30px;
+    height: 30px;
+    border-radius: 6px;
   }
 
   .heroBrand p {
     margin-top: 2px;
-    font-size: 0.78rem;
+    font-size: 0.72rem;
   }
 
   .heroActions {
@@ -2238,9 +2240,10 @@
 
   .topSearchPanel {
     order: 2;
-    gap: 10px;
-    padding: 12px;
-    margin: 0 0 14px;
+    grid-template-columns: 1fr;
+    gap: 8px;
+    padding: 0;
+    margin: 0;
   }
 
   .topSearchPanel .filters {
