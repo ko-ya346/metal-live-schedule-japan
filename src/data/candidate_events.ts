@@ -11293,4 +11293,31 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-09-19",
         reviewedAt: "2026-09-21",
     },
+
+    {
+        id: "sable-hills-homura-japan-tour-2027-01-07-aichi",
+        artists: [
+            "Sable Hills",
+        ],
+        tourName: "Homura Japan Tour 2027",
+        date: "2027-01-07",
+        prefecture: "愛知県",
+        venue: "Electric Lady Land",
+        genres: [
+            "Metalcore",
+            "Metal",
+        ],
+        isInternational: true,
+        ticketUrl: "https://eplus.jp/sf/detail/4394940001-P0030006P021001",
+        officialUrl: null,
+        sourceUrl: "https://eplus.jp/sf/detail/4394940001-P0030006P021001",
+        sourceType: "ticket",
+        sourceName: "eplus 愛知県 メタル・ハードコア",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "スウェーデンのメタルコアバンドSable Hillsの来日ツアー名古屋公演。",
+        collectedAt: "2026-09-22",
+        reviewedAt: null,
+    },
 ];
