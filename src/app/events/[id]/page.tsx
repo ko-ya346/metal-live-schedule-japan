@@ -8,6 +8,7 @@ import {
   eventLinkLabels,
   formatArtists,
   formatEventDisplayStatus,
+  formatTicketProvider,
   formatTicketSaleStatus,
   formatYoutubeLinkLabel,
   getOfficialEventLink,
@@ -43,15 +44,13 @@ function findEvent(id: string) {
 
 function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) {
   const primaryArtist = event.artists[0];
-  const eventYear = event.date.slice(0, 4);
   const location = event.prefecture.replace(/都|府|県$/, "");
-  const eventDate = event.date.slice(5).replace("-", "/");
 
   if (event.isInternational) {
-    return `${primaryArtist} 来日公演 ${eventYear} ${location} ${eventDate} | チケット・会場`;
+    return `${primaryArtist} ${location}来日公演 ${formatEventDate(event.date)} | チケット・会場`;
   }
 
-  return `${primaryArtist}のメタルライブ ${eventYear} ${location} ${eventDate} | チケット・会場`;
+  return `${primaryArtist} ${location}公演 ${formatEventDate(event.date)} | チケット・会場`;
 }
 
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -70,7 +69,7 @@ function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEve
 
   return `${eventTypeText}${supportText}${event.tourName}は${formatEventDate(
     event.date,
-  )}、${event.prefecture} / ${event.venue}で開催。${ticketText}公式リンク、会場情報、関連ライブを掲載。`;
+  )}、${event.prefecture}の${event.venue}で開催。${ticketText}公式情報、会場情報、関連ライブを掲載しています。`;
 }
 
 function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -95,6 +94,86 @@ function formatOperationalDate(date: string | undefined) {
   }
 
   return formatEventDate(date as `${number}-${number}-${number}`);
+}
+
+function getEventLastUpdatedDate(event: NonNullable<ReturnType<typeof findEvent>>) {
+  return event.updatedAt ?? event.publishedAt;
+}
+
+function formatOptionalOperationalDate(date: string | undefined) {
+  return formatOperationalDate(date) ?? "未掲載";
+}
+
+function formatMissingDetail(label: string) {
+  return `未掲載（${label}は公式情報を確認してください）`;
+}
+
+function getOfferAvailability(saleStatus: ReturnType<typeof getTicketLinks>[number]["saleStatus"]) {
+  if (saleStatus === "sold_out") {
+    return "https://schema.org/SoldOut";
+  }
+
+  if (saleStatus === "not_started" || saleStatus === "presale") {
+    return "https://schema.org/PreOrder";
+  }
+
+  if (saleStatus === "on_sale") {
+    return "https://schema.org/InStock";
+  }
+
+  return undefined;
+}
+
+function getMusicEventStructuredData({
+  event,
+  eventUrl,
+  ticketLinks,
+}: {
+  event: NonNullable<ReturnType<typeof findEvent>>;
+  eventUrl: string;
+  ticketLinks: ReturnType<typeof getTicketLinks>;
+}) {
+  const offers = ticketLinks.map((ticketLink) => {
+    const availability = getOfferAvailability(ticketLink.saleStatus);
+
+    return {
+      "@type": "Offer",
+      url: ticketLink.href,
+      name: getTicketLinkLabel(ticketLink),
+      seller: {
+        "@type": "Organization",
+        name: formatTicketProvider(ticketLink.provider),
+      },
+      ...(availability ? { availability } : {}),
+    };
+  });
+
+  return {
+    "@context": "https://schema.org",
+    "@type": "MusicEvent",
+    name: `${formatArtists(event.artists)} - ${event.tourName}`,
+    description: formatEventPageDescription(event),
+    startDate: event.date,
+    eventStatus: getSchemaEventStatus(event),
+    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
+    url: eventUrl,
+    mainEntityOfPage: eventUrl,
+    location: {
+      "@type": "MusicVenue",
+      name: event.venue,
+      address: {
+        "@type": "PostalAddress",
+        addressRegion: event.prefecture,
+        addressCountry: "JP",
+      },
+    },
+    performer: event.artists.map((artist) => ({
+      "@type": "MusicGroup",
+      name: artist,
+    })),
+    ...(event.officialUrl ? { sameAs: event.officialUrl } : {}),
+    ...(offers.length > 0 ? { offers } : {}),
+  };
 }
 
 function EventDiscoveryLinks({
@@ -197,34 +276,16 @@ export default async function EventPage({ params }: EventPageProps) {
   const eventUrl = `${siteUrl}/events/${event.id}`;
   const ticketLinks = getTicketLinks(event);
   const officialLink = getOfficialEventLink(event);
-  const eventStructuredData = {
-    "@context": "https://schema.org",
-    "@type": "Event",
-    name: `${formatArtists(event.artists)} - ${event.tourName}`,
-    description: formatEventPageDescription(event),
-    startDate: event.date,
-    eventStatus: getSchemaEventStatus(event),
-    eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
-    url: eventUrl,
-    location: {
-      "@type": "Place",
-      name: event.venue,
-      address: {
-        "@type": "PostalAddress",
-        addressRegion: event.prefecture,
-        addressCountry: "JP",
-      },
-    },
-    performer: event.artists.map((artist) => ({
-      "@type": "PerformingGroup",
-      name: artist,
-    })),
-  };
+  const eventStructuredData = getMusicEventStructuredData({
+    event,
+    eventUrl,
+    ticketLinks,
+  });
   const shareText = `${formatArtists(event.artists)}「${event.tourName}」${formatEventDate(
     event.date,
   )} ${event.prefecture} / ${event.venue} - ${siteName}`;
   const relatedEventCandidates = getRelatedEventCandidates(event, events);
-  const updatedDate = formatOperationalDate(event.updatedAt);
+  const updatedDate = formatOperationalDate(getEventLastUpdatedDate(event));
 
   return (
     <main className={styles.page}>
@@ -252,17 +313,37 @@ export default async function EventPage({ params }: EventPageProps) {
       <article className={styles.eventDetail}>
         <dl className={styles.eventDetailMeta}>
           <div>
+            <dt>公演名</dt>
+            <dd>{event.tourName}</dd>
+          </div>
+          <div>
+            <dt>出演者</dt>
+            <dd>{formatArtists(event.artists)}</dd>
+          </div>
+          <div>
             <dt>日程</dt>
             <dd>{formatEventDate(event.date)}</dd>
           </div>
           <div>
-            <dt>会場</dt>
+            <dt>開場 / 開演</dt>
+            <dd>{formatMissingDetail("開場・開演時刻")}</dd>
+          </div>
+          <div>
+            <dt>都道府県</dt>
             <dd>
               <PrefectureLink
                 className={styles.inlineLink}
                 prefecture={event.prefecture}
-              />{" "}
-              / {" "}
+              />
+            </dd>
+          </div>
+          <div>
+            <dt>都市</dt>
+            <dd>{formatMissingDetail("都市")}</dd>
+          </div>
+          <div>
+            <dt>会場</dt>
+            <dd>
               <VenueLink
                 className={styles.inlineLink}
                 prefecture={event.prefecture}
@@ -277,6 +358,10 @@ export default async function EventPage({ params }: EventPageProps) {
           <div>
             <dt>状況</dt>
             <dd>{formatEventDisplayStatus(event)}</dd>
+          </div>
+          <div>
+            <dt>最終更新</dt>
+            <dd>{formatOptionalOperationalDate(getEventLastUpdatedDate(event))}</dd>
           </div>
         </dl>
 
@@ -344,7 +429,28 @@ export default async function EventPage({ params }: EventPageProps) {
         </div>
 
         <section className={styles.eventSourceSection}>
-          {updatedDate && <p>情報更新日: {updatedDate}</p>}
+          <h2>情報の確認</h2>
+          <p>最終更新日: {updatedDate ?? "未掲載"}</p>
+          {event.officialUrl ? (
+            <p>
+              公式情報:{" "}
+              <a href={event.officialUrl} target="_blank" rel="noreferrer">
+                公式サイトを確認する
+              </a>
+            </p>
+          ) : (
+            <p>公式情報: 未掲載</p>
+          )}
+          {ticketLinks.length > 0 ? (
+            <p>
+              チケット購入先:{" "}
+              {ticketLinks
+                .map((ticketLink) => formatTicketProvider(ticketLink.provider))
+                .join(" / ")}
+            </p>
+          ) : (
+            <p>チケット購入先: 未掲載</p>
+          )}
           <p>
             公演内容は変更される場合があります。来場前に公式情報やチケット販売ページを確認してください。
           </p>

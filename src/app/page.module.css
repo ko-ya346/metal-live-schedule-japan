@@ -1591,6 +1591,12 @@
   font-size: 0.78rem;
 }
 
+.eventSourceSection h2 {
+  margin: 0 0 2px;
+  color: #d9d9d4;
+  font-size: 0.86rem;
+}
+
 .eventSourceSection p {
   color: inherit;
   line-height: 1.5;
