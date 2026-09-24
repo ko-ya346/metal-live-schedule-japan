@@ -205,6 +205,7 @@ export function EventCard({ event }: EventCardProps) {
             aria-label={`${event.artists.join(" / ")} ${event.tourName}の詳細を見る`}
             className={styles.infoLink}
             href={`/events/${event.id}`}
+            prefetch={false}
             title="詳細を見る"
           >
             詳細

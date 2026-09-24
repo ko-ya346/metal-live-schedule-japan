@@ -14,6 +14,7 @@ export function ArtistLinks({ artists, className }: ArtistLinksProps) {
       <Link
         className={className}
         href={`/artists/${encodeURIComponent(getArtistSlug(artist))}`}
+        prefetch={false}
       >
         {artist}
       </Link>

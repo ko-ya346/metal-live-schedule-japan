@@ -108,6 +108,7 @@ export default function InternationalPage() {
                 className={styles.discoveryCard}
                 href={`/events/${event.id}`}
                 key={event.id}
+                prefetch={false}
               >
                 <span className={styles.discoveryCardLabel}>
                   {formatEventDate(event.date)}
@@ -126,7 +127,11 @@ export default function InternationalPage() {
             <h3>月別</h3>
             <div className={styles.searchGuideLinks}>
               {monthSummaries.map((summary) => (
-                <Link href={`/months/${summary.monthKey}`} key={summary.monthKey}>
+                <Link
+                  href={`/months/${summary.monthKey}`}
+                  key={summary.monthKey}
+                  prefetch={false}
+                >
                   {summary.label} ({summary.count})
                 </Link>
               ))}
@@ -140,6 +145,7 @@ export default function InternationalPage() {
                 <Link
                   href={`/prefectures/${getPrefectureSlug(summary.prefecture)}`}
                   key={summary.prefecture}
+                  prefetch={false}
                 >
                   {summary.prefecture} ({summary.count})
                 </Link>

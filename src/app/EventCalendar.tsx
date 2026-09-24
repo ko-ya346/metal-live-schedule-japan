@@ -215,6 +215,7 @@ export function EventCalendar({
                   <Link
                     className={styles.calendarMobileTooltip}
                     href={`/dates/${dateKey}`}
+                    prefetch={false}
                     role="tooltip"
                   >
                     {dateEvents.slice(0, 3).map((event) => (
@@ -235,6 +236,7 @@ export function EventCalendar({
                     className={styles.calendarEvent}
                     href={`/events/${event.id}`}
                     key={event.id}
+                    prefetch={false}
                     style={getCalendarEventStyle(event.genres)}
                     title={`${event.artists.join(", ")} / ${event.tourName}`}
                   >

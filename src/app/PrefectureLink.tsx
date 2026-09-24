@@ -14,6 +14,7 @@ export function PrefectureLink({
     <Link
       className={className}
       href={`/prefectures/${getPrefectureSlug(prefecture)}`}
+      prefetch={false}
     >
       {prefecture}
     </Link>

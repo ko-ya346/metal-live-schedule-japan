@@ -216,7 +216,11 @@ function formatQuickRangeTitle(quickRange: QuickRange) {
 
 function FeaturedEventCard({ event }: { event: Event }) {
   return (
-    <Link className={styles.featuredCard} href={`/events/${event.id}`}>
+    <Link
+      className={styles.featuredCard}
+      href={`/events/${event.id}`}
+      prefetch={false}
+    >
       <span className={styles.featuredTopLine}>
         <span className={styles.featuredDate}>{formatEventDate(event.date)}</span>
         {event.isInternational && <span className={styles.featuredBadge}>来日</span>}
@@ -422,6 +426,7 @@ export default function Page() {
               <Link
                 className={styles.discoveryCard}
                 href={`/months/${currentMonthKey}`}
+                prefetch={false}
               >
                 <span className={styles.discoveryCardLabel}>今月</span>
                 <strong>{formatCalendarMonth(currentMonthKey)}</strong>
@@ -432,6 +437,7 @@ export default function Page() {
                   className={styles.discoveryCard}
                   href={`/events/${event.id}`}
                   key={event.id}
+                  prefetch={false}
                 >
                   <span className={styles.discoveryCardLabel}>
                     {event.isInternational ? "来日" : "注目"}
@@ -570,6 +576,7 @@ export default function Page() {
                     className={styles.recentItem}
                     href={`/events/${event.id}`}
                     key={event.id}
+                    prefetch={false}
                   >
                     <span className={styles.recentPublishedAt}>
                       {event.publishedAt

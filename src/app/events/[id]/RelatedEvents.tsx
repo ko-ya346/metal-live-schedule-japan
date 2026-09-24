@@ -122,6 +122,7 @@ function RelatedEventList({
             className={styles.relatedEventCard}
             href={`/events/${event.id}`}
             key={event.id}
+            prefetch={false}
           >
             <span className={styles.relatedEventDate}>
               {formatEventDate(event.date)}
