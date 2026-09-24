@@ -85,7 +85,7 @@ export default async function PrefecturePage({ params }: PrefecturePageProps) {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Prefecture</p>
         <h1>{prefecture.name}のメタルライブ</h1>
         <p className={styles.summary}>

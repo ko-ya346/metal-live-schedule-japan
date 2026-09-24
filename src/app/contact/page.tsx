@@ -22,7 +22,7 @@ export const metadata: Metadata = {
 export default function ContactPage() {
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Contact</p>
         <h1>お問い合わせ</h1>
         <p className={styles.summary}>
