@@ -299,7 +299,7 @@ export default async function EventPage({ params }: EventPageProps) {
         {eventLinkLabels.allEvents}
       </Link>
 
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Event</p>
         <h1>
           <ArtistLinks

@@ -59,20 +59,18 @@ export default function InternationalPage() {
 
   return (
     <main className={styles.page}>
-      <header className={`${styles.header} ${styles.heroHeader}`}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <div className={styles.heroCopy}>
-          <p className={styles.kicker}>International</p>
+          <p className={styles.kicker}>来日公演</p>
           <h1>来日メタル・海外バンド公演</h1>
           <p className={styles.summary}>
-            {upcomingEvents.length}件の来日・海外アーティスト公演があります
+            今後の来日公演 {upcomingEvents.length}件 / 今後3か月{" "}
+            {nextThreeMonthEvents.length}件 / 掲載月 {monthSummaries.length}件 /
+            開催地域 {prefectureSummaries.length}件
           </p>
           <p className={styles.lead}>
             日本で開催される海外メタル、ハードロック、ラウドロック、メタルコア、ハードコア系アーティストの来日公演・Japan Tour予定をまとめています。
             公演日、会場、チケットや公式情報は各イベントページから確認できます。
-          </p>
-          <p className={styles.lead} lang="en">
-            Find upcoming international metal, hard rock, metalcore and hardcore
-            shows across Japan. Open an event for ticket and official links.
           </p>
           <div className={styles.heroActions} aria-label="主要ページ">
             <Link className={styles.primaryLink} href="/">
@@ -86,25 +84,6 @@ export default function InternationalPage() {
                 直近の月別ページ
               </Link>
             )}
-          </div>
-        </div>
-
-        <div className={styles.heroStats} aria-label="掲載状況">
-          <div>
-            <strong>{upcomingEvents.length}</strong>
-            <span>今後の来日公演</span>
-          </div>
-          <div>
-            <strong>{nextThreeMonthEvents.length}</strong>
-            <span>今後3か月</span>
-          </div>
-          <div>
-            <strong>{monthSummaries.length}</strong>
-            <span>掲載月</span>
-          </div>
-          <div>
-            <strong>{prefectureSummaries.length}</strong>
-            <span>開催地域</span>
           </div>
         </div>
       </header>
@@ -170,17 +149,8 @@ export default function InternationalPage() {
         </div>
       </section>
 
-      <section className={styles.infoContent}>
-        <div className={styles.infoSection}>
-          <h2>掲載対象</h2>
-          <p>
-            海外アーティストの来日公演、Japan Tour と明記された公演、海外バンドが主要出演者として含まれるフェスやイベントを中心に掲載しています。
-          </p>
-        </div>
-      </section>
-
       <section className={styles.upcomingSection}>
-        <h2 className={styles.sectionTitle}>今後の来日公演 / Upcoming shows</h2>
+        <h2 className={styles.sectionTitle}>今後の来日公演</h2>
 
         {dates.length === 0 ? (
           <p className={styles.empty}>今後の来日公演はまだありません。</p>

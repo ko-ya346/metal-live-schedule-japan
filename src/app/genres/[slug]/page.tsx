@@ -85,7 +85,7 @@ export default async function GenrePage({ params }: GenrePageProps) {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Genre</p>
         <h1>{genre.name}のライブ</h1>
         <p className={styles.summary}>

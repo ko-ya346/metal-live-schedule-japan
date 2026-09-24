@@ -97,7 +97,7 @@ export default async function VenuePage({ params }: VenuePageProps) {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Venue</p>
         <h1>{venue.name}</h1>
         <p className={styles.summary}>

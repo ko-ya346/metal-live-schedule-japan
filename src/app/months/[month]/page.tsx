@@ -76,7 +76,7 @@ export default async function MonthPage({ params }: MonthPageProps) {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Month</p>
         <h1>{month.label}のメタルライブ</h1>
         <p className={styles.summary}>掲載イベント {monthEvents.length}件</p>

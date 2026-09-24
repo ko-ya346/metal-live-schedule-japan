@@ -182,7 +182,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
   return (
     <main className={styles.page}>
-      <header className={`${styles.header} ${styles.heroHeader}`}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <div className={styles.heroCopy}>
           <p className={styles.kicker}>Artist</p>
           <h1>{artist.name}</h1>

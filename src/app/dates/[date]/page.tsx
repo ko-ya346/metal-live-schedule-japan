@@ -77,7 +77,7 @@ export default async function DatePage({ params }: DatePageProps) {
 
   return (
     <main className={styles.page}>
-      <header className={styles.header}>
+      <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Date</p>
         <h1>{formatEventDate(date)}のメタルライブ</h1>
         <p className={styles.summary}>掲載イベント {dateEvents.length}件</p>

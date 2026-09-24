@@ -38,6 +38,54 @@
   box-shadow: 0 14px 32px rgb(0 0 0 / 0.44);
 }
 
+.subpageHeader {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) auto;
+  gap: 14px;
+  align-items: end;
+  padding: 16px 18px;
+  border: 1px solid #35302c;
+  border-top: 2px solid #e23232;
+  border-radius: 6px;
+  background:
+    linear-gradient(135deg, rgb(226 50 50 / 0.12), transparent 40%),
+    #111111;
+  box-shadow: 0 12px 28px rgb(0 0 0 / 0.38);
+}
+
+.subpageHeader .summary {
+  margin-top: 8px;
+}
+
+.subpageHeader .lead {
+  max-width: 66rem;
+  margin-top: 8px;
+  font-size: 0.94rem;
+  line-height: 1.58;
+}
+
+.subpageHeader .heroActions {
+  margin-top: 12px;
+}
+
+.subpageHeader .heroStats {
+  grid-template-columns: repeat(4, minmax(76px, 1fr));
+  gap: 8px;
+  max-width: 430px;
+}
+
+.subpageHeader .heroStats div {
+  padding: 10px 12px;
+}
+
+.subpageHeader .heroStats strong {
+  font-size: 1.32rem;
+}
+
+.subpageHeader .heroStats span {
+  font-size: 0.72rem;
+}
+
 .kicker {
   margin: 0 0 8px;
   color: #ff6b6b;
@@ -140,6 +188,50 @@
     linear-gradient(135deg, rgb(255 107 107 / 0.07), transparent 40%),
     #101010;
   box-shadow: 0 16px 34px rgb(0 0 0 / 0.4);
+}
+
+.searchGuideGroups {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: 12px;
+}
+
+.searchGuideGroup {
+  display: grid;
+  gap: 8px;
+  min-width: 0;
+}
+
+.searchGuideGroup h3 {
+  margin: 0;
+  color: #f2f2ef;
+  font-size: 0.88rem;
+}
+
+.searchGuideLinks {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.searchGuideLinks a {
+  display: inline-flex;
+  align-items: center;
+  min-height: 34px;
+  padding: 0 10px;
+  border: 1px solid #37322f;
+  border-radius: 6px;
+  color: #f2f2ef;
+  background: #151515;
+  font-size: 0.85rem;
+  font-weight: 800;
+  text-decoration: none;
+}
+
+.searchGuideLinks a:hover {
+  border-color: #c52727;
+  color: #ffffff;
+  background: #1d1616;
 }
 
 .topSearchPanel {
@@ -2227,6 +2319,28 @@
 
   .heroStats span {
     font-size: 0.68rem;
+  }
+
+  .subpageHeader {
+    order: 1;
+    grid-template-columns: 1fr;
+    gap: 10px;
+    padding: 12px;
+    margin-bottom: 12px;
+  }
+
+  .subpageHeader .lead {
+    font-size: 0.88rem;
+    line-height: 1.5;
+  }
+
+  .subpageHeader .heroStats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    max-width: none;
+  }
+
+  .searchGuideGroups {
+    grid-template-columns: 1fr;
   }
 
   .contentLayout {
