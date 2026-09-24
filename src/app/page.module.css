@@ -696,16 +696,18 @@
 }
 
 .calendarHeader {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 12px;
+  align-items: center;
 }
 
 .calendarTitle {
+  grid-column: 1 / -1;
   margin: 0;
   font-size: 1.7rem;
   font-weight: 800;
+  text-align: center;
 }
 
 .monthButton {
@@ -723,6 +725,17 @@
 .monthButton:hover {
   border-color: #ff6b6b;
   color: #ff6b6b;
+}
+
+.monthButton:disabled {
+  color: #777777;
+  cursor: not-allowed;
+  opacity: 0.6;
+}
+
+.monthButton:disabled:hover {
+  border-color: #3a3a3a;
+  color: #777777;
 }
 
 .calendarSummary {
@@ -2366,7 +2379,9 @@
 
   .calendarHeader {
     display: grid;
-    grid-template-columns: 1fr 1fr;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 12px;
+    align-items: center;
   }
 
   .calendarTitle {

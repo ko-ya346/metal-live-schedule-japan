@@ -7,6 +7,7 @@ import {
   getCalendarDates,
   getNextMonthKey,
   getPreviousMonthKey,
+  getCurrentMonthKey,
 } from "../utils/date";
 import styles from "./page.module.css";
 
@@ -94,10 +95,14 @@ export function EventCalendar({
     (event) => event.isInternational,
   ).length;
   const todayKey = formatDateKey(new Date());
+  const currentMonthKey = getCurrentMonthKey();
+  const isCurrentMonth = monthKey === currentMonthKey;
 
   return (
     <section className={styles.calendar} aria-label="月間カレンダー">
       <div className={styles.calendarHeader}>
+        <h2 className={styles.calendarTitle}>{formatCalendarMonth(monthKey)}</h2>
+
         <button
           className={styles.monthButton}
           type="button"
@@ -108,7 +113,19 @@ export function EventCalendar({
         >
           前の月
         </button>
-        <h2 className={styles.calendarTitle}>{formatCalendarMonth(monthKey)}</h2>
+
+        <button
+          className={styles.monthButton}
+          type="button"
+          onClick={() => {
+            setPreviewDate(null);
+            onMonthChange(currentMonthKey);
+          }}
+          disabled={isCurrentMonth}
+        >
+          今月
+        </button>
+
         <button
           className={styles.monthButton}
           type="button"
