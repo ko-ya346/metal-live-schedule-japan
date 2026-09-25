@@ -52,6 +52,27 @@ These are no longer hard bans. They should still be introduced only when they cl
 - Explain important changes after editing.
 - After changes, tell me what command to run to verify.
 
+## CSS maintenance policy
+
+CSS should be split by responsibility when it makes future work safer or easier to understand.
+
+Prefer:
+- component-level CSS Modules for self-contained UI, such as cards, calendars, admin screens, and discovery sections
+- keeping layout or truly shared utilities in a small shared module
+- small, mechanical splits that preserve visual behavior
+
+Avoid:
+- splitting CSS only to reduce file size when ownership is unclear
+- moving shared classes into a component module if many unrelated components still depend on them
+- broad visual redesigns during CSS organization work
+
+The expected benefits of CSS splitting are:
+- fewer accidental regressions from editing a large shared stylesheet
+- easier maintenance because styles live near the component they affect
+- lower LLM context/token cost when future agents inspect or edit one UI area
+
+Do not over-split. If a class is genuinely shared or a split would require risky component rewiring, leave it shared and document that decision.
+
 ## Important
 
 I am learning implementation.

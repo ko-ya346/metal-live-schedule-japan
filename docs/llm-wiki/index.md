@@ -89,6 +89,13 @@ Current design direction:
 - event discovery over marketing copy
 - mobile readability first
 
+CSS maintenance direction:
+
+- Split large CSS Modules by component or feature responsibility when it reduces regression risk and makes future edits easier.
+- Keep genuinely shared layout/link/button utilities shared instead of forcing every class into a component module.
+- Prefer small, mechanical CSS moves with no visual redesign.
+- The intended gains are maintainability, fewer accidental style collisions, and lower LLM context/token cost during future UI work.
+
 New packages are allowed when they clearly improve roadmap progress, implementation quality, or maintainability. Keep the dependency count small and prefer established libraries.
 
 ## Copy Rules
