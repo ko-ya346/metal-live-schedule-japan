@@ -2,8 +2,8 @@ import { candidateEvents } from "../src/data/candidate_events.ts";
 import { crawlTargets } from "../src/data/crawlTargets.ts";
 import { events } from "../src/data/events.ts";
 import {
+  discoveryArtistKeywords,
   manualSnsSources,
-  priorityArtistKeywords,
   priorityArtistSources,
   promoterTicketSources,
 } from "../src/data/watchTargets.ts";
@@ -161,33 +161,12 @@ const includeKeywords = [
   "メタル",
   "ラウド",
   "ハードコア",
-  ...priorityArtistKeywords,
-  "FASTKILL",
-  "NEMOPHILA",
-  "BRIDEAR",
-  "SABLE HILLS",
-  "CRYSTAL LAKE",
-  "DEVILOOF",
-  "THE HAUNTED",
-  "CARCASS",
-  "BRUJERIA",
-  "THE CROWN",
-  "LORNA SHORE",
-  "KOIAI",
-  "METALVERSE",
-  "SiM",
-  "UADA",
+  ...discoveryArtistKeywords,
   "FRONTLINE FESTIVAL",
-  "MAYHEM",
-  "EVANESCENCE",
-  "ELVENKING",
   "MORBIDFEST",
   "Black Sun Rising",
-  "I Am Morbid",
-  "Terrorizer",
   "Pagan Metal",
   "PUNK LIVES",
-  "HYENA",
 ];
 
 const excludePatterns = [

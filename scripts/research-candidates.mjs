@@ -2,7 +2,10 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { events } from "../src/data/events.ts";
-import { priorityArtistKeywords } from "../src/data/watchTargets.ts";
+import {
+  discoveryArtistKeywords,
+  priorityArtistKeywords,
+} from "../src/data/watchTargets.ts";
 
 async function loadDotEnvFile(filePath) {
   let content;
@@ -297,21 +300,7 @@ const heavySignalKeywords = [
   "デスメタル",
   "ブラックメタル",
   "スラッシュ",
-  ...priorityArtistKeywords,
-  "FASTKILL",
-  "NEMOPHILA",
-  "BRIDEAR",
-  "SABLE HILLS",
-  "CRYSTAL LAKE",
-  "DEVILOOF",
-  "HANABIE",
-  "花冷え",
-  "THE HAUNTED",
-  "CARCASS",
-  "BRUJERIA",
-  "THE CROWN",
-  "LORNA SHORE",
-  "MAYHEM",
+  ...discoveryArtistKeywords,
   "MORBIDFEST",
 ];
 

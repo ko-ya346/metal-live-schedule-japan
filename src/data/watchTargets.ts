@@ -22,6 +22,7 @@ export const priorityArtistKeywords = [
     "アイリフドーパ",
     "AILIFDOPA",
     "Ailiph Doepa",
+    "FASTKILL",
     "打首獄門同好会",
     "筋肉少女帯",
     "筋少",
@@ -42,6 +43,32 @@ export const priorityArtistKeywords = [
     "Phantom Excaliver",
     "PHANTOM EXCALIVER",
     "ファントムエクスカリバー",
+] as const;
+
+export const discoveryArtistKeywords = [
+    ...priorityArtistKeywords,
+    "NEMOPHILA",
+    "BRIDEAR",
+    "SABLE HILLS",
+    "CRYSTAL LAKE",
+    "DEVILOOF",
+    "HANABIE",
+    "花冷え",
+    "THE HAUNTED",
+    "CARCASS",
+    "BRUJERIA",
+    "THE CROWN",
+    "LORNA SHORE",
+    "MAYHEM",
+    "EVANESCENCE",
+    "ELVENKING",
+    "I Am Morbid",
+    "Terrorizer",
+    "KOIAI",
+    "METALVERSE",
+    "SiM",
+    "UADA",
+    "HYENA",
 ] as const;
 
 export const priorityArtistSources: WatchSource[] = [

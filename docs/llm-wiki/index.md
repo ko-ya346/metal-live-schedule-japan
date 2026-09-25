@@ -55,27 +55,9 @@ Preferred sources:
 4. Official ticket pages
 5. Official SNS accounts
 
-Preferred watch artists:
+`src/data/watchTargets.ts` is the source of truth for high-priority artist keywords, broader discovery artist keywords, recurring promoter/ticket sources, and manual SNS checks. Keep `scripts/collect-research-links.mjs` and `scripts/research-candidates.mjs` using that shared list instead of duplicating artist names.
 
-- SEX MACHINEGUNS
-- 人間椅子
-- アイリフドーパ
-- FASTKILL
-- 打首獄門同好会
-- 筋肉少女帯
-- GALNERYUS
-- BABYMETAL
-- ANTHEM
-- LOUDNESS
-- LOVEBITES
-- 陰陽座
-- GYZE / RYUJIN
-- Aldious
-- Phantom Excaliver
-
-Also collect reliable candidates for visiting international and domestic heavy music events.
-
-`src/data/watchTargets.ts` is the source of truth for high-priority artist keywords, recurring promoter/ticket sources, and manual SNS checks. Keep `scripts/collect-research-links.mjs` and `scripts/research-candidates.mjs` using that shared list instead of duplicating artist names.
+Also collect reliable candidates for visiting international and domestic heavy music events. The watch list is a priority input, not the full collection scope.
 
 Regional collection buckets:
 
