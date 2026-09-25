@@ -41,6 +41,16 @@ GitHub Actions の自動調査メモもこの地域区分で出力します。�
 
 候補イベントはレビュー用の作業リストです。公開データの参照元にはしません。
 
+Search Console のイベント構造化データ警告を減らすため、候補収集時に見つかった場合は以下も拾います。見つからない場合は null または未指定で構いません。価格は推測しないでください。
+
+- `endDate`: 複数日イベントの終了日
+- `imageUrl`: 公式ページやチケットページのイベント画像、OG画像
+- `organizerName` / `organizerUrl`: 主催者、招聘元、会場、公式運営元
+- `ticketLinks[].price`: 実際に表示されている税込/手数料込みに近いチケット価格。無料でない限り 0 は入れない
+- `ticketLinks[].saleStartsAt`: チケット販売開始日
+- `ticketLinks[].saleStatus`: `on_sale`、`presale`、`sold_out`、`not_started`、`unknown`
+- `ticketLinks[].saleEndsAt`: 販売終了日が明記されている場合
+
 ## 候補イベントのテンプレート
 
 候補イベントのテンプレートはこのコマンドで出力できます。
@@ -55,10 +65,15 @@ npm run candidates:new
     artists: ["ARTIST"],
     tourName: null,
     date: null,
+    endDate: null,
     prefecture: null,
     venue: null,
     genres: ["Heavy Metal"],
     ticketUrl: null,
+    ticketLinks: undefined,
+    imageUrl: null,
+    organizerName: null,
+    organizerUrl: null,
     officialUrl: null,
     sourceUrl: "https://example.com/source",
     sourceType: "manual",
@@ -152,10 +167,15 @@ npm run build
     artists: ["HEADLINER", "SUPPORT ACT"],
     tourName: "TOUR NAME",
     date: "2026-01-01",
+    endDate: null,
     prefecture: "東京都",
     venue: "会場名",
     genres: ["Heavy Metal"],
     ticketUrl: null,
+    ticketLinks: undefined,
+    imageUrl: null,
+    organizerName: null,
+    organizerUrl: null,
     officialUrl: "https://example.com/event",
     status: "scheduled",
 },
