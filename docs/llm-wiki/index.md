@@ -129,6 +129,8 @@ npm run build
 
 For docs-only changes, `git diff --check` is usually enough.
 
+Candidate generation defaults to compact prompts. `scripts/research-candidates.mjs` sends short date/venue/ticket/artist snippets instead of full page text. Use `--prompt-only` to inspect prompt size without calling the LLM, and use `--prompt-mode=full` only when compact snippets miss needed details.
+
 ## Roadmap Pointers
 
 Use `docs/ROADMAP.md` for product strategy and `docs/project-roadmap.md` for implementation milestones.

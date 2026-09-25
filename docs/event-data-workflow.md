@@ -119,13 +119,14 @@ npm run data:validate
 
 ## 自動収集と候補確認
 
-GitHub Actions は定期実行で調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
+GitHub Actions は毎日09:00 JSTに調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
 
 - 調査メモ: `npm run research:links`
 - 候補生成: `npm run research:candidates`
 - 候補確認: `/admin/candidates`
 - 候補保存先: `src/data/candidate_events.ts`
 - 公開データには自動反映しない
+- 候補データには自動反映する
 - 新規候補が追加されると、GitHub Actions が main にコミットする
 - 新規候補が追加された回だけ、日付付きの通知 issue を作る
 - レビュー場所は `/admin/candidates` に統一する
@@ -143,6 +144,32 @@ LLM に候補収集を依頼する場合は、未 close の候補確認 issue �
 
 - `OPENAI_API_KEY`
 - 任意: `OPENAI_MODEL`
+
+候補生成は通常、低トークンの compact モードで動きます。各ページの本文全文ではなく、日付、会場、出演、チケット、価格、優先アーティスト周辺の短い抜粋だけをLLMに渡します。
+
+```bash
+npm run research:candidates -- --input=research-links.md --report=candidate-report.md --write
+```
+
+トークン量だけ確認したい場合は、LLM呼び出しをスキップできます。
+
+```bash
+npm run research:candidates -- --input=research-links.md --report=candidate-report.md --prompt-only
+```
+
+どうしてもページ本文を長めに見たい場合だけ full モードを使います。
+
+```bash
+npm run research:candidates -- --input=research-links.md --report=candidate-report.md --prompt-mode=full
+```
+
+主な調整オプション:
+
+- `--body-chars=450`: compactで抜粋が作れない場合の本文フォールバック文字数
+- `--max-snippets=6`: 1ページあたりの抜粋数
+- `--snippet-chars=180`: 1抜粋あたりの文字数
+- `--known-limit=16`: プロンプトに入れる既存イベント/候補の件数
+- `--max-total-pages=24`: 取得してLLMに渡す最大ページ数
 
 SNS 由来や未確認情報は信頼度を低くして、あくまでレビュー対象にします。
 

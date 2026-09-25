@@ -63,8 +63,15 @@ for (const arg of process.argv.slice(2)) {
 const inputPath = args.get("input") ?? "research-links.md";
 const reportPath = args.get("report") ?? null;
 const shouldWrite = args.has("write");
+const promptOnly = args.has("prompt-only");
 const maxPagesPerSource = Number(args.get("max-pages") ?? "3");
 const maxTotalPages = Number(args.get("max-total-pages") ?? "24");
+const promptMode = args.get("prompt-mode") === "full" ? "full" : "compact";
+const isCompactPrompt = promptMode === "compact";
+const bodyCharLimit = Number(args.get("body-chars") ?? (isCompactPrompt ? "450" : "5000"));
+const maxSnippets = Number(args.get("max-snippets") ?? "6");
+const snippetCharLimit = Number(args.get("snippet-chars") ?? "180");
+const knownSummaryLimit = Number(args.get("known-limit") ?? "16");
 const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 const apiKey = process.env.OPENAI_API_KEY || "";
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -104,6 +111,20 @@ function stripTags(value) {
       .replace(/<noscript[\s\S]*?<\/noscript>/gi, " ")
       .replace(/<[^>]*>/g, " "),
   );
+}
+
+function compactText(value) {
+  return String(value ?? "").replace(/\s+/g, " ").trim();
+}
+
+function truncateText(value, maxLength) {
+  const text = compactText(value);
+
+  if (text.length <= maxLength) {
+    return text;
+  }
+
+  return `${text.slice(0, maxLength - 1).trim()}…`;
 }
 
 function extractMetaContent(html, name) {
@@ -208,7 +229,7 @@ function formatCandidateObject(candidate) {
 function parseResearchSections(markdown) {
   const sections = [];
   const sectionPattern =
-    /#### ([^\n]+)\n\n([\s\S]*?)(?=\n#### |\n### |\n## 作業後チェック|\n$)/g;
+    /#### ([^\n]+)\n\n([\s\S]*?)(?=\n#### |\n### |\n## |\n$)/g;
   let match;
 
   while ((match = sectionPattern.exec(markdown)) !== null) {
@@ -443,6 +464,66 @@ function getKnownSummary() {
   return { published, reviewNeeded };
 }
 
+const lowValueLinkPatterns = [
+  /^all$/i,
+  /^band$/i,
+  /^discography$/i,
+  /^dvds?/i,
+  /^home$/i,
+  /^info$/i,
+  /^link$/i,
+  /^media$/i,
+  /^more$/i,
+  /^movie$/i,
+  /^music$/i,
+  /^news$/i,
+  /^profile$/i,
+  /^shop$/i,
+  /^skip to content$/i,
+  /^videos$/i,
+  /お問い合わせ/,
+  /公式サイト/,
+  /オンラインストア/,
+  /グッズ|goods/i,
+];
+
+function scoreResearchEntry(section, entry) {
+  const value = `${section.sourceName} ${entry.title} ${entry.url}`;
+  const normalizedValue = normalizeForMatch(value);
+  const lowerValue = value.toLowerCase();
+  let score = 0;
+
+  if (lowValueLinkPatterns.some((pattern) => pattern.test(entry.title.trim()))) {
+    score -= 8;
+  }
+
+  if (/(20\d{2}|[0-9]{1,2}[/-][0-9]{1,2}|[0-9]{1,2}\/[0-9]{1,2})/.test(value)) {
+    score += 5;
+  }
+
+  if (/live|tour|show|ticket|公演|開演|開場|受付|発売|来日|チケット/i.test(value)) {
+    score += 5;
+  }
+
+  if (/eplus|pia|l-tike|ticket|creativeman|udo|smash|evp|hip|swd|official|公式/i.test(value)) {
+    score += 3;
+  }
+
+  if (
+    priorityArtistKeywords.some((keyword) =>
+      normalizedValue.includes(normalizeForMatch(keyword)),
+    )
+  ) {
+    score += 8;
+  }
+
+  if (heavySignalKeywords.some((keyword) => lowerValue.includes(keyword.toLowerCase()))) {
+    score += 4;
+  }
+
+  return score;
+}
+
 async function fetchHtml(url) {
   const controller = new AbortController();
   const timeout = setTimeout(() => controller.abort(), 15000);
@@ -465,7 +546,93 @@ async function fetchHtml(url) {
   }
 }
 
-function summarizeHtml(html) {
+const eventContextKeywords = [
+  "2026",
+  "2027",
+  "open",
+  "start",
+  "ticket",
+  "tickets",
+  "tour",
+  "live",
+  "japan",
+  "venue",
+  "price",
+  "sold out",
+  "開場",
+  "開演",
+  "公演",
+  "出演",
+  "会場",
+  "料金",
+  "前売",
+  "当日",
+  "発売",
+  "受付",
+  "予定枚数",
+  "チケット",
+  "来日",
+  "主催",
+  "招聘",
+  ...priorityArtistKeywords,
+];
+
+function getContextWindow(text, index, windowSize) {
+  const start = Math.max(0, index - Math.floor(windowSize / 2));
+  const end = Math.min(text.length, index + Math.floor(windowSize / 2));
+  const snippet = text.slice(start, end);
+
+  return truncateText(snippet, windowSize);
+}
+
+function extractContextSnippets(text, keywords) {
+  const normalizedText = compactText(text);
+  const lowerText = normalizedText.toLowerCase();
+  const snippets = [];
+  const seen = new Set();
+  const relevantKeywords = [...new Set(keywords.map(compactText).filter(Boolean))];
+  const dateMatches = normalizedText.matchAll(
+    /(?:20\d{2}[./年-]\s?\d{1,2}[./月-]\s?\d{1,2}|\d{1,2}[./月]\s?\d{1,2})/g,
+  );
+
+  for (const match of dateMatches) {
+    if (snippets.length >= maxSnippets) {
+      break;
+    }
+
+    const snippet = getContextWindow(normalizedText, match.index ?? 0, snippetCharLimit);
+    const key = normalizeForMatch(snippet);
+
+    if (!seen.has(key)) {
+      seen.add(key);
+      snippets.push(snippet);
+    }
+  }
+
+  for (const keyword of relevantKeywords) {
+    if (snippets.length >= maxSnippets) {
+      break;
+    }
+
+    const index = lowerText.indexOf(keyword.toLowerCase());
+
+    if (index === -1) {
+      continue;
+    }
+
+    const snippet = getContextWindow(normalizedText, index, snippetCharLimit);
+    const key = normalizeForMatch(snippet);
+
+    if (!seen.has(key)) {
+      seen.add(key);
+      snippets.push(snippet);
+    }
+  }
+
+  return snippets;
+}
+
+function summarizeHtml(html, pageContext) {
   const title = stripTags(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "");
   const description =
     extractMetaContent(html, "description") || extractMetaContent(html, "og:description");
@@ -489,50 +656,90 @@ function summarizeHtml(html) {
     }
   }
 
-  return {
+  const bodyText = stripTags(html);
+  const summary = {
     title,
     description,
     imageUrl,
-    headings,
-    bodyText: stripTags(html).slice(0, 5000),
+    headings: headings.slice(0, isCompactPrompt ? 8 : 12),
+  };
+
+  if (!isCompactPrompt) {
+    return {
+      ...summary,
+      bodyText: bodyText.slice(0, bodyCharLimit),
+    };
+  }
+
+  const snippets = extractContextSnippets(bodyText, [
+    pageContext.sourceName,
+    pageContext.linkTitle,
+    ...eventContextKeywords,
+  ]);
+
+  return {
+    ...summary,
+    text:
+      snippets.length > 0
+        ? snippets.join("\n")
+        : truncateText(bodyText, bodyCharLimit),
   };
 }
 
 async function buildPageSummaries(sections) {
   const summaries = [];
   const seenUrls = new Set();
+  const sourceCounts = new Map();
+  const entries = sections
+    .flatMap((section, sectionIndex) =>
+      section.entries.map((entry, entryIndex) => ({
+        section,
+        entry,
+        sectionIndex,
+        entryIndex,
+        score: scoreResearchEntry(section, entry),
+      })),
+    )
+    .filter((item) => item.score > 0)
+    .sort(
+      (left, right) =>
+        right.score - left.score ||
+        left.sectionIndex - right.sectionIndex ||
+        left.entryIndex - right.entryIndex,
+    );
 
-  for (const section of sections) {
-    let sourceCount = 0;
+  for (const { section, entry } of entries) {
+    if (summaries.length >= maxTotalPages) {
+      break;
+    }
 
-    for (const entry of section.entries) {
-      if (sourceCount >= maxPagesPerSource || summaries.length >= maxTotalPages) {
-        break;
-      }
+    const sourceCount = sourceCounts.get(section.sourceName) ?? 0;
 
-      if (seenUrls.has(entry.url)) {
-        continue;
-      }
+    if (sourceCount >= maxPagesPerSource || seenUrls.has(entry.url)) {
+      continue;
+    }
 
-      seenUrls.add(entry.url);
-      sourceCount += 1;
+    seenUrls.add(entry.url);
+    sourceCounts.set(section.sourceName, sourceCount + 1);
 
-      try {
-        const html = await fetchHtml(entry.url);
-        summaries.push({
+    try {
+      const html = await fetchHtml(entry.url);
+      summaries.push({
+        sourceName: section.sourceName,
+        url: entry.url,
+        linkTitle: entry.title,
+        ...summarizeHtml(html, {
           sourceName: section.sourceName,
-          url: entry.url,
           linkTitle: entry.title,
-          ...summarizeHtml(html),
-        });
-      } catch (error) {
-        summaries.push({
-          sourceName: section.sourceName,
-          url: entry.url,
-          linkTitle: entry.title,
-          error: error instanceof Error ? error.message : "fetch failed",
-        });
-      }
+        }),
+      });
+    } catch (error) {
+      summaries.push({
+        sourceName: section.sourceName,
+        url: entry.url,
+        linkTitle: entry.title,
+        error: error instanceof Error ? error.message : "fetch failed",
+      });
     }
   }
 
@@ -707,6 +914,10 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
 }
 
 async function callOpenAI(prompt) {
+  if (promptOnly) {
+    return { candidates: [], skippedReason: "prompt-only mode; OpenAI request was skipped." };
+  }
+
   if (!apiKey) {
     return { candidates: [], skippedReason: "OPENAI_API_KEY is not configured." };
   }
@@ -827,17 +1038,21 @@ function buildPrompt(summaries, knownSummary) {
 }`,
     "",
     "Known published events:",
-    knownSummary.published.slice(-40).map((line) => `- ${line}`).join("\n"),
+    knownSummary.published.slice(-knownSummaryLimit).map((line) => `- ${line}`).join("\n"),
     "",
     "Known review-needed candidates:",
-    knownSummary.reviewNeeded.slice(-40).map((line) => `- ${line}`).join("\n"),
+    knownSummary.reviewNeeded.slice(-knownSummaryLimit).map((line) => `- ${line}`).join("\n"),
     "",
-    "Page summaries:",
-    JSON.stringify(summaries, null, 2),
+    `Page summaries (${promptMode}):`,
+    JSON.stringify(summaries),
   ].join("\n");
 }
 
-function buildReport({ sections, summaries, candidates, skipped, skippedReason }) {
+function estimateTokens(text) {
+  return Math.ceil(text.length / 4);
+}
+
+function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt }) {
   const lines = [
     `# 候補自動生成レポート (${today})`,
     "",
@@ -845,6 +1060,8 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason }
     "",
     `- 候補リンクがあったソース数: ${sections.length}`,
     `- 取得ページ数: ${summaries.length}`,
+    `- プロンプトモード: ${promptMode}`,
+    `- プロンプト概算: ${prompt.length.toLocaleString()} chars / 約${estimateTokens(prompt).toLocaleString()} tokens`,
     `- 追加候補数: ${candidates.length}`,
     `- 重複/不正で除外: ${skipped}`,
     "",
@@ -944,6 +1161,7 @@ async function main() {
       candidates,
       skipped,
       skippedReason: parsed.skippedReason,
+      prompt,
     }),
   );
 }
