@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
 import { publishedEvents } from "../../../data/events";
+import adminStyles from "../../admin.module.css";
 import styles from "../../page.module.css";
 import { EventsReview } from "./EventsReview";
 
@@ -24,8 +25,8 @@ export default function AdminEventsPage() {
         </p>
       </header>
 
-      <section className={styles.adminCopyQueue}>
-        <div className={styles.adminLinkRow}>
+      <section className={adminStyles.adminCopyQueue}>
+        <div className={adminStyles.adminLinkRow}>
           <Link className={styles.secondaryLink} href="/admin/candidates">
             候補イベント確認へ
           </Link>

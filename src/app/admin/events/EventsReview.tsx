@@ -4,6 +4,7 @@ import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
 import type { Event, EventStatus } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
+import adminStyles from "../../admin.module.css";
 import styles from "../../page.module.css";
 
 type EventsReviewProps = {
@@ -174,8 +175,8 @@ export function EventsReview({ events }: EventsReviewProps) {
 
   return (
     <>
-      <section className={styles.adminCopyQueue}>
-        <div className={styles.adminCandidateHeader}>
+      <section className={adminStyles.adminCopyQueue}>
+        <div className={adminStyles.adminCandidateHeader}>
           <div>
             <h2>公開イベント管理</h2>
             <p className={styles.summary}>
@@ -191,24 +192,24 @@ export function EventsReview({ events }: EventsReviewProps) {
             placeholder="アーティスト、会場、IDで検索"
           />
         </label>
-        <p className={styles.adminMutedText}>
+        <p className={adminStyles.adminMutedText}>
           {filteredEvents.length} / {eventList.length} 件を表示中。本番環境では書き込みを無効にしています。
         </p>
-        {statusMessage && <p className={styles.adminMutedText}>{statusMessage}</p>}
+        {statusMessage && <p className={adminStyles.adminMutedText}>{statusMessage}</p>}
       </section>
 
-      <div className={styles.adminCandidateList}>
+      <div className={adminStyles.adminCandidateList}>
         {filteredEvents.map((event) => {
           const isPending = pendingEventId === event.id;
 
           return (
-          <article className={styles.adminCandidateCard} key={event.id}>
+          <article className={adminStyles.adminCandidateCard} key={event.id}>
             <form onSubmit={(submitEvent) => handleEventSubmit(submitEvent, event)}>
-            <div className={styles.adminCandidateHeader}>
+            <div className={adminStyles.adminCandidateHeader}>
               <div>
                 <p className={styles.kicker}>{eventStatusLabels[event.status]}</p>
                 <h2>{event.artists.join(" / ")}</h2>
-                <p className={styles.adminCandidateId}>
+                <p className={adminStyles.adminCandidateId}>
                   ID: <code>{event.id}</code>
                 </p>
                 <p className={styles.summary}>
@@ -217,7 +218,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               </div>
             </div>
 
-            <div className={styles.adminEditGrid}>
+            <div className={adminStyles.adminEditGrid}>
               <label>
                 アーティスト
                 <textarea
@@ -297,7 +298,7 @@ export function EventsReview({ events }: EventsReviewProps) {
                   }
                 />
               </label>
-              <label className={styles.adminCheckboxField}>
+              <label className={adminStyles.adminCheckboxField}>
                 <input
                   checked={event.isInternational}
                   name="isInternational"
@@ -358,7 +359,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               </label>
             </div>
 
-            <div className={styles.adminLinkRow}>
+            <div className={adminStyles.adminLinkRow}>
               <button
                 className={styles.secondaryLink}
                 disabled={isPending}
@@ -399,7 +400,7 @@ export function EventsReview({ events }: EventsReviewProps) {
               )}
             </div>
             {isPending && (
-              <p className={styles.adminMutedText} role="status">
+              <p className={adminStyles.adminMutedText} role="status">
                 処理中です。完了するまでそのままお待ちください。
               </p>
             )}

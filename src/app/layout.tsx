@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import Link from "next/link";
 import { GoogleAnalytics } from "./GoogleAnalytics";
-import styles from "./page.module.css";
+import styles from "./layout.module.css";
 import { siteDescription, siteName, siteTitle, siteUrl } from "./site";
 
 export const metadata: Metadata = {

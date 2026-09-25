@@ -3,6 +3,7 @@ import Link from "next/link";
 import type { CandidateEventStatus } from "../../../data/candidates";
 import { candidateEvents } from "../../../data/candidates";
 import { publishedEvents } from "../../../data/events";
+import adminStyles from "../../admin.module.css";
 import styles from "../../page.module.css";
 import { CandidatesReview } from "./CandidatesReview";
 
@@ -46,8 +47,8 @@ export default async function AdminCandidatesPage({
         </p>
       </header>
 
-      <section className={styles.adminCopyQueue}>
-        <div className={styles.adminLinkRow}>
+      <section className={adminStyles.adminCopyQueue}>
+        <div className={adminStyles.adminLinkRow}>
           <Link className={styles.secondaryLink} href="/admin/events">
             公開イベント管理へ
           </Link>

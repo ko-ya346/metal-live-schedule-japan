@@ -1,0 +1,48 @@
+.siteBody {
+  margin: 0;
+  background:
+    linear-gradient(180deg, #120909 0, #050505 360px),
+    #000000;
+}
+
+.siteFooter {
+  max-width: 1180px;
+  margin: 0 auto;
+  padding: 0 20px 36px;
+  color: #d0d0d0;
+  font-family: Arial, Helvetica, sans-serif;
+}
+
+.footerNav {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 14px;
+  margin-bottom: 12px;
+}
+
+.footerNav a {
+  display: inline-flex;
+  align-items: center;
+  color: #ffffff;
+  font-weight: 700;
+  line-height: 1;
+  text-decoration: none;
+}
+
+.footerNav a:hover {
+  color: #ff6b6b;
+}
+
+.footerDisclaimer {
+  max-width: 720px;
+  margin: 0;
+  font-size: 0.86rem;
+  line-height: 1.7;
+}
+
+@media (max-width: 720px) {
+  .siteFooter {
+    padding-bottom: 28px;
+  }
+}
