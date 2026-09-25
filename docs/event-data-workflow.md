@@ -119,7 +119,9 @@ npm run data:validate
 
 ## 自動収集と候補確認
 
-GitHub Actions は毎日09:00 JSTに調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
+GitHub Actions は火木土の09:00 JSTに調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
+
+頻度を上げすぎず、毎回同じ回遊サイト、公式入口、チケット検索、優先アーティストページを定点観測します。巡回頻度よりも、見る入口を固定して差分に気づきやすくすることを優先します。
 
 - 調査メモ: `npm run research:links`
 - 候補生成: `npm run research:candidates`
