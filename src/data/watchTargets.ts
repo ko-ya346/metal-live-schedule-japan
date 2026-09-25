@@ -1,0 +1,294 @@
+export type WatchSourceType = "promoter" | "ticket" | "band_official" | "sns";
+export type WatchSourceRegion =
+    | "kanto"
+    | "kansai"
+    | "tokai"
+    | "other"
+    | "nationwide";
+
+export type WatchSource = {
+    name: string;
+    url: string;
+    type: WatchSourceType;
+    region: WatchSourceRegion;
+    priority: "high" | "medium" | "low";
+    notes: string;
+};
+
+export const priorityArtistKeywords = [
+    "SEX MACHINEGUNS",
+    "セックスマシンガンズ",
+    "人間椅子",
+    "アイリフドーパ",
+    "AILIFDOPA",
+    "Ailiph Doepa",
+    "打首獄門同好会",
+    "筋肉少女帯",
+    "筋少",
+    "GALNERYUS",
+    "ガルネリウス",
+    "BABYMETAL",
+    "ANTHEM",
+    "LOUDNESS",
+    "ラウドネス",
+    "LOVEBITES",
+    "Lovebites",
+    "陰陽座",
+    "GYZE",
+    "GIZE",
+    "RYUJIN",
+    "Aldious",
+    "ALDIOUS",
+    "Phantom Excaliver",
+    "PHANTOM EXCALIVER",
+    "ファントムエクスカリバー",
+] as const;
+
+export const priorityArtistSources: WatchSource[] = [
+    {
+        name: "人間椅子 official schedule",
+        url: "https://ningen-isu.com/live_information/schedule/list/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "人間椅子の公式ライブ情報。毎回確認する。",
+    },
+    {
+        name: "SEX MACHINEGUNS official",
+        url: "http://sexmachineguns.smg-fire.com/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "SEX MACHINEGUNSの公式情報。毎回確認する。",
+    },
+    {
+        name: "アイリフドーパ eplus",
+        url: "https://eplus.jp/sf/word/0000059724",
+        type: "ticket",
+        region: "nationwide",
+        priority: "high",
+        notes: "アイリフドーパのチケット一覧。公式Xとあわせて毎回確認する。",
+    },
+    {
+        name: "打首獄門同好会 official schedule",
+        url: "https://www.uchikubi.com/schedule.html",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "打首獄門同好会の公式ライブ情報。毎回確認する。",
+    },
+    {
+        name: "筋肉少女帯 official",
+        url: "https://king-show.net/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "筋肉少女帯の公式情報。毎回確認する。",
+    },
+    {
+        name: "GALNERYUS official live",
+        url: "https://www.galneryus.jp/live/upcoming",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "GALNERYUSの公式ライブ情報。毎回確認する。",
+    },
+    {
+        name: "BABYMETAL official tour",
+        url: "https://www.babymetal.com/tour/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "BABYMETALの公式ツアー情報。日本公演やフェス出演を確認する。",
+    },
+    {
+        name: "ANTHEM official",
+        url: "http://www.heavymetalanthem.com/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "ANTHEMの公式情報。毎回確認する。",
+    },
+    {
+        name: "LOUDNESS official live",
+        url: "https://loudnessjp.com/live/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "LOUDNESSの公式ライブ情報。毎回確認する。",
+    },
+    {
+        name: "LOVEBITES official tour dates",
+        url: "https://lovebites-music.com/tourdates/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "LOVEBITESの公式ツアー情報。毎回確認する。",
+    },
+    {
+        name: "陰陽座 official live",
+        url: "https://www.onmyo-za.net/live/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "陰陽座の公式公演情報。毎回確認する。",
+    },
+    {
+        name: "RYUJIN / GYZE official",
+        url: "https://www.ryujinband.net/ja",
+        type: "band_official",
+        region: "nationwide",
+        priority: "medium",
+        notes: "GYZE表記も含めて確認する。",
+    },
+    {
+        name: "Aldious official live",
+        url: "https://columbia.jp/artist-info/aldious/live/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "medium",
+        notes: "Aldious関連のライブ/イベント情報を確認する。",
+    },
+    {
+        name: "Phantom Excaliver official",
+        url: "https://phantom-ex.com/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "medium",
+        notes: "Phantom Excaliverの公式情報。Xとあわせて確認する。",
+    },
+];
+
+export const promoterTicketSources: WatchSource[] = [
+    {
+        name: "チケットぴあ メタル",
+        url: "https://t.pia.jp/pia/search_all.do?kw=%E3%83%A1%E3%82%BF%E3%83%AB",
+        type: "ticket",
+        region: "nationwide",
+        priority: "high",
+        notes: "チケットぴあのメタル系入口。",
+    },
+    {
+        name: "ローソンチケット メタル",
+        url: "https://l-tike.com/search/?keyword=%E3%83%A1%E3%82%BF%E3%83%AB",
+        type: "ticket",
+        region: "nationwide",
+        priority: "high",
+        notes: "ローチケのメタル検索入口。",
+    },
+    {
+        name: "楽天チケット メタル",
+        url: "https://ticket.rakuten.co.jp/search?q=%E3%83%A1%E3%82%BF%E3%83%AB",
+        type: "ticket",
+        region: "nationwide",
+        priority: "medium",
+        notes: "楽天チケットのメタル検索入口。",
+    },
+    {
+        name: "TicketDive metal",
+        url: "https://ticketdive.com/",
+        type: "ticket",
+        region: "nationwide",
+        priority: "medium",
+        notes: "国内小規模イベントで使われることがあるため確認する。",
+    },
+    {
+        name: "LivePocket メタル",
+        url: "https://t.livepocket.jp/search?word=%E3%83%A1%E3%82%BF%E3%83%AB",
+        type: "ticket",
+        region: "nationwide",
+        priority: "medium",
+        notes: "国内小規模イベントで使われることがあるため確認する。",
+    },
+    {
+        name: "SWD Japan",
+        url: "https://www.swdjapan.com/",
+        type: "promoter",
+        region: "nationwide",
+        priority: "high",
+        notes: "海外メタル/ハードコア来日公演の確認に使う。",
+    },
+    {
+        name: "Ward Records",
+        url: "https://wardrecords.com/",
+        type: "promoter",
+        region: "nationwide",
+        priority: "medium",
+        notes: "メタル系来日/国内関連の告知確認に使う。",
+    },
+    {
+        name: "東京音協",
+        url: "https://t-onkyo.co.jp/",
+        type: "promoter",
+        region: "nationwide",
+        priority: "medium",
+        notes: "大型ロック/メタル系公演の確認に使う。",
+    },
+    {
+        name: "Hayashi International Promotions",
+        url: "https://www.hipjpn.co.jp/",
+        type: "promoter",
+        region: "nationwide",
+        priority: "high",
+        notes: "来日公演の確認に使う。",
+    },
+];
+
+export const manualSnsSources: WatchSource[] = [
+    {
+        name: "Creativeman official X",
+        url: "https://x.com/CMP_official",
+        type: "sns",
+        region: "nationwide",
+        priority: "high",
+        notes: "来日公演の先出し告知があるため、手動で毎回確認する。",
+    },
+    {
+        name: "Evoken / EVP official X search",
+        url: "https://x.com/search?q=Evoken%20OR%20EVP4U%20OR%20%22Evoken%20de%20Valhall%22&src=typed_query&f=live",
+        type: "sns",
+        region: "nationwide",
+        priority: "high",
+        notes: "Evoken系告知を手動で毎回確認する。",
+    },
+    {
+        name: "SMASH official X search",
+        url: "https://x.com/search?q=SMASH%20%E6%9D%A5%E6%97%A5%E5%85%AC%E6%BC%94&src=typed_query&f=live",
+        type: "sns",
+        region: "nationwide",
+        priority: "medium",
+        notes: "SMASHの来日告知を手動で確認する。",
+    },
+    {
+        name: "UDO official X search",
+        url: "https://x.com/search?q=UDO%20%E6%9D%A5%E6%97%A5%E5%85%AC%E6%BC%94&src=typed_query&f=live",
+        type: "sns",
+        region: "nationwide",
+        priority: "medium",
+        notes: "UDOの来日告知を手動で確認する。",
+    },
+    {
+        name: "H.I.P. official X search",
+        url: "https://x.com/search?q=H.I.P.%20%E6%9D%A5%E6%97%A5%E5%85%AC%E6%BC%94&src=typed_query&f=live",
+        type: "sns",
+        region: "nationwide",
+        priority: "medium",
+        notes: "H.I.P.の来日告知を手動で確認する。",
+    },
+    {
+        name: "アイリフドーパ official X",
+        url: "https://x.com/AILIFDOPA",
+        type: "sns",
+        region: "nationwide",
+        priority: "high",
+        notes: "アイリフドーパはXで新規ライブ告知が出やすいため毎回確認する。",
+    },
+    {
+        name: "Phantom Excaliver official X",
+        url: "https://x.com/PX_official",
+        type: "sns",
+        region: "nationwide",
+        priority: "medium",
+        notes: "Phantom Excaliverのライブ告知を確認する。",
+    },
+];

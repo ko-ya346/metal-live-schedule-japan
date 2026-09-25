@@ -1,6 +1,12 @@
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { crawlTargets } from "../src/data/crawlTargets.ts";
 import { events } from "../src/data/events.ts";
+import {
+  manualSnsSources,
+  priorityArtistKeywords,
+  priorityArtistSources,
+  promoterTicketSources,
+} from "../src/data/watchTargets.ts";
 
 const today = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "Asia/Tokyo",
@@ -91,10 +97,31 @@ const curatedSources = [
 ];
 
 const curatedSourceUrls = new Set(curatedSources.map((source) => source.url));
+const configuredWatchSourceUrls = new Set([
+  ...promoterTicketSources.map((source) => source.url),
+  ...priorityArtistSources.map((source) => source.url),
+]);
 const sources = [
   ...curatedSources,
+  ...promoterTicketSources.map((source) => ({
+    name: source.name,
+    url: source.url,
+    region: source.region,
+    maxLinks: source.priority === "high" ? 8 : 5,
+  })),
+  ...priorityArtistSources.map((source) => ({
+    name: source.name,
+    url: source.url,
+    region: source.region,
+    maxLinks: source.priority === "high" ? 8 : 5,
+  })),
   ...crawlTargets
-    .filter((target) => target.enabled && !curatedSourceUrls.has(target.url))
+    .filter(
+      (target) =>
+        target.enabled &&
+        !curatedSourceUrls.has(target.url) &&
+        !configuredWatchSourceUrls.has(target.url),
+    )
     .map((target) => ({
       name: target.name,
       url: target.url,
@@ -134,13 +161,9 @@ const includeKeywords = [
   "メタル",
   "ラウド",
   "ハードコア",
-  "SEX MACHINEGUNS",
-  "人間椅子",
-  "アイリフドーパ",
+  ...priorityArtistKeywords,
   "FASTKILL",
-  "LOUDNESS",
   "NEMOPHILA",
-  "LOVEBITES",
   "BRIDEAR",
   "SABLE HILLS",
   "CRYSTAL LAKE",
@@ -317,6 +340,7 @@ function getKnownUrls() {
 
 async function fetchHtml(url) {
   const response = await fetch(url, {
+    signal: AbortSignal.timeout(12000),
     headers: {
       "User-Agent": "MetalsCalendarResearchBot/0.1 (+https://metalscalendar.com)",
     },
@@ -435,6 +459,18 @@ function renderMarkdown(results) {
     }
   }
 
+  lines.push("## 毎回手動確認するSNS/検索");
+  lines.push("");
+  lines.push("XはログインやJavaScript依存でHTML取得が安定しないため、自動取得結果とは別に毎回確認します。");
+  lines.push("");
+
+  for (const source of manualSnsSources) {
+    lines.push(`- ${source.name}`);
+    lines.push(`  ${source.url}`);
+    lines.push(`  notes: ${source.notes}`);
+  }
+
+  lines.push("");
   lines.push("## 作業後チェック");
   lines.push("");
   lines.push("- [ ] /admin/candidates で候補を確認");

@@ -109,6 +109,21 @@ When collecting candidate events, regularly check these preferred artists becaus
 - 人間椅子
 - アイリフドーパ
 - FASTKILL
+- 打首獄門同好会
+- 筋肉少女帯
+- GALNERYUS
+- BABYMETAL
+- ANTHEM
+- LOUDNESS
+- LOVEBITES
+- 陰陽座
+- GYZE / RYUJIN
+- Aldious
+- Phantom Excaliver
+
+Keep the recurring watch list in `src/data/watchTargets.ts`. Candidate collection should use that shared list for priority artist keywords, recurring promoter/ticket sources, and manual SNS checks. Also check major metal/heavy music promoters and ticket sites each time, including eplus, チケットぴあ, ローチケ, 楽天チケット, TicketDive, LivePocket, Creativeman, UDO, H.I.P., SMASH, Evoken/EVP, SWD Japan, 東京音協, and Ward Records.
+
+Promoter and artist X accounts can publish visiting-tour and small-show news before websites are updated. X is often not reliably fetchable as static HTML, so the research memo should include manual X checks every time instead of silently skipping them.
 
 Also collect reliable candidate events for visiting international metal, heavy rock, loud rock, metalcore, hardcore, and related heavy music artists. Do not limit collection to the preferred artist list.
 

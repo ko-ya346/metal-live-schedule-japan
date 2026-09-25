@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { events } from "../src/data/events.ts";
+import { priorityArtistKeywords } from "../src/data/watchTargets.ts";
 
 async function loadDotEnvFile(filePath) {
   let content;
@@ -275,13 +276,9 @@ const heavySignalKeywords = [
   "デスメタル",
   "ブラックメタル",
   "スラッシュ",
-  "SEX MACHINEGUNS",
-  "人間椅子",
-  "アイリフドーパ",
+  ...priorityArtistKeywords,
   "FASTKILL",
-  "LOUDNESS",
   "NEMOPHILA",
-  "LOVEBITES",
   "BRIDEAR",
   "SABLE HILLS",
   "CRYSTAL LAKE",
@@ -756,6 +753,8 @@ async function callOpenAI(prompt) {
 }
 
 function buildPrompt(summaries, knownSummary) {
+  const priorityArtists = priorityArtistKeywords.join(", ");
+
   return [
     "Metals Calendar is a Japan metal live event calendar.",
     "Act like the project's normal Codex-assisted candidate collection workflow.",
@@ -767,7 +766,7 @@ function buildPrompt(summaries, knownSummary) {
     "- Include metal, hard rock, loud rock, metalcore, hardcore, punk/hardcore-adjacent festivals, extreme metal, death metal, black metal, thrash, power metal, and related heavy music.",
     "- Ticket sale starts, lineup additions, date changes, postponements, cancellations are allowed only if the live event itself is clear.",
     "- Album release news alone is out of scope.",
-    "- Preferred watch artists include SEX MACHINEGUNS, 人間椅子, and アイリフドーパ, but do not limit candidates to them.",
+    `- Preferred watch artists include: ${priorityArtists}. Check these carefully, but do not limit candidates to them.`,
     "",
     "Source policy:",
     "- Prefer official band, promoter, venue, label, and ticket pages.",

@@ -21,6 +21,7 @@ Do not turn the site into a generic music news site.
 - Public event data: `src/data/events.ts`
 - Candidate event data: `src/data/candidate_events.ts`
 - Crawl targets: `src/data/crawlTargets.ts`
+- Priority watch targets: `src/data/watchTargets.ts`
 - Event utilities: `src/utils/events.ts`
 - Date utilities: `src/utils/date.ts`
 - Link/copy utilities: `src/utils/eventLinks.ts`
@@ -60,8 +61,21 @@ Preferred watch artists:
 - 人間椅子
 - アイリフドーパ
 - FASTKILL
+- 打首獄門同好会
+- 筋肉少女帯
+- GALNERYUS
+- BABYMETAL
+- ANTHEM
+- LOUDNESS
+- LOVEBITES
+- 陰陽座
+- GYZE / RYUJIN
+- Aldious
+- Phantom Excaliver
 
 Also collect reliable candidates for visiting international and domestic heavy music events.
+
+`src/data/watchTargets.ts` is the source of truth for high-priority artist keywords, recurring promoter/ticket sources, and manual SNS checks. Keep `scripts/collect-research-links.mjs` and `scripts/research-candidates.mjs` using that shared list instead of duplicating artist names.
 
 Regional collection buckets:
 

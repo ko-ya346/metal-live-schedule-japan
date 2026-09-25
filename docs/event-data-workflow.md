@@ -9,12 +9,32 @@
 最終確認には、公式情報またはチケット販売ページを使います。
 
 - アーティスト公式サイト: live、tour、schedule、news ページ
-- プロモーター: Creativeman、UDO、SMASH、Hayashi International Promotions、Evoken de Valhall Production
-- チケット販売: eplus、チケットぴあ、ローチケ、楽天チケット
+- プロモーター: Creativeman、UDO、SMASH、Hayashi International Promotions、Evoken de Valhall Production、SWD Japan、東京音協、Ward Records
+- チケット販売: eplus、チケットぴあ、ローチケ、楽天チケット、TicketDive、LivePocket
 - 会場スケジュール: Club Citta、Zepp、Club Quattro、渋谷・大阪のライブハウス
+- プロモーター/アーティスト公式X: 来日公演や小規模公演はX先行で出ることがあるため、毎回手動確認する
 - 発見用のみ: メタルニュースサイト、SNS投稿、ファンカレンダー
 
 発見用の情報源だけを最終ソースにしないでください。イベントを公開データに追加する前に、アーティスト、プロモーター、会場、チケット販売ページのいずれかで確認します。
+
+毎回確認する優先アーティスト、主要プロモーター/チケットサイト、手動確認するX検索は `src/data/watchTargets.ts` にまとめます。候補収集スクリプトはこのリストを使うため、優先対象を変える場合はここを更新してください。
+
+優先アーティスト:
+
+- SEX MACHINEGUNS
+- 人間椅子
+- アイリフドーパ
+- 打首獄門同好会
+- 筋肉少女帯
+- GALNERYUS
+- BABYMETAL
+- ANTHEM
+- LOUDNESS
+- LOVEBITES
+- 陰陽座
+- GYZE / RYUJIN
+- Aldious
+- Phantom Excaliver
 
 ## 地域別の収集分担
 
