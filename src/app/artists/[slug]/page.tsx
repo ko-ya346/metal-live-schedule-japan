@@ -241,7 +241,11 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
           </div>
 
           <div className={styles.discoveryCardGrid}>
-            <Link className={styles.discoveryCard} href={`/events/${nextEvent.id}`}>
+            <Link
+              className={styles.discoveryCard}
+              href={`/events/${nextEvent.id}`}
+              prefetch={false}
+            >
               <span className={styles.discoveryCardLabel}>
                 {formatEventDate(nextEvent.date)}
               </span>
@@ -264,6 +268,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 className={styles.discoveryCard}
                 href={`/prefectures/${getPrefectureSlug(prefecture)}`}
                 key={prefecture}
+                prefetch={false}
               >
                 <span className={styles.discoveryCardLabel}>地域</span>
                 <strong>{prefecture}のライブ</strong>
@@ -279,6 +284,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                   className={styles.discoveryCard}
                   href={`/venues/${getVenueSlug(prefecture, venue)}`}
                   key={venueKey}
+                  prefetch={false}
                 >
                   <span className={styles.discoveryCardLabel}>会場</span>
                   <strong>{venue}</strong>

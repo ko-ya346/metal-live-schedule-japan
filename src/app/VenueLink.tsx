@@ -11,7 +11,11 @@ export function VenueLink({ className, prefecture, venue }: VenueLinkProps) {
   const slug = getVenueSlug(prefecture, venue);
 
   return (
-    <Link className={className} href={`/venues/${encodeURIComponent(slug)}`}>
+    <Link
+      className={className}
+      href={`/venues/${encodeURIComponent(slug)}`}
+      prefetch={false}
+    >
       {venue}
     </Link>
   );

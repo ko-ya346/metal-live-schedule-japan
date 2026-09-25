@@ -31,6 +31,7 @@ export function EventDateGroup({
           <Link
             className={styles.dateHeadingLink}
             href={`/months/${getEventMonthKey(date)}`}
+            prefetch={false}
           >
             {dateLabel}
           </Link>

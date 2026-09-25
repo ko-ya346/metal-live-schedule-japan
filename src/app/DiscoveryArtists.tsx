@@ -124,6 +124,7 @@ export function DiscoveryArtists({
                 <Link
                   className={styles.secondaryLink}
                   href={`/artists/${encodeURIComponent(artist.artistSlug)}`}
+                  prefetch={false}
                   data-analytics="discovery-artist-click"
                   data-artist={artist.artistName}
                 >
