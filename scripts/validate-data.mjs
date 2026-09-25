@@ -65,6 +65,18 @@ function checkOptionalDate(item, label, field, allowNull = false) {
   }
 }
 
+function checkOptionalUrl(item, label, field) {
+  const value = item[field];
+
+  if (value === undefined || value === null) {
+    return;
+  }
+
+  if (!isValidUrl(value)) {
+    errors.push(`${label}:${item.id}: invalid ${field}`);
+  }
+}
+
 function checkStringArray(item, label, field) {
   const values = item[field];
 
@@ -138,6 +150,25 @@ function checkTicketLinks(item, label) {
       !ticketSaleStatuses.has(ticketLink.saleStatus)
     ) {
       errors.push(`${ticketLabel}: invalid saleStatus`);
+    }
+
+    if (
+      ticketLink.price !== undefined &&
+      ticketLink.price !== null &&
+      (typeof ticketLink.price !== "number" ||
+        !Number.isFinite(ticketLink.price) ||
+        ticketLink.price < 0)
+    ) {
+      errors.push(`${ticketLabel}: price must be a non-negative number`);
+    }
+
+    if (
+      ticketLink.saleStartsAt !== undefined &&
+      ticketLink.saleStartsAt !== null &&
+      (!isNonEmptyString(ticketLink.saleStartsAt) ||
+        !isValidDate(ticketLink.saleStartsAt))
+    ) {
+      errors.push(`${ticketLabel}: saleStartsAt must be a valid YYYY-MM-DD date`);
     }
 
     if (
@@ -253,6 +284,7 @@ for (const event of events) {
   checkStringArray(event, "events", "genres");
 
   checkOptionalDate(event, "events", "date");
+  checkOptionalDate(event, "events", "endDate", true);
 
   if (!eventStatuses.has(event.status)) {
     errors.push(`events:${event.id}: invalid status "${event.status}"`);
@@ -266,6 +298,10 @@ for (const event of events) {
     if (!isValidUrl(event[field])) {
       errors.push(`events:${event.id}: invalid ${field}`);
     }
+  }
+
+  for (const field of ["imageUrl", "organizerUrl"]) {
+    checkOptionalUrl(event, "events", field);
   }
 
   checkTicketLinks(event, "events");
@@ -283,6 +319,7 @@ for (const candidate of candidateEvents) {
   checkStringArray(candidate, "candidateEvents", "genres");
 
   checkOptionalDate(candidate, "candidateEvents", "date", true);
+  checkOptionalDate(candidate, "candidateEvents", "endDate", true);
   checkOptionalDate(candidate, "candidateEvents", "collectedAt");
   checkOptionalDate(candidate, "candidateEvents", "reviewedAt", true);
 
@@ -322,6 +359,10 @@ for (const candidate of candidateEvents) {
     if (!isValidUrl(candidate[field])) {
       errors.push(`candidateEvents:${candidate.id}: invalid ${field}`);
     }
+  }
+
+  for (const field of ["imageUrl", "organizerUrl"]) {
+    checkOptionalUrl(candidate, "candidateEvents", field);
   }
 
   checkTicketLinks(candidate, "candidateEvents");

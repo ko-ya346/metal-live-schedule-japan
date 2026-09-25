@@ -156,6 +156,10 @@ function formatValue(value, indentLevel) {
     return JSON.stringify(value);
   }
 
+  if (typeof value === "object") {
+    return formatObject(value, Object.keys(value), indentLevel);
+  }
+
   return String(value);
 }
 
@@ -177,12 +181,16 @@ function formatCandidateObject(candidate) {
     "artists",
     "tourName",
     "date",
+    "endDate",
     "prefecture",
     "venue",
     "genres",
     "isInternational",
     "ticketUrl",
     "ticketLinks",
+    "imageUrl",
+    "organizerName",
+    "organizerUrl",
     "officialUrl",
     "sourceUrl",
     "sourceType",
@@ -464,6 +472,7 @@ function summarizeHtml(html) {
   const title = stripTags(html.match(/<title[^>]*>([\s\S]*?)<\/title>/i)?.[1] ?? "");
   const description =
     extractMetaContent(html, "description") || extractMetaContent(html, "og:description");
+  const imageUrl = extractMetaContent(html, "og:image");
   const headings = [];
 
   for (const pattern of [
@@ -486,6 +495,7 @@ function summarizeHtml(html) {
   return {
     title,
     description,
+    imageUrl,
     headings,
     bodyText: stripTags(html).slice(0, 5000),
   };
@@ -558,6 +568,27 @@ function toNullableString(value) {
   return text.length > 0 ? text : null;
 }
 
+function normalizeDateValue(value) {
+  const text = toNullableString(value);
+  return text && datePattern.test(text) ? text : null;
+}
+
+function normalizePriceValue(value) {
+  if (typeof value === "number" && Number.isFinite(value) && value >= 0) {
+    return value;
+  }
+
+  const text = toNullableString(value);
+  if (!text) {
+    return undefined;
+  }
+
+  const normalizedText = text.replace(/[¥￥,円\s]/g, "");
+  const price = Number(normalizedText);
+
+  return Number.isFinite(price) && price >= 0 ? price : undefined;
+}
+
 function normalizeCandidate(candidate, knownIds, knownEvents) {
   const artists = Array.isArray(candidate.artists)
     ? candidate.artists.map((artist) => String(artist).trim()).filter(Boolean)
@@ -569,7 +600,8 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
   }
 
   const rawDate = toNullableString(candidate.date);
-  const date = rawDate && datePattern.test(rawDate) ? rawDate : null;
+  const date = normalizeDateValue(rawDate);
+  const endDate = normalizeDateValue(candidate.endDate);
   const prefecture = toNullableString(candidate.prefecture);
   const venue = toNullableString(candidate.venue);
   const primaryArtist = artists[0];
@@ -612,6 +644,7 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
     artists,
     tourName: toNullableString(candidate.tourName),
     date,
+    endDate,
     prefecture,
     venue,
     genres:
@@ -628,6 +661,8 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
             affiliateUrl: ticketLink.affiliateUrl
               ? normalizeUrl(String(ticketLink.affiliateUrl))
               : null,
+            price: normalizePriceValue(ticketLink.price),
+            saleStartsAt: normalizeDateValue(ticketLink.saleStartsAt),
             saleStatus:
               ticketLink.saleStatus === "on_sale" ||
               ticketLink.saleStatus === "presale" ||
@@ -636,13 +671,18 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
               ticketLink.saleStatus === "unknown"
                 ? ticketLink.saleStatus
                 : "unknown",
-            saleEndsAt: toNullableString(ticketLink.saleEndsAt),
+            saleEndsAt: normalizeDateValue(ticketLink.saleEndsAt),
             priority: Number.isInteger(ticketLink.priority) ? ticketLink.priority : undefined,
           }))
           .filter((ticketLink) => ticketLink.url)
       : undefined,
     officialUrl: candidate.officialUrl
       ? normalizeUrl(String(candidate.officialUrl))
+      : null,
+    imageUrl: candidate.imageUrl ? normalizeUrl(String(candidate.imageUrl), sourceUrl) : null,
+    organizerName: toNullableString(candidate.organizerName),
+    organizerUrl: candidate.organizerUrl
+      ? normalizeUrl(String(candidate.organizerUrl), sourceUrl)
       : null,
     sourceUrl,
     sourceType,
@@ -740,6 +780,11 @@ function buildPrompt(summaries, knownSummary) {
     "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible.",
     "- Set isInternational to true when the main purpose is a visiting international artist's Japan show. Domestic-only events should be false.",
     "- If date, prefecture, or venue is missing but the announcement is important, keep the missing field null and explain it in reviewNotes.",
+    "- When visible, collect event end date, event image URL, organizer/promoter name and URL, ticket price, ticket sale start date, ticket sale end date, and ticket availability.",
+    "- Use ticketLinks: null when no ticket purchase URL is visible.",
+    "- Do not invent prices. Only set ticketLinks[].price when an actual numeric ticket price is visible. Use null or omit it when unknown.",
+    "- Set ticketLinks[].saleStartsAt only when the ticket sale start date is visible. Do not use the event date as the sale start date.",
+    "- Use imageUrl only for a relevant event, artist, tour, venue, or official OG image URL from the source page.",
     "- Keep reviewNotes in Japanese and include why a human should review it.",
     "",
     "Return JSON only with this shape:",
@@ -750,12 +795,27 @@ function buildPrompt(summaries, knownSummary) {
       "artists": ["ARTIST"],
       "tourName": null,
       "date": "YYYY-MM-DD or null",
+      "endDate": "YYYY-MM-DD or null",
       "prefecture": "東京都 or null",
       "venue": "venue name or null",
       "genres": ["Heavy Metal"],
       "isInternational": true,
       "ticketUrl": null,
-      "ticketLinks": null,
+      "ticketLinks": [
+        {
+          "provider": "eplus|pia|lawson|livepocket|rakuten|creativeman|smash|evp|other",
+          "url": "https://...",
+          "affiliateUrl": null,
+          "price": 8800,
+          "saleStartsAt": "YYYY-MM-DD or null",
+          "saleStatus": "on_sale|presale|sold_out|not_started|unknown",
+          "saleEndsAt": "YYYY-MM-DD or null",
+          "priority": 1
+        }
+      ],
+      "imageUrl": "https://... or null",
+      "organizerName": "organizer/promoter name or null",
+      "organizerUrl": "https://... or null",
       "officialUrl": null,
       "sourceUrl": "https://...",
       "sourceType": "promoter|venue|band_official|ticket|sns|manual",

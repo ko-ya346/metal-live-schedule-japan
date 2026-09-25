@@ -83,6 +83,10 @@ function formatValue(value: unknown, indentLevel: number): string {
     return JSON.stringify(value);
   }
 
+  if (typeof value === "object") {
+    return formatObject(value as Record<string, unknown>, Object.keys(value), indentLevel);
+  }
+
   return String(value);
 }
 
@@ -108,12 +112,16 @@ function formatCandidateObject(candidate: CandidateEvent) {
     "artists",
     "tourName",
     "date",
+    "endDate",
     "prefecture",
     "venue",
     "genres",
     "isInternational",
     "ticketUrl",
     "ticketLinks",
+    "imageUrl",
+    "organizerName",
+    "organizerUrl",
     "officialUrl",
     "sourceUrl",
     "sourceType",
@@ -135,12 +143,16 @@ function formatEventObject(candidate: CandidateEvent): Event {
     artists: candidate.artists,
     tourName: candidate.tourName ?? candidate.artists.join(" / "),
     date: candidate.date as Event["date"],
+    endDate: candidate.endDate as Event["endDate"],
     prefecture: candidate.prefecture ?? "都道府県",
     venue: candidate.venue ?? "会場名",
     genres: candidate.genres,
     isInternational: candidate.isInternational,
     ticketUrl: candidate.ticketUrl,
     ticketLinks: candidate.ticketLinks,
+    imageUrl: candidate.imageUrl,
+    organizerName: candidate.organizerName,
+    organizerUrl: candidate.organizerUrl,
     officialUrl: candidate.officialUrl,
     status: candidate.eventStatus,
     candidateCreatedAt: candidate.collectedAt,
@@ -243,12 +255,16 @@ async function appendEventFile(candidate: CandidateEvent) {
       "artists",
       "tourName",
       "date",
+      "endDate",
       "prefecture",
       "venue",
       "genres",
       "isInternational",
       "ticketUrl",
       "ticketLinks",
+      "imageUrl",
+      "organizerName",
+      "organizerUrl",
       "officialUrl",
       "status",
       "candidateCreatedAt",
@@ -283,8 +299,12 @@ function normalizeCandidate(candidate: CandidateEvent, action: AdminAction) {
     officialUrl: candidate.officialUrl || null,
     tourName: candidate.tourName || null,
     date: candidate.date || null,
+    endDate: candidate.endDate || null,
     prefecture: candidate.prefecture || null,
     venue: candidate.venue || null,
+    imageUrl: candidate.imageUrl || null,
+    organizerName: candidate.organizerName || null,
+    organizerUrl: candidate.organizerUrl || null,
     reviewStatus:
       action === "ignore"
         ? "ignored"
@@ -336,11 +356,15 @@ async function parseAdminCandidateRequest(request: Request) {
         artists: formValueToList(formData, "artists"),
         tourName: formValueToString(formData, "tourName") || null,
         date: formValueToString(formData, "date") || null,
+        endDate: formValueToString(formData, "endDate") || null,
         prefecture: formValueToString(formData, "prefecture") || null,
         venue: formValueToString(formData, "venue") || null,
         genres: formValueToList(formData, "genres"),
         isInternational: formData.get("isInternational") === "on",
         ticketUrl: formValueToString(formData, "ticketUrl") || null,
+        imageUrl: formValueToString(formData, "imageUrl") || null,
+        organizerName: formValueToString(formData, "organizerName") || null,
+        organizerUrl: formValueToString(formData, "organizerUrl") || null,
         officialUrl: formValueToString(formData, "officialUrl") || null,
         reviewNotes: formValueToString(formData, "reviewNotes"),
       },

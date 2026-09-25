@@ -160,9 +160,14 @@ Metals Calendar がチケット送客価値を示せるようになってから�
 - `ticketLinks[].provider`
 - `ticketLinks[].url`
 - `ticketLinks[].affiliateUrl`
+- `ticketLinks[].price`
+- `ticketLinks[].saleStartsAt`
 - `ticketLinks[].saleStatus`
 - `ticketLinks[].saleEndsAt`
 - `ticketLinks[].priority`
+- `imageUrl`
+- `organizerName`
+- `organizerUrl`
 
 #### 指標
 

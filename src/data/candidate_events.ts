@@ -17,6 +17,7 @@ export type CandidateEvent = {
     tourName: string | null;
     // Use null when the date is not confirmed yet.
     date: string | null;
+    endDate?: string | null;
     prefecture: string | null;
     venue: string | null;
     genres: string[];
@@ -24,6 +25,9 @@ export type CandidateEvent = {
     isInternational: boolean;
     ticketUrl: string | null;
     ticketLinks?: TicketLink[];
+    imageUrl?: string | null;
+    organizerName?: string | null;
+    organizerUrl?: string | null;
     officialUrl: string | null;
     sourceUrl: string;
     sourceType: CandidateEventSourceType;
@@ -43,11 +47,15 @@ export const candidateEvents: CandidateEvent[] = [
         artists: ["EXAMPLE BAND"],
         tourName: null,
         date: null,
+        endDate: null,
         prefecture: "東京都",
         venue: null,
         genres: ["Heavy Metal"],
         isInternational: false,
         ticketUrl: null,
+        imageUrl: null,
+        organizerName: null,
+        organizerUrl: null,
         officialUrl: null,
         sourceUrl: "https://example.com/live",
         sourceType: "manual",

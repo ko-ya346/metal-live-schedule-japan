@@ -4,7 +4,7 @@ import Link from "next/link";
 import type { FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
 import type { CandidateEvent, CandidateEventStatus } from "../../../data/candidates";
-import type { Event } from "../../../data/events";
+import type { Event, TicketLink, TicketSaleStatus } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
 import styles from "../../page.module.css";
 
@@ -154,7 +154,21 @@ function inferTicketProvider(url: string) {
 }
 
 function ticketLinksToText(ticketLinks: CandidateEvent["ticketLinks"]) {
-  return (ticketLinks ?? [])
+  const links = ticketLinks ?? [];
+  const hasStructuredFields = links.some(
+    (ticketLink) =>
+      ticketLink.affiliateUrl ||
+      ticketLink.price !== undefined ||
+      ticketLink.saleStartsAt ||
+      ticketLink.saleStatus ||
+      ticketLink.saleEndsAt,
+  );
+
+  if (hasStructuredFields) {
+    return JSON.stringify(links, null, 2);
+  }
+
+  return links
     .map((ticketLink) => {
       if (!ticketLink.provider || ticketLink.provider === inferTicketProvider(ticketLink.url)) {
         return ticketLink.url;
@@ -163,6 +177,61 @@ function ticketLinksToText(ticketLinks: CandidateEvent["ticketLinks"]) {
       return `${ticketLink.provider} ${ticketLink.url}`;
     })
     .join("\n");
+}
+
+function normalizeTicketLink(ticketLink: unknown, priority: number): TicketLink | null {
+  if (!ticketLink || typeof ticketLink !== "object") {
+    return null;
+  }
+
+  const link = ticketLink as Record<string, unknown>;
+  const url = typeof link.url === "string" ? link.url.trim() : "";
+
+  if (!url) {
+    return null;
+  }
+
+  const price =
+    typeof link.price === "number" && Number.isFinite(link.price)
+      ? link.price
+      : typeof link.price === "string" && link.price.trim() !== ""
+        ? Number(link.price)
+        : undefined;
+
+  const saleStatus: TicketSaleStatus =
+    link.saleStatus === "on_sale" ||
+    link.saleStatus === "presale" ||
+    link.saleStatus === "sold_out" ||
+    link.saleStatus === "not_started" ||
+    link.saleStatus === "unknown"
+      ? link.saleStatus
+      : "unknown";
+
+  return {
+    provider:
+      typeof link.provider === "string" && link.provider.trim()
+        ? link.provider.trim()
+        : inferTicketProvider(url),
+    url,
+    affiliateUrl:
+      typeof link.affiliateUrl === "string" && link.affiliateUrl.trim()
+        ? link.affiliateUrl.trim()
+        : null,
+    ...(price !== undefined && Number.isFinite(price) ? { price } : {}),
+    saleStartsAt:
+      typeof link.saleStartsAt === "string" && link.saleStartsAt.trim()
+        ? link.saleStartsAt.trim()
+        : null,
+    saleStatus,
+    saleEndsAt:
+      typeof link.saleEndsAt === "string" && link.saleEndsAt.trim()
+        ? link.saleEndsAt.trim()
+        : null,
+    priority:
+      typeof link.priority === "number" && Number.isInteger(link.priority)
+        ? link.priority
+        : priority,
+  };
 }
 
 function formValueToTicketLinks(formData: FormData): CandidateEvent["ticketLinks"] {
@@ -179,7 +248,11 @@ function formValueToTicketLinks(formData: FormData): CandidateEvent["ticketLinks
       throw new Error("チケットリンクは配列JSON、または1行1URLで入力してください");
     }
 
-    return parsed as CandidateEvent["ticketLinks"];
+    return parsed
+      .map((ticketLink, index) => normalizeTicketLink(ticketLink, index + 1))
+      .filter((ticketLink): ticketLink is NonNullable<typeof ticketLink> =>
+        Boolean(ticketLink),
+      );
   }
 
   return value
@@ -200,6 +273,9 @@ function formValueToTicketLinks(formData: FormData): CandidateEvent["ticketLinks
         provider,
         url,
         affiliateUrl: null,
+        saleStartsAt: null,
+        saleStatus: "unknown" as const,
+        saleEndsAt: null,
         priority: index + 1,
       };
     })
@@ -217,12 +293,16 @@ function formDataToCandidate(
     artists: formValueToList(formData, "artists"),
     tourName: formValueToString(formData, "tourName") || null,
     date: formValueToString(formData, "date") || null,
+    endDate: formValueToString(formData, "endDate") || null,
     prefecture: formValueToString(formData, "prefecture") || null,
     venue: formValueToString(formData, "venue") || null,
     genres: formValueToList(formData, "genres"),
     isInternational: formData.get("isInternational") === "on",
     ticketUrl: formValueToString(formData, "ticketUrl") || null,
     ticketLinks: formValueToTicketLinks(formData),
+    imageUrl: formValueToString(formData, "imageUrl") || null,
+    organizerName: formValueToString(formData, "organizerName") || null,
+    organizerUrl: formValueToString(formData, "organizerUrl") || null,
     officialUrl: formValueToString(formData, "officialUrl") || null,
     reviewNotes: formValueToString(formData, "reviewNotes"),
   };
@@ -417,6 +497,14 @@ export function CandidatesReview({
                     />
                   </label>
                   <label>
+                    終了日
+                    <input
+                      defaultValue={candidate.endDate ?? ""}
+                      name="endDate"
+                      placeholder="YYYY-MM-DD（複数日公演のみ）"
+                    />
+                  </label>
+                  <label>
                     都道府県
                     <input
                       defaultValue={candidate.prefecture ?? ""}
@@ -451,7 +539,28 @@ export function CandidatesReview({
                     <textarea
                       defaultValue={ticketLinksToText(candidate.ticketLinks)}
                       name="ticketLinks"
-                      placeholder={"https://eplus.jp/...\npia https://t.pia.jp/...\nlawson https://l-tike.com/..."}
+                      placeholder={'https://eplus.jp/...\npia https://t.pia.jp/...\nまたは [{"provider":"eplus","url":"https://...","price":8800,"saleStartsAt":"2026-01-01","saleStatus":"on_sale"}]'}
+                    />
+                  </label>
+                  <label>
+                    画像URL
+                    <input
+                      defaultValue={candidate.imageUrl ?? ""}
+                      name="imageUrl"
+                    />
+                  </label>
+                  <label>
+                    主催者名
+                    <input
+                      defaultValue={candidate.organizerName ?? ""}
+                      name="organizerName"
+                    />
+                  </label>
+                  <label>
+                    主催者URL
+                    <input
+                      defaultValue={candidate.organizerUrl ?? ""}
+                      name="organizerUrl"
                     />
                   </label>
                   <label>

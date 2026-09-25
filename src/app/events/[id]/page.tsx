@@ -108,7 +108,17 @@ function formatMissingDetail(label: string) {
   return `未掲載（${label}は公式情報を確認してください）`;
 }
 
-function getOfferAvailability(saleStatus: ReturnType<typeof getTicketLinks>[number]["saleStatus"]) {
+function getOfferAvailability({
+  event,
+  saleStatus,
+}: {
+  event: NonNullable<ReturnType<typeof findEvent>>;
+  saleStatus: ReturnType<typeof getTicketLinks>[number]["saleStatus"];
+}) {
+  if (event.status === "cancelled" || isPastEventDate(event.date)) {
+    return "https://schema.org/SoldOut";
+  }
+
   if (saleStatus === "sold_out") {
     return "https://schema.org/SoldOut";
   }
@@ -121,7 +131,52 @@ function getOfferAvailability(saleStatus: ReturnType<typeof getTicketLinks>[numb
     return "https://schema.org/InStock";
   }
 
-  return undefined;
+  return "https://schema.org/InStock";
+}
+
+function formatSchemaDateTime(date: string | undefined) {
+  if (!date) {
+    return undefined;
+  }
+
+  if (date.includes("T")) {
+    return date;
+  }
+
+  return `${date}T00:00:00+09:00`;
+}
+
+function getEventStructuredDataImageUrl(eventUrl: string) {
+  return `${eventUrl}/opengraph-image`;
+}
+
+function getEventImageUrls({
+  event,
+  eventUrl,
+}: {
+  event: NonNullable<ReturnType<typeof findEvent>>;
+  eventUrl: string;
+}) {
+  return [
+    event.imageUrl,
+    getEventStructuredDataImageUrl(eventUrl),
+  ].filter((url): url is string => Boolean(url));
+}
+
+function getOfferValidFrom({
+  event,
+  ticketLink,
+}: {
+  event: NonNullable<ReturnType<typeof findEvent>>;
+  ticketLink: ReturnType<typeof getTicketLinks>[number];
+}) {
+  return formatSchemaDateTime(
+    ticketLink.saleStartsAt ??
+      event.publishedAt ??
+      event.candidateCreatedAt ??
+      event.updatedAt ??
+      event.date,
+  );
 }
 
 function getMusicEventStructuredData({
@@ -134,17 +189,30 @@ function getMusicEventStructuredData({
   ticketLinks: ReturnType<typeof getTicketLinks>;
 }) {
   const offers = ticketLinks.map((ticketLink) => {
-    const availability = getOfferAvailability(ticketLink.saleStatus);
+    const availability = getOfferAvailability({
+      event,
+      saleStatus: ticketLink.saleStatus,
+    });
+    const price =
+      typeof ticketLink.price === "number" && Number.isFinite(ticketLink.price)
+        ? ticketLink.price
+        : undefined;
 
     return {
       "@type": "Offer",
       url: ticketLink.href,
       name: getTicketLinkLabel(ticketLink),
+      priceCurrency: "JPY",
+      ...(price !== undefined ? { price } : {}),
       seller: {
         "@type": "Organization",
         name: formatTicketProvider(ticketLink.provider),
       },
-      ...(availability ? { availability } : {}),
+      availability,
+      validFrom: getOfferValidFrom({ event, ticketLink }),
+      ...(ticketLink.saleEndsAt
+        ? { validThrough: formatSchemaDateTime(ticketLink.saleEndsAt) }
+        : {}),
     };
   });
 
@@ -154,6 +222,8 @@ function getMusicEventStructuredData({
     name: `${formatArtists(event.artists)} - ${event.tourName}`,
     description: formatEventPageDescription(event),
     startDate: event.date,
+    endDate: event.endDate ?? event.date,
+    image: getEventImageUrls({ event, eventUrl }),
     eventStatus: getSchemaEventStatus(event),
     eventAttendanceMode: "https://schema.org/OfflineEventAttendanceMode",
     url: eventUrl,
@@ -171,6 +241,13 @@ function getMusicEventStructuredData({
       "@type": "MusicGroup",
       name: artist,
     })),
+    organizer: {
+      "@type": "Organization",
+      name: event.organizerName ?? event.artists[0],
+      ...(event.organizerUrl ?? event.officialUrl
+        ? { url: event.organizerUrl ?? event.officialUrl }
+        : {}),
+    },
     ...(event.officialUrl ? { sameAs: event.officialUrl } : {}),
     ...(offers.length > 0 ? { offers } : {}),
   };
@@ -243,6 +320,9 @@ export async function generateMetadata({
 
   const title = formatEventPageTitle(event);
   const description = formatEventPageDescription(event);
+  const eventUrl = `${siteUrl}/events/${event.id}`;
+  const imageUrls = getEventImageUrls({ event, eventUrl });
+  const imageUrl = imageUrls[0];
 
   return {
     title,
@@ -255,11 +335,20 @@ export async function generateMetadata({
       description,
       url: `/events/${event.id}`,
       type: "article",
+      images: [
+        {
+          url: imageUrl,
+          width: 1200,
+          height: 630,
+          alt: `${formatArtists(event.artists)} - ${event.tourName}`,
+        },
+      ],
     },
     twitter: {
       card: "summary",
       title: `${title} | ${siteName}`,
       description,
+      images: [imageUrl],
     },
   };
 }

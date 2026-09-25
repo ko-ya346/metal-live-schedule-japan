@@ -11,6 +11,8 @@ export type TicketLink = {
     provider: string;
     url: string;
     affiliateUrl?: string | null;
+    price?: number | null;
+    saleStartsAt?: string | null;
     saleStatus?: TicketSaleStatus;
     saleEndsAt?: string | null;
     priority?: number;
@@ -23,6 +25,8 @@ export type Event = {
     tourName: string;
     // Use YYYY-MM-DD.
     date: EventDate;
+    // Use YYYY-MM-DD when the event spans multiple days. Omit for single-day events.
+    endDate?: EventDate | null;
     prefecture: string;
     venue: string;
     genres: string[];
@@ -32,6 +36,9 @@ export type Event = {
     ticketUrl: string | null;
     // Optional normalized ticket links. Prefer this when multiple providers are known.
     ticketLinks?: TicketLink[];
+    imageUrl?: string | null;
+    organizerName?: string | null;
+    organizerUrl?: string | null;
     // Artist, venue, or organizer event page used to verify event details.
     officialUrl: string | null;
     status: EventStatus;

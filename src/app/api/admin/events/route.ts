@@ -55,6 +55,10 @@ function formatValue(value: unknown, indentLevel: number): string {
     return JSON.stringify(value);
   }
 
+  if (typeof value === "object") {
+    return formatObject(value as Record<string, unknown>, Object.keys(value), indentLevel);
+  }
+
   return String(value);
 }
 
@@ -80,11 +84,16 @@ function formatEventObject(event: Event) {
     "artists",
     "tourName",
     "date",
+    "endDate",
     "prefecture",
     "venue",
     "genres",
     "isInternational",
     "ticketUrl",
+    "ticketLinks",
+    "imageUrl",
+    "organizerName",
+    "organizerUrl",
     "officialUrl",
     "status",
     "candidateCreatedAt",
@@ -99,11 +108,16 @@ function formatCandidateObject(candidate: CandidateEvent) {
     "artists",
     "tourName",
     "date",
+    "endDate",
     "prefecture",
     "venue",
     "genres",
     "isInternational",
     "ticketUrl",
+    "ticketLinks",
+    "imageUrl",
+    "organizerName",
+    "organizerUrl",
     "officialUrl",
     "sourceUrl",
     "sourceType",
@@ -203,11 +217,16 @@ async function appendIgnoredCandidate(event: Event) {
     artists: event.artists,
     tourName: event.tourName,
     date: event.date,
+    endDate: event.endDate,
     prefecture: event.prefecture,
     venue: event.venue,
     genres: event.genres,
     isInternational: event.isInternational,
     ticketUrl: event.ticketUrl,
+    ticketLinks: event.ticketLinks,
+    imageUrl: event.imageUrl,
+    organizerName: event.organizerName,
+    organizerUrl: event.organizerUrl,
     officialUrl: event.officialUrl,
     sourceUrl:
       event.officialUrl ??
@@ -287,6 +306,14 @@ function normalizeEvent(event: Event) {
     genres: event.genres.filter(Boolean),
     isInternational: event.isInternational,
     ticketUrl: event.ticketUrl || null,
+    ticketLinks:
+      event.ticketLinks && event.ticketLinks.length > 0
+        ? event.ticketLinks
+        : undefined,
+    endDate: event.endDate || null,
+    imageUrl: event.imageUrl || null,
+    organizerName: event.organizerName || null,
+    organizerUrl: event.organizerUrl || null,
     officialUrl: event.officialUrl || null,
     status,
     updatedAt: getTodayInJapan(),
