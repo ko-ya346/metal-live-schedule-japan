@@ -9,7 +9,7 @@ import {
   getPreviousMonthKey,
   getCurrentMonthKey,
 } from "../utils/date";
-import styles from "./page.module.css";
+import styles from "./EventCalendar.module.css";
 
 type EventCalendarProps = {
   events: Event[];

@@ -6,6 +6,7 @@ import { useMemo, useState } from "react";
 import type { CandidateEvent, CandidateEventStatus } from "../../../data/candidates";
 import type { Event, TicketLink, TicketSaleStatus } from "../../../data/events";
 import { formatEventDate } from "../../../utils/date";
+import adminStyles from "../../admin.module.css";
 import styles from "../../page.module.css";
 
 type CandidatesReviewProps = {
@@ -398,11 +399,11 @@ export function CandidatesReview({
 
   return (
     <>
-      <div className={styles.adminToolbar}>
+      <div className={adminStyles.adminToolbar}>
         {reviewStatuses.map((status) => (
           <Link
-            className={`${styles.adminStatusButton} ${
-              selectedStatus === status ? styles.activeAdminStatusButton : ""
+            className={`${adminStyles.adminStatusButton} ${
+              selectedStatus === status ? adminStyles.activeAdminStatusButton : ""
             }`}
             href={`/admin/candidates?status=${status}`}
             key={status}
@@ -417,8 +418,8 @@ export function CandidatesReview({
         ))}
       </div>
 
-      <section className={styles.adminCopyQueue}>
-        <div className={styles.adminCandidateHeader}>
+      <section className={adminStyles.adminCopyQueue}>
+        <div className={adminStyles.adminCandidateHeader}>
           <div>
             <h2>ローカル管理</h2>
             <p className={styles.summary}>
@@ -426,17 +427,17 @@ export function CandidatesReview({
             </p>
           </div>
         </div>
-        <p className={styles.adminMutedText}>
+        <p className={adminStyles.adminMutedText}>
           本番環境では書き込みを無効にしています。操作後は `npm run build` で確認してください。
         </p>
         {statusMessage && (
-          <p className={styles.adminInlineStatus} role="status">
+          <p className={adminStyles.adminInlineStatus} role="status">
             {statusMessage}
           </p>
         )}
       </section>
 
-      <div className={styles.adminCandidateList}>
+      <div className={adminStyles.adminCandidateList}>
         {filteredCandidates.map((candidate) => {
           const relatedEvents = findRelatedPublishedEvents(candidate, publishedEvents);
           const isPublished = candidate.reviewStatus === "published";
@@ -447,7 +448,7 @@ export function CandidatesReview({
           const isPending = pendingCandidateId === candidate.id;
 
           return (
-            <article className={styles.adminCandidateCard} key={candidate.id}>
+            <article className={adminStyles.adminCandidateCard} key={candidate.id}>
               <form
                 action="/api/admin/candidates"
                 method="post"
@@ -455,13 +456,13 @@ export function CandidatesReview({
               >
                 <input name="candidateId" type="hidden" value={candidate.id} />
 
-                <div className={styles.adminCandidateHeader}>
+                <div className={adminStyles.adminCandidateHeader}>
                   <div>
                     <p className={styles.kicker}>
                       {statusLabels[candidate.reviewStatus]}
                     </p>
                     <h2>{candidate.artists.join(" / ")}</h2>
-                    <p className={styles.adminCandidateId}>
+                    <p className={adminStyles.adminCandidateId}>
                       ID: <code>{candidate.id}</code>
                     </p>
                     <p className={styles.summary}>
@@ -473,7 +474,7 @@ export function CandidatesReview({
                   </div>
                 </div>
 
-                <div className={styles.adminEditGrid}>
+                <div className={adminStyles.adminEditGrid}>
                   <label>
                     アーティスト
                     <textarea
@@ -519,7 +520,7 @@ export function CandidatesReview({
                     ジャンル
                     <textarea defaultValue={listToText(candidate.genres)} name="genres" />
                   </label>
-                  <label className={styles.adminCheckboxField}>
+                  <label className={adminStyles.adminCheckboxField}>
                     <input
                       defaultChecked={candidate.isInternational}
                       name="isInternational"
@@ -579,7 +580,7 @@ export function CandidatesReview({
                   </label>
                 </div>
 
-                <dl className={styles.adminCandidateMeta}>
+                <dl className={adminStyles.adminCandidateMeta}>
                   <div>
                     <dt>情報源</dt>
                     <dd>{candidate.sourceName}</dd>
@@ -590,7 +591,7 @@ export function CandidatesReview({
                   </div>
                 </dl>
 
-                <div className={styles.adminLinkRow}>
+                <div className={adminStyles.adminLinkRow}>
                   <AdminSubmitButton
                     className={styles.secondaryLink}
                     isPending={isPending}
@@ -652,18 +653,18 @@ export function CandidatesReview({
                   )}
                 </div>
                 {isPending && (
-                  <p className={styles.adminMutedText} role="status">
+                  <p className={adminStyles.adminMutedText} role="status">
                     処理中です。完了するまでそのままお待ちください。
                   </p>
                 )}
                 {missingPublishFields.length > 0 && (
-                  <p className={styles.adminFieldWarning} role="status">
+                  <p className={adminStyles.adminFieldWarning} role="status">
                     公開には {missingPublishFields.join(" / ")} が必要です。先に保存して埋めてください。
                   </p>
                 )}
               </form>
 
-              <section className={styles.adminCompareSection}>
+              <section className={adminStyles.adminCompareSection}>
                 <h3>近い公開済みイベント</h3>
                 {relatedEvents.length === 0 ? (
                   <p>該当しそうな公開済みイベントはありません。</p>
