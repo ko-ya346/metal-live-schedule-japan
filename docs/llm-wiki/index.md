@@ -21,6 +21,7 @@ Do not turn the site into a generic music news site.
 - Public event data: `src/data/events.ts`
 - Candidate event data: `src/data/candidate_events.ts`
 - Crawl targets: `src/data/crawlTargets.ts`
+- Priority watch targets: `src/data/watchTargets.ts`
 - Event utilities: `src/utils/events.ts`
 - Date utilities: `src/utils/date.ts`
 - Link/copy utilities: `src/utils/eventLinks.ts`
@@ -54,14 +55,9 @@ Preferred sources:
 4. Official ticket pages
 5. Official SNS accounts
 
-Preferred watch artists:
+`src/data/watchTargets.ts` is the source of truth for high-priority artist keywords, broader discovery artist keywords, recurring promoter/ticket sources, and manual SNS checks. Keep `scripts/collect-research-links.mjs` and `scripts/research-candidates.mjs` using that shared list instead of duplicating artist names.
 
-- SEX MACHINEGUNS
-- 人間椅子
-- アイリフドーパ
-- FASTKILL
-
-Also collect reliable candidates for visiting international and domestic heavy music events.
+Also collect reliable candidates for visiting international and domestic heavy music events. The watch list is a priority input, not the full collection scope.
 
 Regional collection buckets:
 
@@ -114,6 +110,8 @@ npm run build
 ```
 
 For docs-only changes, `git diff --check` is usually enough.
+
+Candidate generation defaults to compact prompts. `scripts/research-candidates.mjs` sends short date/venue/ticket/artist snippets instead of full page text. Use `--prompt-only` to inspect prompt size without calling the LLM, and use `--prompt-mode=full` only when compact snippets miss needed details.
 
 ## Roadmap Pointers
 

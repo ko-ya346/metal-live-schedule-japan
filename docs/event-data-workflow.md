@@ -9,12 +9,15 @@
 最終確認には、公式情報またはチケット販売ページを使います。
 
 - アーティスト公式サイト: live、tour、schedule、news ページ
-- プロモーター: Creativeman、UDO、SMASH、Hayashi International Promotions、Evoken de Valhall Production
-- チケット販売: eplus、チケットぴあ、ローチケ、楽天チケット
+- プロモーター: Creativeman、UDO、SMASH、Hayashi International Promotions、Evoken de Valhall Production、SWD Japan、東京音協、Ward Records
+- チケット販売: eplus、チケットぴあ、ローチケ、楽天チケット、TicketDive、LivePocket
 - 会場スケジュール: Club Citta、Zepp、Club Quattro、渋谷・大阪のライブハウス
+- プロモーター/アーティスト公式X: 来日公演や小規模公演はX先行で出ることがあるため、毎回手動確認する
 - 発見用のみ: メタルニュースサイト、SNS投稿、ファンカレンダー
 
 発見用の情報源だけを最終ソースにしないでください。イベントを公開データに追加する前に、アーティスト、プロモーター、会場、チケット販売ページのいずれかで確認します。
+
+毎回確認する優先アーティスト、主要プロモーター/チケットサイト、手動確認するX検索は `src/data/watchTargets.ts` にまとめます。候補収集スクリプトはこのリストを使うため、優先対象を変える場合はここだけを更新してください。
 
 ## 地域別の収集分担
 
@@ -99,13 +102,16 @@ npm run data:validate
 
 ## 自動収集と候補確認
 
-GitHub Actions は定期実行で調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
+GitHub Actions は火木土の09:00 JSTに調査リンクを集め、LLM で候補イベントに変換し、`src/data/candidate_events.ts` に `review_needed` で追加します。候補の確認は `/admin/candidates` で行います。
+
+頻度を上げすぎず、毎回同じ回遊サイト、公式入口、チケット検索、優先アーティストページを定点観測します。巡回頻度よりも、見る入口を固定して差分に気づきやすくすることを優先します。
 
 - 調査メモ: `npm run research:links`
 - 候補生成: `npm run research:candidates`
 - 候補確認: `/admin/candidates`
 - 候補保存先: `src/data/candidate_events.ts`
 - 公開データには自動反映しない
+- 候補データには自動反映する
 - 新規候補が追加されると、GitHub Actions が main にコミットする
 - 新規候補が追加された回だけ、日付付きの通知 issue を作る
 - レビュー場所は `/admin/candidates` に統一する
@@ -123,6 +129,32 @@ LLM に候補収集を依頼する場合は、未 close の候補確認 issue �
 
 - `OPENAI_API_KEY`
 - 任意: `OPENAI_MODEL`
+
+候補生成は通常、低トークンの compact モードで動きます。各ページの本文全文ではなく、日付、会場、出演、チケット、価格、優先アーティスト周辺の短い抜粋だけをLLMに渡します。
+
+```bash
+npm run research:candidates -- --input=research-links.md --report=candidate-report.md --write
+```
+
+トークン量だけ確認したい場合は、LLM呼び出しをスキップできます。
+
+```bash
+npm run research:candidates -- --input=research-links.md --report=candidate-report.md --prompt-only
+```
+
+どうしてもページ本文を長めに見たい場合だけ full モードを使います。
+
+```bash
+npm run research:candidates -- --input=research-links.md --report=candidate-report.md --prompt-mode=full
+```
+
+主な調整オプション:
+
+- `--body-chars=450`: compactで抜粋が作れない場合の本文フォールバック文字数
+- `--max-snippets=6`: 1ページあたりの抜粋数
+- `--snippet-chars=180`: 1抜粋あたりの文字数
+- `--known-limit=16`: プロンプトに入れる既存イベント/候補の件数
+- `--max-total-pages=24`: 取得してLLMに渡す最大ページ数
 
 SNS 由来や未確認情報は信頼度を低くして、あくまでレビュー対象にします。
 

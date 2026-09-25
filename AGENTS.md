@@ -104,11 +104,9 @@ AI-generated or crawled data must be reviewable before publishing.
 
 Keep candidate events in `src/data/candidate_events.ts` and do not publish them automatically.
 
-When collecting candidate events, regularly check these preferred artists because they are important watch targets for the project:
-- SEX MACHINEGUNS
-- 人間椅子
-- アイリフドーパ
-- FASTKILL
+Keep the recurring watch list in `src/data/watchTargets.ts`. Candidate collection should use that shared list for priority artist keywords, recurring promoter/ticket sources, and manual SNS checks. Do not duplicate the full watch artist list in docs or scripts; update `src/data/watchTargets.ts` instead.
+
+Promoter and artist X accounts can publish visiting-tour and small-show news before websites are updated. X is often not reliably fetchable as static HTML, so the research memo should include manual X checks every time instead of silently skipping them.
 
 Also collect reliable candidate events for visiting international metal, heavy rock, loud rock, metalcore, hardcore, and related heavy music artists. Do not limit collection to the preferred artist list.
 
