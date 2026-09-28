@@ -1,27 +1,28 @@
 import type { Metadata } from "next";
 import Link from "next/link";
+import { eventUpdateCandidates } from "../../../data/event_update_candidates";
 import { publishedEvents } from "../../../data/events";
 import adminStyles from "../../admin.module.css";
 import styles from "../../page.module.css";
-import { EventsReview } from "./EventsReview";
+import { UpdatesReview } from "./UpdatesReview";
 
 export const metadata: Metadata = {
-  title: "公開イベント管理 | Metal Live Schedule",
-  description: "公開済みイベントを編集・公開取り消しする管理用ページです。",
+  title: "公開イベント更新候補 | Metal Live Schedule",
+  description: "公開済みイベントの更新候補を確認する管理用ページです。",
   robots: {
     index: false,
     follow: false,
   },
 };
 
-export default function AdminEventsPage() {
+export default function AdminUpdatesPage() {
   return (
     <main className={styles.page}>
       <header className={styles.header}>
         <p className={styles.kicker}>Admin</p>
-        <h1>公開イベント管理</h1>
+        <h1>公開イベント更新候補</h1>
         <p className={styles.summary}>
-          公開済みイベントを編集し、掲載をやめたいものは公開取り消しにできます。
+          公開済みイベントの変更候補を確認し、必要なものだけ公開データへ適用します。
         </p>
       </header>
 
@@ -30,8 +31,8 @@ export default function AdminEventsPage() {
           <Link className={styles.secondaryLink} href="/admin/candidates">
             候補イベント確認へ
           </Link>
-          <Link className={styles.secondaryLink} href="/admin/updates">
-            更新候補確認へ
+          <Link className={styles.secondaryLink} href="/admin/events">
+            公開イベント管理へ
           </Link>
           <Link className={styles.secondaryLink} href="/">
             公開ページへ
@@ -39,7 +40,10 @@ export default function AdminEventsPage() {
         </div>
       </section>
 
-      <EventsReview events={publishedEvents} />
+      <UpdatesReview
+        events={publishedEvents}
+        updateCandidates={eventUpdateCandidates}
+      />
     </main>
   );
 }

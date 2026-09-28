@@ -52,6 +52,7 @@ LLM向けの短い作業コンテキストは [`llms.txt`](llms.txt) と [`docs/
 - `保存` は `src/data/candidate_events.ts` を更新します。
 - `ignore` は候補を `reviewStatus: "ignored"` にします。
 - `公開する` は `src/data/events.ts` にイベントを追加し、候補を `published` にします。
+- 公開済みイベントの更新候補は `/admin/updates` で確認し、適用するまで `src/data/events.ts` には反映しません。
 - 本番環境では認証なしのファイル書き込みを避けるため、管理APIの書き込みは無効です。
 
 ## 自動収集

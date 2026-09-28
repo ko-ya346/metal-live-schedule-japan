@@ -52,6 +52,9 @@ export default async function AdminCandidatesPage({
           <Link className={styles.secondaryLink} href="/admin/events">
             公開イベント管理へ
           </Link>
+          <Link className={styles.secondaryLink} href="/admin/updates">
+            更新候補確認へ
+          </Link>
           <Link className={styles.secondaryLink} href="/">
             公開ページへ
           </Link>
