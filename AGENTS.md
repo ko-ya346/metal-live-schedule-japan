@@ -125,7 +125,7 @@ AI-generated or crawled data must be reviewable before publishing.
 
 Keep candidate events in `src/data/candidate_events.ts` and do not publish them automatically.
 
-Keep published-event update candidates in `src/data/event_update_candidates.ts`. Do not mix them with new event candidates. Existing event updates must be reviewed in `/admin/updates` and must not be applied automatically.
+Keep published-event update candidates in `src/data/event_update_candidates.ts`. Do not mix them with new event candidates. Existing event updates must be reviewed in `/admin/candidates` and must not be applied automatically.
 
 Keep the recurring watch list in `src/data/watchTargets.ts`. Candidate collection should use that shared list for priority artist keywords, recurring promoter/ticket sources, and manual SNS checks. Do not duplicate the full watch artist list in docs or scripts; update `src/data/watchTargets.ts` instead.
 

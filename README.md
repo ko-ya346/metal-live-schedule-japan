@@ -46,13 +46,13 @@ LLM向けの短い作業コンテキストは [`llms.txt`](llms.txt) と [`docs/
 
 ## ローカル管理画面
 
-開発サーバーで `/admin/candidates` を開くと、候補イベントを確認できます。
+開発サーバーで `/admin/candidates` を開くと、新規イベント候補と公開済みイベントの更新候補を確認できます。
 
 - 候補の出演者、日付、会場、URL、メモをブラウザで編集できます。
 - `保存` は `src/data/candidate_events.ts` を更新します。
 - `ignore` は候補を `reviewStatus: "ignored"` にします。
 - `公開する` は `src/data/events.ts` にイベントを追加し、候補を `published` にします。
-- 公開済みイベントの更新候補は `/admin/updates` で確認し、適用するまで `src/data/events.ts` には反映しません。
+- 公開済みイベントの更新候補は `/admin/candidates` で確認し、適用するまで `src/data/events.ts` には反映しません。
 - 本番環境では認証なしのファイル書き込みを避けるため、管理APIの書き込みは無効です。
 
 ## 自動収集

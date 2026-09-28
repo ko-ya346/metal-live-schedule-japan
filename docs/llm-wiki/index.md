@@ -44,7 +44,7 @@ Normal data flow:
 Published-event updates are a separate review queue:
 
 1. Update candidates are added to `src/data/event_update_candidates.ts`.
-2. Human reviews updates in `/admin/updates`.
+2. Human reviews updates in `/admin/candidates`.
 3. Human applies or ignores updates.
 
 Do not auto-publish crawled or LLM-generated data.
