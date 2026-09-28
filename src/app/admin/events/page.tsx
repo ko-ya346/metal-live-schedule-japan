@@ -28,7 +28,7 @@ export default function AdminEventsPage() {
       <section className={adminStyles.adminCopyQueue}>
         <div className={adminStyles.adminLinkRow}>
           <Link className={styles.secondaryLink} href="/admin/candidates">
-            候補イベント確認へ
+            候補確認へ
           </Link>
           <Link className={styles.secondaryLink} href="/">
             公開ページへ

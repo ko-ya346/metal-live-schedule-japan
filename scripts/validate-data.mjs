@@ -1,5 +1,6 @@
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { crawlTargets } from "../src/data/crawlTargets.ts";
+import { eventUpdateCandidates } from "../src/data/event_update_candidates.ts";
 import { events } from "../src/data/events.ts";
 
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -12,6 +13,16 @@ const ticketSaleStatuses = new Set([
   "unknown",
 ]);
 const reviewStatuses = new Set(["review_needed", "published", "ignored"]);
+const updateReviewStatuses = new Set(["review_needed", "applied", "ignored"]);
+const updateTypes = new Set([
+  "lineup",
+  "ticket",
+  "schedule",
+  "venue",
+  "status",
+  "official",
+  "metadata",
+]);
 const confidences = new Set(["high", "medium", "low"]);
 const sourceTypes = new Set(["promoter", "venue", "band_official", "ticket", "sns", "manual"]);
 const targetTypes = new Set(["promoter", "venue", "band_official", "ticket", "sns"]);
@@ -273,6 +284,7 @@ function checkDuplicateEvents() {
 
 checkUniqueIds(events, "events");
 checkUniqueIds(candidateEvents, "candidateEvents");
+checkUniqueIds(eventUpdateCandidates, "eventUpdateCandidates");
 checkUniqueIds(crawlTargets, "crawlTargets");
 
 for (const event of events) {
@@ -388,6 +400,63 @@ for (const candidate of candidateEvents) {
   }
 }
 
+for (const updateCandidate of eventUpdateCandidates) {
+  checkRequiredString(updateCandidate, "eventUpdateCandidates", "id");
+  checkRequiredString(updateCandidate, "eventUpdateCandidates", "eventId");
+  checkRequiredString(updateCandidate, "eventUpdateCandidates", "sourceUrl");
+  checkRequiredString(updateCandidate, "eventUpdateCandidates", "sourceName");
+  checkRequiredString(updateCandidate, "eventUpdateCandidates", "reviewNotes");
+
+  checkOptionalDate(updateCandidate, "eventUpdateCandidates", "collectedAt");
+  checkOptionalDate(updateCandidate, "eventUpdateCandidates", "reviewedAt", true);
+
+  if (!updateTypes.has(updateCandidate.updateType)) {
+    errors.push(`eventUpdateCandidates:${updateCandidate.id}: invalid updateType`);
+  }
+
+  if (!confidences.has(updateCandidate.confidence)) {
+    errors.push(`eventUpdateCandidates:${updateCandidate.id}: invalid confidence`);
+  }
+
+  if (!updateReviewStatuses.has(updateCandidate.reviewStatus)) {
+    errors.push(`eventUpdateCandidates:${updateCandidate.id}: invalid reviewStatus`);
+  }
+
+  if (!isValidUrl(updateCandidate.sourceUrl)) {
+    errors.push(`eventUpdateCandidates:${updateCandidate.id}: invalid sourceUrl`);
+  }
+
+  if (
+    !updateCandidate.currentSnapshot ||
+    typeof updateCandidate.currentSnapshot !== "object" ||
+    Array.isArray(updateCandidate.currentSnapshot)
+  ) {
+    errors.push(`eventUpdateCandidates:${updateCandidate.id}: currentSnapshot must be an object`);
+  }
+
+  if (
+    !updateCandidate.proposedChanges ||
+    typeof updateCandidate.proposedChanges !== "object" ||
+    Array.isArray(updateCandidate.proposedChanges)
+  ) {
+    errors.push(`eventUpdateCandidates:${updateCandidate.id}: proposedChanges must be an object`);
+  }
+
+  const publishedEvent = events.find((event) => event.id === updateCandidate.eventId);
+
+  if (!publishedEvent) {
+    errors.push(
+      `eventUpdateCandidates:${updateCandidate.id}: eventId is not found in published events`,
+    );
+  }
+
+  if (updateCandidate.reviewStatus !== "review_needed" && updateCandidate.reviewedAt === null) {
+    warnings.push(
+      `eventUpdateCandidates:${updateCandidate.id}: reviewed update should have reviewedAt`,
+    );
+  }
+}
+
 for (const target of crawlTargets) {
   checkRequiredString(target, "crawlTargets", "id");
   checkRequiredString(target, "crawlTargets", "name");
@@ -426,5 +495,5 @@ if (errors.length > 0) {
 }
 
 console.log(
-  `Data validation passed: ${events.length} published events, ${candidateEvents.length} candidates, ${crawlTargets.length} crawl targets.`,
+  `Data validation passed: ${events.length} published events, ${candidateEvents.length} candidates, ${eventUpdateCandidates.length} update candidates, ${crawlTargets.length} crawl targets.`,
 );

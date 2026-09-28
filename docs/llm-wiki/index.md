@@ -41,6 +41,12 @@ Normal data flow:
 4. Published events end up in `src/data/events.ts`.
 5. Agent commits and pushes only when instructed.
 
+Published-event updates are a separate review queue:
+
+1. Update candidates are added to `src/data/event_update_candidates.ts`.
+2. Human reviews updates in `/admin/candidates`.
+3. Human applies or ignores updates.
+
 Do not auto-publish crawled or LLM-generated data.
 
 Candidate review issues are notifications only. Do not treat GitHub issues as a second review queue; keep the human workflow centered on `/admin/candidates`.
