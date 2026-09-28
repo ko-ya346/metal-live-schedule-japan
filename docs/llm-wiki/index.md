@@ -73,6 +73,9 @@ Quality rule:
 - Always include `sourceUrl`, `confidence`, and `reviewNotes`.
 - Avoid duplicates with existing published events and existing candidates.
 - For discovery/news sources, require a clear heavy-music signal from artist, event title, source URL, or notes before adding a candidate.
+- For tour-like candidates, check the full tour schedule before adding only one date.
+- If other dates are confirmed, add one candidate per date.
+- In `reviewNotes`, state whether the full tour schedule was checked or whether other dates are still unconfirmed.
 
 ## UI Direction
 
