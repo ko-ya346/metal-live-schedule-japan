@@ -131,6 +131,8 @@ Promoter and artist X accounts can publish visiting-tour and small-show news bef
 
 Also collect reliable candidate events for visiting international metal, heavy rock, loud rock, metalcore, hardcore, and related heavy music artists. Do not limit collection to the preferred artist list.
 
+When a candidate looks like a tour or multi-date run, check for other Japan dates before adding only one event. Treat Japan Tour, Tour, nationwide tour, one-man tour, additional show, multiple city names, and shared ticket reception pages as signals to inspect artist, promoter, and ticket tour pages. Add one candidate per confirmed date, and write in `reviewNotes` whether the full schedule was checked or other dates remain unconfirmed.
+
 ## Discovery strategy
 
 Potential future feature:

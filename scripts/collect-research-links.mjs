@@ -385,6 +385,8 @@ function renderMarkdown(results) {
     "",
     "```text",
     "このIssueの自動収集リンクを参考にしつつ、追加で公式/信頼できるソースを確認して、新着ライブ候補を src/data/candidate_events.ts に review_needed で追加してください。",
+    "ツアー名、Japan Tour、複数都市、同一チケット受付が見えた場合は、単発で追加せず公式/プロモーター/チケットページで他日程も確認してください。",
+    "ツアー系候補の reviewNotes には、全日程確認済みか、他日程の有無が未確認かを書いてください。",
     "公開イベントには追加しないでください。",
     "重複を避け、npm run data:validate と npm run build を通してください。",
     "```",
