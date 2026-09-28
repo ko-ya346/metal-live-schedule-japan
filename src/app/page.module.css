@@ -807,6 +807,82 @@
   margin-bottom: 34px;
 }
 
+.pastEventsSection {
+  margin-top: 8px;
+  opacity: 0.78;
+}
+
+.pastEventsDisclosure {
+  display: grid;
+  gap: 12px;
+}
+
+.pastEventsDisclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #303030;
+  border-bottom: 1px solid #303030;
+  color: #b9b9b3;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pastEventsDisclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.pastEventsDisclosure summary::after {
+  content: "開く";
+  flex: 0 0 auto;
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.pastEventsDisclosure[open] summary::after {
+  content: "閉じる";
+}
+
+.pastEventsDisclosure summary span:last-child {
+  margin-left: auto;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
+.pastEventsSection .dateGroups {
+  gap: 18px;
+}
+
+.pastEventsSection .dateGroup {
+  gap: 8px;
+}
+
+.pastEventsSection .dateHeading {
+  padding-bottom: 6px;
+  border-bottom-width: 1px;
+  color: #d0d0ca;
+  font-size: 1rem;
+}
+
+.pastEventsSection .eventList {
+  gap: 6px;
+}
+
+.pastEventsSection .eventCard {
+  gap: 6px;
+  padding: 9px 11px;
+  border-left-width: 2px;
+  background: #131313;
+  box-shadow: none;
+}
+
+.pastEventsSection .artist {
+  font-size: 0.92rem;
+}
+
 .sectionLead {
   max-width: 44rem;
   margin: 8px 0 0;

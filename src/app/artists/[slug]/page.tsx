@@ -7,12 +7,18 @@ import {
   getArtists,
   getEventsByArtistSlug,
 } from "../../../utils/artists";
-import { formatEventDate, isPastEventDate } from "../../../utils/date";
+import {
+  formatCalendarMonth,
+  formatEventDate,
+  getEventMonthKey,
+  isPastEventDate,
+} from "../../../utils/date";
 import {
   getGroupedEventDates,
   groupEventsByDate,
   sortEventsByDate,
 } from "../../../utils/events";
+import { getGenreSlug } from "../../../utils/genres";
 import { getPrefectureSlug } from "../../../utils/prefectures";
 import { getVenueSlug } from "../../../utils/venues";
 import { EventDateGroup } from "../../EventDateGroup";
@@ -74,7 +80,7 @@ function formatArtistPageDescription(
     nextEvent.date,
   )}、${nextEvent.prefecture} / ${nextEvent.venue}で開催予定。${prefectures.join(
     "、",
-  )}などの日程・会場・チケット情報を掲載しています。`;
+  )}などの日程・会場・チケット情報に加えて、同じ時期や近いジャンルのメタルライブも探せます。`;
 }
 
 function formatArtistPageLead(
@@ -98,7 +104,7 @@ function formatArtistPageLead(
     ? "来日公演・日本ライブ"
     : "日本国内ライブ";
 
-  return `${artistName}の${eventTypeText}を日付順にまとめています。次回は${formatEventDate(
+  return `${artistName}の${eventTypeText}を日付順にまとめています。次回公演の詳細だけでなく、同じ時期・地域・ジャンルのメタルライブも探せます。次回は${formatEventDate(
     nextEvent.date,
   )}の${nextEvent.prefecture} / ${
     nextEvent.venue
@@ -174,6 +180,12 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
   const upcomingVenues = getUniqueValues(
     upcomingEvents.map((event) => `${event.prefecture}\t${event.venue}`),
   ).slice(0, 2);
+  const upcomingMonthKeys = getUniqueValues(
+    upcomingEvents.map((event) => getEventMonthKey(event.date)),
+  ).slice(0, 2);
+  const upcomingGenres = getUniqueValues(
+    upcomingEvents.flatMap((event) => event.genres),
+  ).slice(0, 2);
   const nextEvent = upcomingEvents[0];
   const upcomingEventsByDate = groupEventsByDate(upcomingEvents);
   const pastEventsByDate = groupEventsByDate(pastEvents);
@@ -235,7 +247,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 {artist.name}のライブを探す
               </h2>
               <p className={styles.sectionLead}>
-                次回公演、地域、会場から関連するライブへ進めます。
+                次回公演だけでなく、同じ時期・地域・ジャンルのライブへ進めます。
               </p>
             </div>
           </div>
@@ -273,6 +285,32 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
                 <span className={styles.discoveryCardLabel}>地域</span>
                 <strong>{prefecture}のライブ</strong>
                 <span>{artist.name}の掲載公演あり</span>
+              </Link>
+            ))}
+
+            {upcomingMonthKeys.map((monthKey) => (
+              <Link
+                className={styles.discoveryCard}
+                href={`/months/${monthKey}`}
+                key={monthKey}
+                prefetch={false}
+              >
+                <span className={styles.discoveryCardLabel}>月別</span>
+                <strong>{formatCalendarMonth(monthKey)}</strong>
+                <span>同じ月のメタルライブを確認</span>
+              </Link>
+            ))}
+
+            {upcomingGenres.map((genre) => (
+              <Link
+                className={styles.discoveryCard}
+                href={`/genres/${getGenreSlug(genre)}`}
+                key={genre}
+                prefetch={false}
+              >
+                <span className={styles.discoveryCardLabel}>ジャンル</span>
+                <strong>{genre}</strong>
+                <span>近いジャンルのライブを探す</span>
               </Link>
             ))}
 
@@ -314,17 +352,22 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
       </section>
 
       {pastDates.length > 0 && (
-        <section className={styles.recentSection}>
-          <h2 className={styles.sectionTitle}>過去のライブ</h2>
-          <div className={styles.dateGroups}>
-            {pastDates.map((date) => (
-              <EventDateGroup
-                date={date}
-                events={pastEventsByDate[date]}
-                key={date}
-              />
-            ))}
-          </div>
+        <section className={`${styles.recentSection} ${styles.pastEventsSection}`}>
+          <details className={styles.pastEventsDisclosure}>
+            <summary>
+              <span className={styles.sectionTitle}>過去のライブ</span>
+              <span>{pastEvents.length}件</span>
+            </summary>
+            <div className={styles.dateGroups}>
+              {pastDates.map((date) => (
+                <EventDateGroup
+                  date={date}
+                  events={pastEventsByDate[date]}
+                  key={date}
+                />
+              ))}
+            </div>
+          </details>
         </section>
       )}
 

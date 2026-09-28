@@ -3,7 +3,12 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { events } from "../../../data/events";
 import { getArtistSlug } from "../../../utils/artists";
-import { formatEventDate, isPastEventDate } from "../../../utils/date";
+import {
+  formatCalendarMonth,
+  formatEventDate,
+  getEventMonthKey,
+  isPastEventDate,
+} from "../../../utils/date";
 import {
   eventLinkLabels,
   formatArtists,
@@ -18,6 +23,7 @@ import {
   getYoutubeSearchUrl,
 } from "../../../utils/eventLinks";
 import { getRelatedEventCandidates } from "../../../utils/events";
+import { getGenreSlug } from "../../../utils/genres";
 import { getPrefectureSlug } from "../../../utils/prefectures";
 import { getVenueSlug } from "../../../utils/venues";
 import { SiteAnalytics } from "../../Analytics";
@@ -47,10 +53,10 @@ function formatEventPageTitle(event: NonNullable<ReturnType<typeof findEvent>>) 
   const location = event.prefecture.replace(/都|府|県$/, "");
 
   if (event.isInternational) {
-    return `${primaryArtist} ${location}来日公演 ${formatEventDate(event.date)} | チケット・会場`;
+    return `${primaryArtist} ${location}来日公演 ${formatEventDate(event.date)} | チケット・関連ライブ`;
   }
 
-  return `${primaryArtist} ${location}公演 ${formatEventDate(event.date)} | チケット・会場`;
+  return `${primaryArtist} ${location}公演 ${formatEventDate(event.date)} | チケット・関連ライブ`;
 }
 
 function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -69,7 +75,7 @@ function formatEventPageDescription(event: NonNullable<ReturnType<typeof findEve
 
   return `${eventTypeText}${supportText}${event.tourName}は${formatEventDate(
     event.date,
-  )}、${event.prefecture}の${event.venue}で開催。${ticketText}公式情報、会場情報、関連ライブを掲載しています。`;
+  )}、${event.prefecture}の${event.venue}で開催。${ticketText}公式情報、会場情報に加えて、同じ時期・地域・ジャンルの関連ライブも探せます。`;
 }
 
 function getSchemaEventStatus(event: NonNullable<ReturnType<typeof findEvent>>) {
@@ -262,8 +268,18 @@ function EventDiscoveryLinks({
     href: `/artists/${encodeURIComponent(getArtistSlug(artist))}`,
     label: `${artist}のライブ`,
   }));
+  const monthKey = getEventMonthKey(event.date);
+  const genreLinks = event.genres.slice(0, 2).map((genre) => ({
+    href: `/genres/${getGenreSlug(genre)}`,
+    label: `${genre}のライブ`,
+  }));
   const links = [
     ...artistLinks,
+    {
+      href: `/months/${monthKey}`,
+      label: `${formatCalendarMonth(monthKey)}のライブ`,
+    },
+    ...genreLinks,
     {
       href: `/venues/${encodeURIComponent(
         getVenueSlug(event.prefecture, event.venue),
