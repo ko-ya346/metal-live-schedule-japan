@@ -9,6 +9,7 @@ on:
 permissions:
   contents: write
   issues: write
+  pull-requests: write
 
 jobs:
   collect:
@@ -42,12 +43,52 @@ jobs:
             exit 0
           fi
 
+          branch_name="automated-candidates-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
+          git switch -c "$branch_name"
           git add src/data/candidate_events.ts
           git commit -m "Add automated candidate events"
-          git push
+          git push -u origin "$branch_name"
           echo "committed=true" >> "$GITHUB_OUTPUT"
+          echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
+
+      - name: Create candidate review pull request
+        id: candidate_pr
+        if: steps.candidate_commit.outputs.committed == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          today="$(TZ=Asia/Tokyo date +%Y-%m-%d)"
+
+          {
+            echo "## 概要"
+            echo
+            echo "自動収集で候補イベントが追加されました。"
+            echo "本番データへ直接反映せず、PR上で差分を確認してからマージします。"
+            echo
+            echo "## 確認場所"
+            echo
+            echo "- /admin/candidates?status=review_needed"
+            echo
+            echo "## 今回追加された候補"
+            echo
+            cat candidate-report.md
+            echo
+            echo "## 確認"
+            echo
+            echo "- npm run data:validate"
+          } > candidate-pr.md
+
+          pr_url="$(gh pr create \
+            --repo "$GH_REPO" \
+            --base main \
+            --head "${{ steps.candidate_commit.outputs.branch_name }}" \
+            --title "候補イベントを追加する ${today}" \
+            --body-file candidate-pr.md)"
+
+          echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
 
       - name: Close older candidate review issues
         if: steps.candidate_commit.outputs.committed == 'true'
@@ -77,7 +118,11 @@ jobs:
           {
             echo "# 候補イベントの確認"
             echo
-            echo "自動収集で候補イベントが追加されました。この issue は通知用です。レビューは /admin/candidates だけで行います。"
+            echo "自動収集で候補イベントが追加されました。この issue は通知用です。レビューは /admin/candidates とPR差分で行います。"
+            echo
+            echo "## PR"
+            echo
+            echo "- ${{ steps.candidate_pr.outputs.pr_url }}"
             echo
             echo "## 確認場所"
             echo
@@ -87,7 +132,7 @@ jobs:
             echo
             echo "- \`review_needed\` の候補を確認する"
             echo "- 公開するものは「公開」、対象外は「無視」にする"
-            echo "- 反映後に push する"
+            echo "- PRの差分を確認して、問題なければマージする"
             echo "- 確認が終わったらこの issue を close する"
             echo
             echo "## 今回追加された候補"
