@@ -353,16 +353,21 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
 
       {pastDates.length > 0 && (
         <section className={`${styles.recentSection} ${styles.pastEventsSection}`}>
-          <h2 className={styles.sectionTitle}>過去のライブ</h2>
-          <div className={styles.dateGroups}>
-            {pastDates.map((date) => (
-              <EventDateGroup
-                date={date}
-                events={pastEventsByDate[date]}
-                key={date}
-              />
-            ))}
-          </div>
+          <details className={styles.pastEventsDisclosure}>
+            <summary>
+              <span className={styles.sectionTitle}>過去のライブ</span>
+              <span>{pastEvents.length}件</span>
+            </summary>
+            <div className={styles.dateGroups}>
+              {pastDates.map((date) => (
+                <EventDateGroup
+                  date={date}
+                  events={pastEventsByDate[date]}
+                  key={date}
+                />
+              ))}
+            </div>
+          </details>
         </section>
       )}
 

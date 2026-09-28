@@ -812,6 +812,46 @@
   opacity: 0.78;
 }
 
+.pastEventsDisclosure {
+  display: grid;
+  gap: 12px;
+}
+
+.pastEventsDisclosure summary {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  padding: 10px 0;
+  border-top: 1px solid #303030;
+  border-bottom: 1px solid #303030;
+  color: #b9b9b3;
+  cursor: pointer;
+  list-style: none;
+}
+
+.pastEventsDisclosure summary::-webkit-details-marker {
+  display: none;
+}
+
+.pastEventsDisclosure summary::after {
+  content: "開く";
+  flex: 0 0 auto;
+  color: #ff6b6b;
+  font-size: 0.78rem;
+  font-weight: 800;
+}
+
+.pastEventsDisclosure[open] summary::after {
+  content: "閉じる";
+}
+
+.pastEventsDisclosure summary span:last-child {
+  margin-left: auto;
+  font-size: 0.84rem;
+  font-weight: 800;
+}
+
 .pastEventsSection .dateGroups {
   gap: 18px;
 }
