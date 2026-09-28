@@ -520,16 +520,7 @@ export default async function EventPage({ params }: EventPageProps) {
         <section className={styles.eventSourceSection}>
           <h2>情報の確認</h2>
           <p>最終更新日: {updatedDate ?? "未掲載"}</p>
-          {event.officialUrl ? (
-            <p>
-              公式情報:{" "}
-              <a href={event.officialUrl} target="_blank" rel="noreferrer">
-                公式サイトを確認する
-              </a>
-            </p>
-          ) : (
-            <p>公式情報: 未掲載</p>
-          )}
+          <p>公式情報: {event.officialUrl ? "掲載あり" : "未掲載"}</p>
           {ticketLinks.length > 0 ? (
             <p>
               チケット購入先:{" "}

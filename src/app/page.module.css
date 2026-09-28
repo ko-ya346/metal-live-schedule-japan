@@ -33,7 +33,7 @@
 
 .subpageHeader {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1fr);
   gap: 14px;
   align-items: end;
   padding: 16px 18px;
@@ -44,6 +44,10 @@
     linear-gradient(135deg, rgb(226 50 50 / 0.12), transparent 40%),
     #111111;
   box-shadow: 0 12px 28px rgb(0 0 0 / 0.38);
+}
+
+.subpageHeader > * {
+  min-width: 0;
 }
 
 .subpageHeader .summary {
