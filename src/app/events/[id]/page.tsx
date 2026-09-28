@@ -400,10 +400,6 @@ export default async function EventPage({ params }: EventPageProps) {
           __html: JSON.stringify(eventStructuredData).replace(/</g, "\\u003c"),
         }}
       />
-      <Link className={styles.eventBackLink} href="/">
-        {eventLinkLabels.allEvents}
-      </Link>
-
       <header className={`${styles.header} ${styles.subpageHeader}`}>
         <p className={styles.kicker}>Event</p>
         <h1>
