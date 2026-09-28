@@ -352,7 +352,7 @@ export default async function ArtistPage({ params }: ArtistPageProps) {
       </section>
 
       {pastDates.length > 0 && (
-        <section className={styles.recentSection}>
+        <section className={`${styles.recentSection} ${styles.pastEventsSection}`}>
           <h2 className={styles.sectionTitle}>過去のライブ</h2>
           <div className={styles.dateGroups}>
             {pastDates.map((date) => (

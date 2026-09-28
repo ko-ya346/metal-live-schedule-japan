@@ -807,6 +807,42 @@
   margin-bottom: 34px;
 }
 
+.pastEventsSection {
+  margin-top: 8px;
+  opacity: 0.78;
+}
+
+.pastEventsSection .dateGroups {
+  gap: 18px;
+}
+
+.pastEventsSection .dateGroup {
+  gap: 8px;
+}
+
+.pastEventsSection .dateHeading {
+  padding-bottom: 6px;
+  border-bottom-width: 1px;
+  color: #d0d0ca;
+  font-size: 1rem;
+}
+
+.pastEventsSection .eventList {
+  gap: 6px;
+}
+
+.pastEventsSection .eventCard {
+  gap: 6px;
+  padding: 9px 11px;
+  border-left-width: 2px;
+  background: #131313;
+  box-shadow: none;
+}
+
+.pastEventsSection .artist {
+  font-size: 0.92rem;
+}
+
 .sectionLead {
   max-width: 44rem;
   margin: 8px 0 0;
