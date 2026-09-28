@@ -48,6 +48,7 @@ LLM向けの短い作業コンテキストは [`llms.txt`](llms.txt) と [`docs/
 
 開発サーバーで `/admin/candidates` を開くと、新規イベント候補と公開済みイベントの更新候補を確認できます。
 
+- 画面上部で `新規候補の要確認` と `更新候補の要確認` を切り替えます。
 - 候補の出演者、日付、会場、URL、メモをブラウザで編集できます。
 - `保存` は `src/data/candidate_events.ts` を更新します。
 - `ignore` は候補を `reviewStatus: "ignored"` にします。

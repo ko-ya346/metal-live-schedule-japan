@@ -21,12 +21,19 @@ export const metadata: Metadata = {
 type AdminCandidatesPageProps = {
   searchParams?: Promise<{
     adminMessage?: string;
+    queue?: string;
     status?: string;
   }>;
 };
 
+type ReviewQueue = "new" | "updates";
+
 function isCandidateEventStatus(value: unknown): value is CandidateEventStatus {
   return value === "review_needed" || value === "published" || value === "ignored";
+}
+
+function isReviewQueue(value: unknown): value is ReviewQueue {
+  return value === "new" || value === "updates";
 }
 
 export default async function AdminCandidatesPage({
@@ -34,10 +41,18 @@ export default async function AdminCandidatesPage({
 }: AdminCandidatesPageProps) {
   const resolvedSearchParams = await searchParams;
   const adminMessage = resolvedSearchParams?.adminMessage;
+  const requestedQueue = resolvedSearchParams?.queue;
   const requestedStatus = resolvedSearchParams?.status;
+  const selectedQueue = isReviewQueue(requestedQueue) ? requestedQueue : "new";
   const selectedStatus = isCandidateEventStatus(requestedStatus)
     ? requestedStatus
     : "review_needed";
+  const newReviewNeededCount = candidateEvents.filter(
+    (candidate) => candidate.reviewStatus === "review_needed",
+  ).length;
+  const updateReviewNeededCount = eventUpdateCandidates.filter(
+    (candidate) => candidate.reviewStatus === "review_needed",
+  ).length;
 
   return (
     <main className={styles.page}>
@@ -51,6 +66,22 @@ export default async function AdminCandidatesPage({
 
       <section className={adminStyles.adminCopyQueue}>
         <div className={adminStyles.adminLinkRow}>
+          <Link
+            className={`${adminStyles.adminStatusButton} ${
+              selectedQueue === "new" ? adminStyles.activeAdminStatusButton : ""
+            }`}
+            href="/admin/candidates?queue=new&status=review_needed"
+          >
+            新規候補の要確認 ({newReviewNeededCount})
+          </Link>
+          <Link
+            className={`${adminStyles.adminStatusButton} ${
+              selectedQueue === "updates" ? adminStyles.activeAdminStatusButton : ""
+            }`}
+            href="/admin/candidates?queue=updates"
+          >
+            更新候補の要確認 ({updateReviewNeededCount})
+          </Link>
           <Link className={styles.secondaryLink} href="/admin/events">
             公開イベント管理へ
           </Link>
@@ -60,17 +91,19 @@ export default async function AdminCandidatesPage({
         </div>
       </section>
 
-      <CandidatesReview
-        candidates={candidateEvents}
-        initialStatusMessage={adminMessage}
-        publishedEvents={publishedEvents}
-        selectedStatus={selectedStatus}
-      />
-
-      <UpdatesReview
-        events={publishedEvents}
-        updateCandidates={eventUpdateCandidates}
-      />
+      {selectedQueue === "new" ? (
+        <CandidatesReview
+          candidates={candidateEvents}
+          initialStatusMessage={adminMessage}
+          publishedEvents={publishedEvents}
+          selectedStatus={selectedStatus}
+        />
+      ) : (
+        <UpdatesReview
+          events={publishedEvents}
+          updateCandidates={eventUpdateCandidates}
+        />
+      )}
     </main>
   );
 }
