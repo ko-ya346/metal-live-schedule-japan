@@ -75,6 +75,9 @@ const bodyCharLimit = Number(args.get("body-chars") ?? (isCompactPrompt ? "450" 
 const maxSnippets = Number(args.get("max-snippets") ?? "6");
 const snippetCharLimit = Number(args.get("snippet-chars") ?? "180");
 const knownSummaryLimit = Number(args.get("known-limit") ?? "16");
+const fetchTimeoutMs = Number(args.get("fetch-timeout-ms") ?? "25000");
+const fetchRetryCount = Number(args.get("fetch-retries") ?? "3");
+const retryBaseDelayMs = Number(args.get("fetch-retry-delay-ms") ?? "1500");
 const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
 const apiKey = process.env.OPENAI_API_KEY || "";
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
@@ -128,6 +131,33 @@ function truncateText(value, maxLength) {
   }
 
   return `${text.slice(0, maxLength - 1).trim()}…`;
+}
+
+function delay(ms) {
+  return new Promise((resolve) => {
+    setTimeout(resolve, ms);
+  });
+}
+
+function getRetryDelay(attempt) {
+  return retryBaseDelayMs * attempt;
+}
+
+function isRetryableFetchError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  const statusMatch = message.match(/^HTTP (\d{3})$/);
+
+  if (statusMatch) {
+    const status = Number(statusMatch[1]);
+    return status === 408 || status === 429 || status >= 500;
+  }
+
+  return (
+    error?.name === "AbortError" ||
+    message.includes("timeout") ||
+    message.includes("aborted") ||
+    message.includes("fetch failed")
+  );
 }
 
 function extractMetaContent(html, name) {
@@ -514,25 +544,40 @@ function scoreResearchEntry(section, entry) {
 }
 
 async function fetchHtml(url) {
-  const controller = new AbortController();
-  const timeout = setTimeout(() => controller.abort(), 15000);
+  let lastError;
 
-  try {
-    const response = await fetch(url, {
-      signal: controller.signal,
-      headers: {
-        "User-Agent": "MetalsCalendarResearchBot/0.2 (+https://metalscalendar.com)",
-      },
-    });
+  for (let attempt = 1; attempt <= fetchRetryCount; attempt += 1) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), fetchTimeoutMs);
 
-    if (!response.ok) {
-      throw new Error(`HTTP ${response.status}`);
+    try {
+      const response = await fetch(url, {
+        signal: controller.signal,
+        headers: {
+          "User-Agent": "MetalsCalendarResearchBot/0.2 (+https://metalscalendar.com)",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return response.text();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt >= fetchRetryCount || !isRetryableFetchError(error)) {
+        break;
+      }
+
+      await delay(getRetryDelay(attempt));
+    } finally {
+      clearTimeout(timeout);
     }
-
-    return response.text();
-  } finally {
-    clearTimeout(timeout);
   }
+
+  const message = lastError instanceof Error ? lastError.message : "fetch failed";
+  throw new Error(`${message} after ${fetchRetryCount} attempts`);
 }
 
 const eventContextKeywords = [
