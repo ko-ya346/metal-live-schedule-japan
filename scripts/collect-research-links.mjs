@@ -146,6 +146,9 @@ const regionLabels = {
 };
 
 const regionOrder = ["nationwide", "kanto", "kansai", "tokai", "other"];
+const fetchTimeoutMs = Number(process.env.RESEARCH_FETCH_TIMEOUT_MS ?? "25000");
+const fetchRetryCount = Number(process.env.RESEARCH_FETCH_RETRIES ?? "3");
+const retryBaseDelayMs = Number(process.env.RESEARCH_FETCH_RETRY_DELAY_MS ?? "1500");
 
 const includeKeywords = [
   "metal",
@@ -230,6 +233,27 @@ function delay(ms) {
   return new Promise((resolve) => {
     setTimeout(resolve, ms);
   });
+}
+
+function getRetryDelay(attempt) {
+  return retryBaseDelayMs * attempt;
+}
+
+function isRetryableFetchError(error) {
+  const message = error instanceof Error ? error.message : String(error);
+  const statusMatch = message.match(/^HTTP (\d{3})$/);
+
+  if (statusMatch) {
+    const status = Number(statusMatch[1]);
+    return status === 408 || status === 429 || status >= 500;
+  }
+
+  return (
+    error?.name === "AbortError" ||
+    message.includes("timeout") ||
+    message.includes("aborted") ||
+    message.includes("fetch failed")
+  );
 }
 
 function decodeHtml(value) {
@@ -318,18 +342,35 @@ function getKnownUrls() {
 }
 
 async function fetchHtml(url) {
-  const response = await fetch(url, {
-    signal: AbortSignal.timeout(12000),
-    headers: {
-      "User-Agent": "MetalsCalendarResearchBot/0.1 (+https://metalscalendar.com)",
-    },
-  });
+  let lastError;
 
-  if (!response.ok) {
-    throw new Error(`HTTP ${response.status}`);
+  for (let attempt = 1; attempt <= fetchRetryCount; attempt += 1) {
+    try {
+      const response = await fetch(url, {
+        signal: AbortSignal.timeout(fetchTimeoutMs),
+        headers: {
+          "User-Agent": "MetalsCalendarResearchBot/0.1 (+https://metalscalendar.com)",
+        },
+      });
+
+      if (!response.ok) {
+        throw new Error(`HTTP ${response.status}`);
+      }
+
+      return response.text();
+    } catch (error) {
+      lastError = error;
+
+      if (attempt >= fetchRetryCount || !isRetryableFetchError(error)) {
+        break;
+      }
+
+      await delay(getRetryDelay(attempt));
+    }
   }
 
-  return response.text();
+  const message = lastError instanceof Error ? lastError.message : "Unknown error";
+  throw new Error(`${message} after ${fetchRetryCount} attempts`);
 }
 
 async function collectSource(source, knownUrls, globalSeenUrls) {

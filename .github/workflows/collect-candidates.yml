@@ -23,6 +23,24 @@ jobs:
         with:
           node-version: 24
 
+      - name: Prepare candidate branch
+        id: candidate_branch
+        run: |
+          branch_name="automated-candidates"
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git fetch origin main
+
+          if git ls-remote --exit-code --heads origin "$branch_name" > /dev/null 2>&1; then
+            git fetch origin "$branch_name:$branch_name"
+            git switch "$branch_name"
+            git rebase origin/main
+          else
+            git switch -c "$branch_name"
+          fi
+
+          echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
+
       - name: Collect research links
         run: npm run research:links > research-links.md
 
@@ -43,13 +61,10 @@ jobs:
             exit 0
           fi
 
-          branch_name="automated-candidates-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
-          git config user.name "github-actions[bot]"
-          git config user.email "github-actions[bot]@users.noreply.github.com"
-          git switch -c "$branch_name"
+          branch_name="${{ steps.candidate_branch.outputs.branch_name }}"
           git add src/data/candidate_events.ts
           git commit -m "Add automated candidate events"
-          git push -u origin "$branch_name"
+          git push --force-with-lease -u origin "$branch_name"
           echo "committed=true" >> "$GITHUB_OUTPUT"
           echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
 
@@ -81,12 +96,26 @@ jobs:
             echo "- npm run data:validate"
           } > candidate-pr.md
 
-          pr_url="$(gh pr create \
+          pr_url="$(gh pr list \
             --repo "$GH_REPO" \
-            --base main \
+            --state open \
             --head "${{ steps.candidate_commit.outputs.branch_name }}" \
-            --title "候補イベントを追加する ${today}" \
-            --body-file candidate-pr.md)"
+            --json url \
+            --jq '.[0].url // ""')"
+
+          if [ -n "$pr_url" ]; then
+            gh pr edit "$pr_url" \
+              --repo "$GH_REPO" \
+              --title "候補イベントを追加する ${today}" \
+              --body-file candidate-pr.md
+          else
+            pr_url="$(gh pr create \
+              --repo "$GH_REPO" \
+              --base main \
+              --head "${{ steps.candidate_commit.outputs.branch_name }}" \
+              --title "候補イベントを追加する ${today}" \
+              --body-file candidate-pr.md)"
+          fi
 
           echo "pr_url=$pr_url" >> "$GITHUB_OUTPUT"
 

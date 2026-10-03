@@ -163,11 +163,11 @@ export const crawlTargets: CrawlTarget[] = [
         id: "shinsaibashi-clapper",
         name: "心斎橋CLAPPER",
         type: "venue",
-        url: "https://club-clapper.com/schedule/",
+        url: "https://clapper.jp/data/",
         region: "kansai",
         enabled: true,
         priority: "medium",
-        notes: "大阪のメタル、ラウド、ハードコア系小規模公演を拾う。",
+        notes: "大阪のメタル、ラウド、ハードコア系小規模公演を拾う。公式SCHEDULEページ。",
         lastCheckedAt: null,
     },
     {
