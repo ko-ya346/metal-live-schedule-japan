@@ -7162,10 +7162,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "amass live news",
         confidence: "medium",
         eventStatus: "scheduled",
-        reviewStatus: "published",
-        reviewNotes: "10月24日・25日に横浜で開催される大型メタルフェス。出演者多数。公式サイトあり。日付は2日間だが詳細なタイムテーブルは要確認。",
+        reviewStatus: "ignored",
+        reviewNotes: "Day1/Day2の個別イベントを正として公開済みのため、2日通し候補は重複として除外。",
         collectedAt: "2026-08-04",
-        reviewedAt: "2026-08-08",
+        reviewedAt: "2026-10-03",
     },
 
     {
