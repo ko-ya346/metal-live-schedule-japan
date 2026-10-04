@@ -11,14 +11,36 @@ export type DiscoveryPick = {
 
 export const discoveryPicks: DiscoveryPick[] = [
   {
-    artistName: "AMORPHIS",
-    genre: "Melodic Death Metal / Progressive Metal",
+    artistName: "MICHAEL SCHENKER GROUP",
+    genre: "Hard Rock / Heavy Metal",
     description:
-      "北欧らしいメロディと重さを、フォーク感やプログレッシブな展開で聴かせるバンド。",
-    recommendedFor: "激しさだけでなく、歌心や物語性もほしい人に。",
+      "叙情的で歌うようなギターと王道ハードロックの熱量を味わえる、レジェンド級のプロジェクト。",
+    recommendedFor: "ギター主役のハードロックや、クラシックなメタルの高揚感が好きな人に。",
     firstListen: {
-      label: "The Bee",
-      url: "https://www.youtube.com/results?search_query=AMORPHIS+The+Bee",
+      label: "Armed and Ready",
+      url: "https://www.youtube.com/results?search_query=MICHAEL+SCHENKER+GROUP+Armed+and+Ready",
+    },
+  },
+  {
+    artistName: "STRATOVARIUS",
+    genre: "Power Metal",
+    description:
+      "透明感のあるメロディ、疾走するリズム、シンフォニックな広がりが魅力の北欧パワーメタル代表格。",
+    recommendedFor: "明るくドラマチックなメロディと、伸びやかなサビを求める人に。",
+    firstListen: {
+      label: "Hunting High and Low",
+      url: "https://www.youtube.com/results?search_query=STRATOVARIUS+Hunting+High+and+Low",
+    },
+  },
+  {
+    artistName: "POWERWOLF",
+    genre: "Power Metal / Heavy Metal",
+    description:
+      "荘厳なコーラス、分かりやすいサビ、ライブで映える演出を武器にするドイツのパワーメタルバンド。",
+    recommendedFor: "初見でも乗りやすいメタル、合唱できるサビ、祝祭感のあるライブが好きな人に。",
+    firstListen: {
+      label: "We Drink Your Blood",
+      url: "https://www.youtube.com/results?search_query=POWERWOLF+We+Drink+Your+Blood",
     },
   },
   {
@@ -30,28 +52,6 @@ export const discoveryPicks: DiscoveryPick[] = [
     firstListen: {
       label: "When Destinies Align",
       url: "https://www.youtube.com/results?search_query=LOVEBITES+When+Destinies+Align",
-    },
-  },
-  {
-    artistName: "CARCASS",
-    genre: "Death Metal / Grindcore",
-    description:
-      "デスメタルとグラインドコアを出発点に、鋭いリフと冷たいメロディで聴かせる英国のバンド。",
-    recommendedFor: "速さ、重さ、切れ味のあるギターリフを浴びたい人に。",
-    firstListen: {
-      label: "Heartwork",
-      url: "https://www.youtube.com/results?search_query=CARCASS+Heartwork",
-    },
-  },
-  {
-    artistName: "BEAST IN BLACK",
-    genre: "Power Metal / Heavy Metal",
-    description:
-      "きらびやかなシンセと大きなサビ、疾走感のあるメタルを押し出すフィンランドのバンド。",
-    recommendedFor: "キャッチーで派手なメロディと、ライブ映えする高揚感がほしい人に。",
-    firstListen: {
-      label: "Blind and Frozen",
-      url: "https://www.youtube.com/results?search_query=BEAST+IN+BLACK+Blind+and+Frozen",
     },
   },
 ];
