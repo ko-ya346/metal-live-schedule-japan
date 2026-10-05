@@ -1,0 +1,10 @@
+[Unit]
+Description=Weekly Metals Calendar proposal-only pilot
+
+[Timer]
+OnCalendar=Sun *-*-* 05:00:00 Asia/Tokyo
+Persistent=false
+Unit=metals-review.service
+
+[Install]
+WantedBy=timers.target

@@ -1,0 +1,14 @@
+[Unit]
+Description=Metals Calendar proposal-only review pilot
+After=network-online.target ollama.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/.local/share/metals-calendar/repo
+Environment=PATH=%h/.local/share/metals-calendar/runtime/node/bin:/usr/bin:/bin
+Environment=SITE_REVIEW_LLM_MODEL=metals-review:8b
+EnvironmentFile=-%h/.config/metals-calendar/review.env
+ExecStart=%h/.local/share/metals-calendar/runtime/node/bin/node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/ubuntu-review.ts review
+TimeoutStartSec=25min
+UMask=0077
+NoNewPrivileges=true
