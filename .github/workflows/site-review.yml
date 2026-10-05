@@ -1,0 +1,66 @@
+name: Daily site review
+
+on:
+  workflow_dispatch:
+  schedule:
+    # 08:30 JST every day.
+    - cron: "30 23 * * *"
+
+permissions:
+  contents: read
+  issues: write
+
+jobs:
+  review:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 24
+
+      - name: Install Ollama
+        run: curl -fsSL https://ollama.com/install.sh | sh
+
+      - name: Start Ollama
+        run: |
+          ollama serve > ollama.log 2>&1 &
+          sleep 5
+
+      - name: Pull review model
+        env:
+          SITE_REVIEW_LLM_MODEL: ${{ vars.SITE_REVIEW_LLM_MODEL || 'qwen2.5:1.5b-instruct' }}
+        run: ollama pull "$SITE_REVIEW_LLM_MODEL"
+
+      - name: Run site review agent
+        id: site_review
+        env:
+          SITE_REVIEW_SITE_URL: ${{ vars.SITE_REVIEW_SITE_URL || 'https://metalscalendar.com' }}
+          SITE_REVIEW_LLM_BASE_URL: http://localhost:11434/v1
+          SITE_REVIEW_LLM_MODEL: ${{ vars.SITE_REVIEW_LLM_MODEL || 'qwen2.5:1.5b-instruct' }}
+        run: npm run site:review -- --output=site-review-report.md --json-output=site-review-result.json --github-output="$GITHUB_OUTPUT"
+
+      - name: Create review issue
+        if: steps.site_review.outputs.should_create_issue == 'true'
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          today="$(TZ=Asia/Tokyo date +%Y-%m-%d)"
+
+          {
+            echo "# AIサイトレビュー ${today}"
+            echo
+            echo "毎朝のAIサイトレビューで改善候補が見つかりました。"
+            echo "これは通知用のIssueです。実装する場合は別PRで対応します。"
+            echo
+            cat site-review-report.md
+          } > site-review-issue.md
+
+          gh issue create \
+            --repo "$GH_REPO" \
+            --title "AIサイトレビュー ${today}" \
+            --body-file site-review-issue.md
