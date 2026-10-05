@@ -21,56 +21,15 @@ import { PrefectureLink } from "./PrefectureLink";
 import { TrackedExternalLink } from "./TrackedExternalLink";
 import { VenueLink } from "./VenueLink";
 
-const lovebitesTowerRecordsAd = {
-  advertiser: "TOWER RECORDS",
-  artist: "LOVEBITES",
-  bannerUrl:
-    "//ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3783446&pid=892720990",
-  href:
-    "//ck.jp.ap.valuecommerce.com/servlet/referral?sid=3783446&pid=892720990&vc_url=https%3A%2F%2Ftower.jp%2Fartist%2F2575861",
-  label: "TOWER RECORDSでLOVEBITESの作品を見る",
-  placement: "event_card_lovebites",
-};
-
 type EventCardProps = {
   event: Event;
 };
-
-function hasLovebites(event: Event) {
-  return event.artists.some(
-    (artist) => artist.trim().toLocaleLowerCase() === "lovebites",
-  );
-}
-
-function trackAdClick(event: Event) {
-  if (typeof window === "undefined" || !window.gtag) {
-    return;
-  }
-
-  window.gtag("event", "ad_click", {
-    ad_artist: lovebitesTowerRecordsAd.artist,
-    ad_destination: lovebitesTowerRecordsAd.advertiser,
-    ad_label: lovebitesTowerRecordsAd.label,
-    ad_placement: lovebitesTowerRecordsAd.placement,
-    ad_url: lovebitesTowerRecordsAd.href,
-    artist_count: event.artists.length,
-    event_date: event.date,
-    event_id: event.id,
-    event_name: event.tourName,
-    is_international: event.isInternational,
-    prefecture: event.prefecture,
-    primary_artist: event.artists[0],
-    source_surface: "event_card",
-    venue: event.venue,
-  });
-}
 
 export function EventCard({ event }: EventCardProps) {
   const shouldShowSetlistLink = isPastEventDate(event.date);
   const shouldShowStatusBadge =
     event.status !== "scheduled" || shouldShowSetlistLink;
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
-  const shouldShowLovebitesAd = hasLovebites(event);
   const ticketLinks = getTicketLinks(event);
   const shouldCollapseTicketLinks = ticketLinks.length > 1;
   const primaryEventLinks = getPrimaryEventLinks(event);
@@ -253,26 +212,6 @@ export function EventCard({ event }: EventCardProps) {
           </Link>
         </div>
       </div>
-
-      {shouldShowLovebitesAd && (
-        <a
-          className={styles.eventAdLink}
-          href={lovebitesTowerRecordsAd.href}
-          onClick={() => trackAdClick(event)}
-          rel="nofollow sponsored noreferrer"
-          target="_blank"
-        >
-          <span className={styles.eventAdLabel}>PR</span>
-          <img
-            alt=""
-            aria-hidden="true"
-            height={1}
-            src={lovebitesTowerRecordsAd.bannerUrl}
-            width={0}
-          />
-          <span>{lovebitesTowerRecordsAd.label}</span>
-        </a>
-      )}
     </article>
   );
 }
