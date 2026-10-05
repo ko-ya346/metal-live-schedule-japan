@@ -56,3 +56,31 @@ Parameters:
 Use this custom event as the main metric for ticket/official outbound clicks.
 GA4 enhanced measurement may also record generic outbound clicks, so avoid mixing
 the two metrics when reviewing results.
+
+## Affiliate ad click event
+
+Affiliate ad links send this event:
+
+```text
+ad_click
+```
+
+Parameters:
+
+- `ad_artist`
+- `ad_destination`
+- `ad_label`
+- `ad_placement`
+- `ad_url`
+- `source_surface`
+- `event_id`
+- `event_name`
+- `event_date`
+- `primary_artist`
+- `artist_count`
+- `prefecture`
+- `venue`
+- `is_international`
+
+Use `ad_click` separately from `outbound_event_link_click` so ticket/official
+outbound metrics stay clean.
