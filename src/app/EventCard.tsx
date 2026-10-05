@@ -21,38 +21,50 @@ import { PrefectureLink } from "./PrefectureLink";
 import { TrackedExternalLink } from "./TrackedExternalLink";
 import { VenueLink } from "./VenueLink";
 
-const lovebitesTowerRecordsAd = {
-  advertiser: "TOWER RECORDS",
-  artist: "LOVEBITES",
-  bannerUrl:
-    "//ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3783446&pid=892720990",
-  href:
-    "//ck.jp.ap.valuecommerce.com/servlet/referral?sid=3783446&pid=892720990&vc_url=https%3A%2F%2Ftower.jp%2Fartist%2F2575861",
-  label: "TOWER RECORDSでLOVEBITESの作品を見る",
-  placement: "event_card_lovebites",
-};
+const towerRecordsAds = [
+  {
+    advertiser: "TOWER RECORDS",
+    artist: "LOVEBITES",
+    bannerUrl:
+      "//ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3783446&pid=892720990",
+    href:
+      "//ck.jp.ap.valuecommerce.com/servlet/referral?sid=3783446&pid=892720990&vc_url=https%3A%2F%2Ftower.jp%2Fartist%2F2575861",
+    label: "TOWER RECORDSでLOVEBITESの作品を見る",
+    placement: "event_card_lovebites",
+  },
+  {
+    advertiser: "TOWER RECORDS",
+    artist: "陰陽座",
+    bannerUrl:
+      "//ad.jp.ap.valuecommerce.com/servlet/gifbanner?sid=3783446&pid=892720990",
+    href:
+      "//ck.jp.ap.valuecommerce.com/servlet/referral?sid=3783446&pid=892720990&vc_url=https%3A%2F%2Ftower.jp%2Fartist%2F341387",
+    label: "TOWER RECORDSで陰陽座の作品を見る",
+    placement: "event_card_onmyoza",
+  },
+];
 
 type EventCardProps = {
   event: Event;
 };
 
-function hasLovebites(event: Event) {
-  return event.artists.some(
-    (artist) => artist.trim().toLocaleLowerCase() === "lovebites",
+function getEventArtistAd(event: Event) {
+  return towerRecordsAds.find((ad) =>
+    event.artists.some((artist) => artist.trim() === ad.artist),
   );
 }
 
-function trackAdClick(event: Event) {
+function trackAdClick(event: Event, ad: (typeof towerRecordsAds)[number]) {
   if (typeof window === "undefined" || !window.gtag) {
     return;
   }
 
   window.gtag("event", "ad_click", {
-    ad_artist: lovebitesTowerRecordsAd.artist,
-    ad_destination: lovebitesTowerRecordsAd.advertiser,
-    ad_label: lovebitesTowerRecordsAd.label,
-    ad_placement: lovebitesTowerRecordsAd.placement,
-    ad_url: lovebitesTowerRecordsAd.href,
+    ad_artist: ad.artist,
+    ad_destination: ad.advertiser,
+    ad_label: ad.label,
+    ad_placement: ad.placement,
+    ad_url: ad.href,
     artist_count: event.artists.length,
     event_date: event.date,
     event_id: event.id,
@@ -70,7 +82,7 @@ export function EventCard({ event }: EventCardProps) {
   const shouldShowStatusBadge =
     event.status !== "scheduled" || shouldShowSetlistLink;
   const shouldCollapseYoutubeLinks = event.artists.length > 1;
-  const shouldShowLovebitesAd = hasLovebites(event);
+  const artistAd = getEventArtistAd(event);
   const ticketLinks = getTicketLinks(event);
   const shouldCollapseTicketLinks = ticketLinks.length > 1;
   const primaryEventLinks = getPrimaryEventLinks(event);
@@ -254,11 +266,11 @@ export function EventCard({ event }: EventCardProps) {
         </div>
       </div>
 
-      {shouldShowLovebitesAd && (
+      {artistAd && (
         <a
           className={styles.eventAdLink}
-          href={lovebitesTowerRecordsAd.href}
-          onClick={() => trackAdClick(event)}
+          href={artistAd.href}
+          onClick={() => trackAdClick(event, artistAd)}
           rel="nofollow sponsored noreferrer"
           target="_blank"
         >
@@ -267,10 +279,10 @@ export function EventCard({ event }: EventCardProps) {
             alt=""
             aria-hidden="true"
             height={1}
-            src={lovebitesTowerRecordsAd.bannerUrl}
+            src={artistAd.bannerUrl}
             width={0}
           />
-          <span>{lovebitesTowerRecordsAd.label}</span>
+          <span>{artistAd.label}</span>
         </a>
       )}
     </article>
