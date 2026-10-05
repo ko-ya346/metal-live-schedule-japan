@@ -69,6 +69,16 @@ GitHub Actions は定期実行で Web 調査を行い、候補イベントだけ
 - レビュー場所は `/admin/candidates` に統一し、issue は確認が終わったら close します
 - 新しい通知 issue を作るとき、古い候補確認 issue は自動で close します
 
+## AIサイトレビュー
+
+GitHub Actions は毎朝、サイト構成・公開イベントデータ・直近の計測レポートを読み、改善候補がある場合だけ通知用 issue を作ります。
+
+- デフォルトではGitHub Actions内でOllamaを起動し、無料のオープンウェイトモデルを使います
+- コードや公開データは自動変更しません
+- 実装する場合は、人間が issue を確認して別PRで対応します
+
+詳しくは [`docs/site-review-agent.md`](docs/site-review-agent.md) を参照してください。
+
 ## ローカル確認
 
 ```bash

@@ -15,7 +15,8 @@
     "candidates:list": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/list-candidates.mjs",
     "candidates:new": "node scripts/new-candidate-template.mjs",
     "analytics:search-console": "node scripts/search-console-report.mjs",
-    "analytics:ga4": "node scripts/ga4-report.mjs"
+    "analytics:ga4": "node scripts/ga4-report.mjs",
+    "site:review": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/site-review-agent.mjs"
   },
   "dependencies": {
     "@vercel/analytics": "^2.0.1",
