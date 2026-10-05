@@ -1328,37 +1328,6 @@
   font-size: 0.78rem;
 }
 
-.eventAdLink {
-  display: inline-flex;
-  align-items: center;
-  justify-self: start;
-  gap: 7px;
-  min-width: 0;
-  color: #b9b9b3;
-  font-size: 0.78rem;
-  font-weight: 700;
-  line-height: 1.35;
-  text-decoration: none;
-}
-
-.eventAdLink:hover {
-  color: #ff6b6b;
-}
-
-.eventAdLabel {
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 18px;
-  padding: 0 6px;
-  border: 1px solid #454545;
-  border-radius: 999px;
-  color: #ff9999;
-  font-size: 0.68rem;
-  font-weight: 900;
-  line-height: 1;
-}
-
 .eventUtilityLinks {
   display: flex;
   align-items: center;
