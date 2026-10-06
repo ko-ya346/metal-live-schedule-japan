@@ -65,7 +65,7 @@ systemctl --user enable --now metals-review.timer
 ```
 
 認証設定は`~/.config/metals-calendar/review.env`（0600）へ`GH_TOKEN=...`形式で置ける。リポジトリ管理外とする。
-現在Linger=noのため、ログアウト後も定期実行するには`loginctl enable-linger`の設定が必要。既存ユーザーサービス全体に影響するので移行作業として確認する。
+移行準備で`loginctl enable-linger`を設定し、`Linger=yes`を確認済み。新しいサーバーへ移す場合は、ログアウト後も定期実行できるよう`loginctl show-user "$USER" -p Linger`で確認する。設定は既存ユーザーサービス全体に影響する。
 
 ## 失敗・復旧・停止
 
