@@ -12262,9 +12262,9 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "イープラス",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "アニメタルの日本公演。イープラス公式チケットページで日付・会場・チケット情報が確認できる。",
         collectedAt: "2026-10-06",
-        reviewedAt: null,
+        reviewedAt: "2026-10-08",
     },
 ];

@@ -9808,6 +9808,42 @@ const realEvents: Event[] = [
         publishedAt: "2026-10-06",
         updatedAt: "2026-10-06",
     },
+    {
+        id: "animetal-2026-11-06-kanagawa-club-citta",
+        artists: [
+            "アニメタル",
+        ],
+        tourName: "アニメタル",
+        date: "2026-11-06",
+        endDate: null,
+        prefecture: "神奈川県",
+        venue: "CLUB CITTA’",
+        genres: [
+            "Heavy Metal",
+            "Anime Metal",
+        ],
+        isInternational: false,
+        ticketUrl: "https://eplus.jp/sf/detail/4556770001-P0030003P021001",
+        ticketLinks: [
+                        {
+                provider: "eplus",
+                url: "https://eplus.jp/sf/detail/4556770001-P0030003P021001",
+                affiliateUrl: null,
+                saleStartsAt: "2026-08-23",
+                saleStatus: "on_sale",
+                saleEndsAt: "2026-11-04",
+                priority: 1,
+            },
+        ],
+        imageUrl: "https://eplus.jp/s/image/455677/0001/000/4556770001_1.jpg",
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: null,
+        status: "scheduled",
+        candidateCreatedAt: "2026-10-06",
+        publishedAt: "2026-10-08",
+        updatedAt: "2026-10-08",
+    },
 ];
 
 export const publishedEvents = realEvents;
