@@ -1,5 +1,7 @@
 "use client";
 
+import { useReviewSync } from "./ReviewSync";
+
 import Link from "next/link";
 import type { FormEvent, ReactNode } from "react";
 import { useMemo, useState } from "react";
@@ -18,7 +20,7 @@ type CandidatesReviewProps = {
 
 const statusLabels: Record<CandidateEventStatus, string> = {
   review_needed: "要確認",
-  published: "公開済み",
+  published: "採用済み",
   ignored: "対象外",
 };
 
@@ -312,11 +314,13 @@ function formDataToCandidate(
 async function postCandidateAction(
   action: "save" | "ignore" | "publish",
   candidate: CandidateEvent,
+  revision?: string,
 ) {
   const response = await fetch("/api/admin/candidates", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(revision ? { "x-review-revision": revision } : {}),
     },
     body: JSON.stringify({ action, candidate }),
   });
@@ -339,6 +343,7 @@ export function CandidatesReview({
   selectedStatus,
   initialStatusMessage = null,
 }: CandidatesReviewProps) {
+  const sync = useReviewSync();
   const [editableCandidates, setEditableCandidates] = useState<
     Record<string, CandidateEvent>
   >(() => Object.fromEntries(candidates.map((candidate) => [candidate.id, candidate])));
@@ -376,14 +381,16 @@ export function CandidatesReview({
     setPendingCandidateId(candidate.id);
 
     try {
-      const savedCandidate = await postCandidateAction(action, nextCandidate);
+      const savedCandidate = await (sync
+        ? sync.run(() => postCandidateAction(action, nextCandidate, sync.info.revision))
+        : postCandidateAction(action, nextCandidate));
       setEditableCandidates((currentCandidates) => ({
         ...currentCandidates,
         [savedCandidate.id]: savedCandidate,
       }));
       setStatusMessage(
         action === "publish"
-          ? `${savedCandidate.id} を公開しました`
+          ? `${savedCandidate.id} を採用しました`
           : action === "ignore"
             ? `${savedCandidate.id} を対象外にしました`
             : `${savedCandidate.id} を保存しました`,
@@ -423,12 +430,12 @@ export function CandidatesReview({
           <div>
             <h2>ローカル管理</h2>
             <p className={styles.summary}>
-              この画面の編集、ignore、公開はローカル開発サーバー上のデータファイルへ保存します。
+              {sync ? "確認結果を候補PRへ保存します。" : "この画面の編集、ignore、公開はローカル開発サーバー上のデータファイルへ保存します。"}
             </p>
           </div>
         </div>
         <p className={adminStyles.adminMutedText}>
-          本番環境では書き込みを無効にしています。操作後は `npm run build` で確認してください。
+          {sync ? "保存後に画面を更新します。PRのチェックが成功してからマージしてください。" : "本番環境では書き込みを無効にしています。操作後は npm run build で確認してください。"}
         </p>
         {statusMessage && (
           <p className={adminStyles.adminInlineStatus} role="status">
@@ -444,8 +451,8 @@ export function CandidatesReview({
           const isIgnored = candidate.reviewStatus === "ignored";
           const missingPublishFields = getMissingPublishFields(candidate);
           const canPublish = !isPublished && missingPublishFields.length === 0;
-          const publishButtonLabel = isIgnored ? "公開に戻す" : "公開する";
-          const isPending = pendingCandidateId === candidate.id;
+          const publishButtonLabel = sync ? "採用（マージ後に公開）" : isIgnored ? "公開に戻す" : "公開する";
+          const isPending = pendingCandidateId !== null || !!sync?.disabled;
 
           return (
             <article className={adminStyles.adminCandidateCard} key={candidate.id}>

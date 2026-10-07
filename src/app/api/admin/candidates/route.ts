@@ -1,3 +1,4 @@
+import { withReviewWrite } from "@/src/server/candidateReview";
 import { NextResponse } from "next/server";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -276,8 +277,8 @@ async function appendEventFile(candidate: CandidateEvent) {
   await writeFile(eventsPath, nextContent);
 }
 
-function normalizeCandidate(candidate: CandidateEvent, action: AdminAction) {
-  const currentCandidate = candidateEvents.find((item) => item.id === candidate.id);
+function normalizeCandidate(candidate: CandidateEvent, action: AdminAction, currentCandidates = candidateEvents) {
+  const currentCandidate = currentCandidates.find((item) => item.id === candidate.id);
 
   if (!currentCandidate) {
     throw new Error(`candidate not found: ${candidate.id}`);
@@ -327,7 +328,7 @@ function formValueToList(formData: FormData, key: string) {
     .filter(Boolean);
 }
 
-async function parseAdminCandidateRequest(request: Request) {
+async function parseAdminCandidateRequest(request: Request, currentCandidates = candidateEvents) {
   const contentType = request.headers.get("content-type") ?? "";
 
   if (contentType.includes("application/json")) {
@@ -340,7 +341,7 @@ async function parseAdminCandidateRequest(request: Request) {
   const formData = await request.formData();
   const action = formData.get("action");
   const candidateId = formData.get("candidateId");
-  const currentCandidate = candidateEvents.find(
+  const currentCandidate = currentCandidates.find(
     (candidate) => candidate.id === candidateId,
   );
 
@@ -374,12 +375,12 @@ async function parseAdminCandidateRequest(request: Request) {
   };
 }
 
-function getCandidateFromRequest(body: AdminCandidateRequest) {
+function getCandidateFromRequest(body: AdminCandidateRequest, currentCandidates = candidateEvents) {
   if (body.candidate) {
     return body.candidate;
   }
 
-  const currentCandidate = candidateEvents.find(
+  const currentCandidate = currentCandidates.find(
     (candidate) => candidate.id === body.candidateId,
   );
 
@@ -417,58 +418,57 @@ export async function POST(request: Request) {
     );
   }
 
-  try {
-    const { body, shouldRedirect } = await parseAdminCandidateRequest(request);
+  return withReviewWrite(request, async (snapshot) => {
+    try {
+      const currentCandidates = snapshot?.candidateEvents ?? candidateEvents;
+      const { body, shouldRedirect } = await parseAdminCandidateRequest(request, currentCandidates);
 
-    if (!isAdminAction(body.action)) {
-      throw new Error("invalid admin action");
-    }
+      if (!isAdminAction(body.action)) {
+        throw new Error("invalid admin action");
+      }
 
-    const requestCandidate = getCandidateFromRequest(body);
-    const candidate = normalizeCandidate(requestCandidate, body.action);
+      const requestCandidate = getCandidateFromRequest(body, currentCandidates);
+      const candidate = normalizeCandidate(requestCandidate, body.action, currentCandidates);
 
-    if (body.action === "publish") {
-      const missingPublishFields = getMissingPublishFields(candidate);
-      if (missingPublishFields.length > 0) {
+      if (body.action === "publish") {
+        const missingPublishFields = getMissingPublishFields(candidate);
+        if (missingPublishFields.length > 0) {
+          throw new Error(`${candidate.id}: ${missingPublishFields.join(" / ")} を埋めてください`);
+        }
+
+        await appendEventFile(candidate);
+      }
+
+      await updateCandidateFile(candidate);
+
+      if (shouldRedirect) {
         return redirectWithMessage(
           request,
-          `${candidate.id} は公開できません。${missingPublishFields.join(" / ")} を埋めてください`,
-          "review_needed",
+          body.action === "publish"
+            ? `${candidate.id} を公開しました`
+            : body.action === "ignore"
+              ? `${candidate.id} を対象外にしました`
+              : `${candidate.id} を保存しました`,
+          candidate.reviewStatus,
         );
       }
 
-      await appendEventFile(candidate);
-    }
-
-    await updateCandidateFile(candidate);
-
-    if (shouldRedirect) {
-      return redirectWithMessage(
-        request,
-        body.action === "publish"
-          ? `${candidate.id} を公開しました`
-          : body.action === "ignore"
-            ? `${candidate.id} を対象外にしました`
-            : `${candidate.id} を保存しました`,
-        candidate.reviewStatus,
+      return NextResponse.json({
+        candidate,
+        message:
+          body.action === "publish"
+            ? "published"
+            : body.action === "ignore"
+              ? "ignored"
+              : "saved",
+      });
+    } catch (error) {
+      return NextResponse.json(
+        {
+          error: error instanceof Error ? error.message : "Unknown admin error",
+        },
+        { status: 400 },
       );
     }
-
-    return NextResponse.json({
-      candidate,
-      message:
-        body.action === "publish"
-          ? "published"
-          : body.action === "ignore"
-            ? "ignored"
-            : "saved",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Unknown admin error",
-      },
-      { status: 400 },
-    );
-  }
+  });
 }
