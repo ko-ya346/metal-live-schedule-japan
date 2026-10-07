@@ -1,3 +1,5 @@
+import { reviewPageData } from "../../../server/candidateReview";
+import { ReviewSync } from "./ReviewSync";
 import type { Metadata } from "next";
 import Link from "next/link";
 import type { CandidateEventStatus } from "../../../data/candidates";
@@ -39,6 +41,10 @@ function isReviewQueue(value: unknown): value is ReviewQueue {
 export default async function AdminCandidatesPage({
   searchParams,
 }: AdminCandidatesPageProps) {
+  const snapshot = await reviewPageData();
+  const currentCandidates = snapshot?.data.candidateEvents ?? candidateEvents;
+  const currentUpdates = snapshot?.data.eventUpdateCandidates ?? eventUpdateCandidates;
+  const currentEvents = snapshot?.data.publishedEvents ?? publishedEvents;
   const resolvedSearchParams = await searchParams;
   const adminMessage = resolvedSearchParams?.adminMessage;
   const requestedQueue = resolvedSearchParams?.queue;
@@ -47,10 +53,10 @@ export default async function AdminCandidatesPage({
   const selectedStatus = isCandidateEventStatus(requestedStatus)
     ? requestedStatus
     : "review_needed";
-  const newReviewNeededCount = candidateEvents.filter(
+  const newReviewNeededCount = currentCandidates.filter(
     (candidate) => candidate.reviewStatus === "review_needed",
   ).length;
-  const updateReviewNeededCount = eventUpdateCandidates.filter(
+  const updateReviewNeededCount = currentUpdates.filter(
     (candidate) => candidate.reviewStatus === "review_needed",
   ).length;
 
@@ -82,28 +88,32 @@ export default async function AdminCandidatesPage({
           >
             更新候補の要確認 ({updateReviewNeededCount})
           </Link>
-          <Link className={styles.secondaryLink} href="/admin/events">
-            公開イベント管理へ
-          </Link>
+          {!snapshot && (
+            <Link className={styles.secondaryLink} href="/admin/events">
+              公開イベント管理へ
+            </Link>
+          )}
           <Link className={styles.secondaryLink} href="/">
             公開ページへ
           </Link>
         </div>
       </section>
 
-      {selectedQueue === "new" ? (
-        <CandidatesReview
-          candidates={candidateEvents}
-          initialStatusMessage={adminMessage}
-          publishedEvents={publishedEvents}
-          selectedStatus={selectedStatus}
-        />
-      ) : (
-        <UpdatesReview
-          events={publishedEvents}
-          updateCandidates={eventUpdateCandidates}
-        />
-      )}
+      <ReviewSync key={snapshot?.info?.revision} info={snapshot?.info ?? null} initialMessage={adminMessage}>
+        {selectedQueue === "new" ? (
+          <CandidatesReview
+            candidates={currentCandidates}
+            initialStatusMessage={snapshot ? null : adminMessage}
+            publishedEvents={currentEvents}
+            selectedStatus={selectedStatus}
+          />
+        ) : (
+          <UpdatesReview
+            events={currentEvents}
+            updateCandidates={currentUpdates}
+          />
+        )}
+      </ReviewSync>
     </main>
   );
 }

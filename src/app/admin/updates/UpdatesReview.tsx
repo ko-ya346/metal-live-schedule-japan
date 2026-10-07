@@ -1,5 +1,7 @@
 "use client";
 
+import { useReviewSync } from "../candidates/ReviewSync";
+
 import type { FormEvent } from "react";
 import { useMemo, useState } from "react";
 import type {
@@ -71,11 +73,13 @@ function parseProposedChanges(value: string) {
 async function postUpdateAction(
   action: AdminUpdateAction,
   candidate: EventUpdateCandidate,
+  revision?: string,
 ) {
   const response = await fetch("/api/admin/updates", {
     method: "POST",
     headers: {
       "Content-Type": "application/json",
+      ...(revision ? { "x-review-revision": revision } : {}),
     },
     body: JSON.stringify({ action, candidate }),
   });
@@ -96,6 +100,7 @@ export function UpdatesReview({
   events,
   updateCandidates,
 }: UpdatesReviewProps) {
+  const sync = useReviewSync();
   const [editableCandidates, setEditableCandidates] = useState<
     Record<string, EventUpdateCandidate>
   >(() => createUpdateMap(updateCandidates));
@@ -160,7 +165,9 @@ export function UpdatesReview({
     setPendingCandidateId(candidate.id);
 
     try {
-      const nextCandidate = await postUpdateAction(action, candidate);
+      const nextCandidate = await (sync
+        ? sync.run(() => postUpdateAction(action, candidate, sync.info.revision))
+        : postUpdateAction(action, candidate));
       updateCandidate(nextCandidate.id, nextCandidate);
       setStatusMessage(
         action === "apply"
@@ -215,7 +222,7 @@ export function UpdatesReview({
           <div>
             <h2>更新候補一覧</h2>
             <p className={styles.summary}>
-              公開済みイベントへの変更候補です。適用するまで公開データは変わりません。
+              {sync ? "適用した変更をPRに保存します。サイトへの反映はマージ後です。" : "公開済みイベントへの変更候補です。適用するまで公開データは変わりません。"}
             </p>
           </div>
         </div>
@@ -252,7 +259,7 @@ export function UpdatesReview({
       <div className={adminStyles.adminCandidateList}>
         {filteredCandidates.map((candidate) => {
           const event = findEvent(events, candidate.eventId);
-          const isPending = pendingCandidateId === candidate.id;
+          const isPending = pendingCandidateId !== null || !!sync?.disabled;
 
           return (
             <article className={adminStyles.adminCandidateCard} key={candidate.id}>
