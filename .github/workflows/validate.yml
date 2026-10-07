@@ -25,6 +25,9 @@ jobs:
       - name: Check UI copy
         run: npm run copy:check
 
+      - name: Check candidate review synchronization
+        run: npm run check:candidate-review
+
       - name: Validate data
         run: npm run data:validate
 

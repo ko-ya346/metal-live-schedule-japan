@@ -11,8 +11,31 @@ permissions:
   issues: write
   pull-requests: write
 
+concurrency:
+  group: candidate-collection
+  cancel-in-progress: false
+
 jobs:
+  pending:
+    runs-on: ubuntu-latest
+    outputs:
+      exists: ${{ steps.check.outputs.exists }}
+    steps:
+      - name: Wait for the current candidate review
+        id: check
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          exists="$(gh pr list --state open --base main --limit 100 --json headRefName --jq 'any(.[]; .headRefName | startswith("automated-candidates"))')"
+          echo "exists=$exists" >> "$GITHUB_OUTPUT"
+          if [ "$exists" = "true" ]; then
+            echo "Candidate review is pending; collection is skipped." >> "$GITHUB_STEP_SUMMARY"
+          fi
+
   collect:
+    needs: pending
+    if: needs.pending.outputs.exists == 'false'
     runs-on: ubuntu-latest
     steps:
       - name: Checkout
@@ -26,18 +49,12 @@ jobs:
       - name: Prepare candidate branch
         id: candidate_branch
         run: |
-          branch_name="automated-candidates"
+          branch_name="automated-candidates-${GITHUB_RUN_ID}-${GITHUB_RUN_ATTEMPT}"
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
           git fetch origin main
 
-          if git ls-remote --exit-code --heads origin "$branch_name" > /dev/null 2>&1; then
-            git fetch origin "$branch_name:$branch_name"
-            git switch "$branch_name"
-            git rebase origin/main
-          else
-            git switch -c "$branch_name"
-          fi
+          git switch -c "$branch_name" origin/main
 
           echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
 
@@ -50,8 +67,16 @@ jobs:
           OPENAI_MODEL: ${{ vars.OPENAI_MODEL }}
         run: npm run research:candidates -- --input=research-links.md --report=candidate-report.md --write
 
-      - name: Validate data
-        run: npm run data:validate
+      # GITHUB_TOKEN-created PRs do not trigger pull_request workflows.
+      # Validate here as well; later human-authenticated review pushes trigger PR CI.
+      - name: Install dependencies
+        run: npm ci
+
+      - name: Validate candidate PR
+        run: |
+          npm run data:validate
+          npm run copy:check
+          npm run build
 
       - name: Commit generated candidates
         id: candidate_commit
@@ -64,7 +89,7 @@ jobs:
           branch_name="${{ steps.candidate_branch.outputs.branch_name }}"
           git add src/data/candidate_events.ts
           git commit -m "Add automated candidate events"
-          git push --force-with-lease -u origin "$branch_name"
+          git push -u origin "$branch_name"
           echo "committed=true" >> "$GITHUB_OUTPUT"
           echo "branch_name=$branch_name" >> "$GITHUB_OUTPUT"
 
@@ -93,7 +118,7 @@ jobs:
             echo
             echo "## 確認"
             echo
-            echo "- npm run data:validate"
+            echo "- npm run data:validate / npm run copy:check / npm run build"
           } > candidate-pr.md
 
           pr_url="$(gh pr list \
@@ -160,7 +185,8 @@ jobs:
             echo "## やること"
             echo
             echo "- \`review_needed\` の候補を確認する"
-            echo "- 公開するものは「公開」、対象外は「無視」にする"
+            echo "- ローカルで npm run candidates:review -- PR番号 を起動する"
+            echo "- 公開するものは「採用」、対象外は「無視」にする（同じPRへ自動保存）"
             echo "- PRの差分を確認して、問題なければマージする"
             echo "- 確認が終わったらこの issue を close する"
             echo

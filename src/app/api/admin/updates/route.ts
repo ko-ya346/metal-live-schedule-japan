@@ -1,3 +1,4 @@
+import { withReviewWrite } from "@/src/server/candidateReview";
 import { NextResponse } from "next/server";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -185,8 +186,9 @@ function findObjectRangeById(fileContent: string, id: string) {
 function normalizeCandidate(
   candidate: EventUpdateCandidate,
   action: AdminUpdateAction,
+  currentCandidates = eventUpdateCandidates,
 ) {
-  const currentCandidate = eventUpdateCandidates.find(
+  const currentCandidate = currentCandidates.find(
     (item) => item.id === candidate.id,
   );
 
@@ -224,8 +226,8 @@ async function updateUpdateCandidateFile(candidate: EventUpdateCandidate) {
   await writeFile(eventUpdateCandidatesPath, nextContent);
 }
 
-async function updateEventFile(candidate: EventUpdateCandidate) {
-  const currentEvent = events.find((event) => event.id === candidate.eventId);
+async function updateEventFile(candidate: EventUpdateCandidate, currentEvents = events) {
+  const currentEvent = currentEvents.find((event) => event.id === candidate.eventId);
 
   if (!currentEvent) {
     throw new Error(`event not found: ${candidate.eventId}`);
@@ -252,12 +254,12 @@ async function updateEventFile(candidate: EventUpdateCandidate) {
   await writeFile(eventsPath, nextContent);
 }
 
-function getCandidateFromRequest(body: AdminUpdateRequest) {
+function getCandidateFromRequest(body: AdminUpdateRequest, currentCandidates = eventUpdateCandidates) {
   if (body.candidate) {
     return body.candidate;
   }
 
-  const currentCandidate = eventUpdateCandidates.find(
+  const currentCandidate = currentCandidates.find(
     (candidate) => candidate.id === body.candidateId,
   );
 
@@ -276,37 +278,40 @@ export async function POST(request: Request) {
     );
   }
 
-  try {
-    const body = (await request.json()) as AdminUpdateRequest;
+  return withReviewWrite(request, async (snapshot) => {
+    try {
+      const currentCandidates = snapshot?.eventUpdateCandidates ?? eventUpdateCandidates;
+      const body = (await request.json()) as AdminUpdateRequest;
 
-    if (!isAdminUpdateAction(body.action)) {
-      throw new Error("invalid admin action");
+      if (!isAdminUpdateAction(body.action)) {
+        throw new Error("invalid admin action");
+      }
+
+      const requestCandidate = getCandidateFromRequest(body, currentCandidates);
+      const candidate = normalizeCandidate(requestCandidate, body.action, currentCandidates);
+
+      if (body.action === "apply") {
+        await updateEventFile(candidate, snapshot?.publishedEvents ?? events);
+      }
+
+      await updateUpdateCandidateFile(candidate);
+
+      return NextResponse.json({
+        candidate,
+        message:
+          body.action === "apply"
+            ? "applied"
+            : body.action === "ignore"
+              ? "ignored"
+              : "saved",
+      });
+    } catch (error) {
+      return NextResponse.json(
+        {
+          error: error instanceof Error ? error.message : "Unknown admin error",
+        },
+        { status: 400 },
+      );
     }
-
-    const requestCandidate = getCandidateFromRequest(body);
-    const candidate = normalizeCandidate(requestCandidate, body.action);
-
-    if (body.action === "apply") {
-      await updateEventFile(candidate);
-    }
-
-    await updateUpdateCandidateFile(candidate);
-
-    return NextResponse.json({
-      candidate,
-      message:
-        body.action === "apply"
-          ? "applied"
-          : body.action === "ignore"
-            ? "ignored"
-            : "saved",
-    });
-  } catch (error) {
-    return NextResponse.json(
-      {
-        error: error instanceof Error ? error.message : "Unknown admin error",
-      },
-      { status: 400 },
-    );
-  }
+  });
 }

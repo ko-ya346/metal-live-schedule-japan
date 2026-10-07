@@ -1,3 +1,4 @@
+import { reviewEnabled } from "@/src/server/candidateReview";
 import { NextResponse } from "next/server";
 import { readFile, writeFile } from "node:fs/promises";
 import path from "node:path";
@@ -321,6 +322,7 @@ function normalizeEvent(event: Event) {
 }
 
 export async function POST(request: Request) {
+  if (reviewEnabled()) return NextResponse.json({ error: "レビュー専用環境では候補確認画面を使ってください。" }, { status: 403 });
   if (!isLocalWriteAllowed()) {
     return NextResponse.json(
       { error: "Admin file writes are only enabled in local development." },
