@@ -105,6 +105,8 @@ try {
   assert.equal(firstSuccess.status, 0, firstSuccess.stderr);
   assert.equal(firstSuccess.requests.length, 1);
   const firstPrompt = firstSuccess.requests[0].messages.at(-1).content;
+  assert.match(firstPrompt, /lowCtrQueries と lowCtrPages を優先/);
+  assert.match(firstPrompt, /clicks、impressions、ctr、positionを原文どおり/);
   const promptContext = JSON.parse(firstPrompt.slice(firstPrompt.indexOf("Context:\n") + "Context:\n".length));
   const searchConsoleContext = promptContext.docs.latestSearchConsole.content;
   assert.equal(searchConsoleContext.summary.Period, "2026-09-12 - 2026-10-09");
