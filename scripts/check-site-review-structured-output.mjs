@@ -104,6 +104,10 @@ try {
   assert.equal(firstAttempt.rawResponse, validResult);
   assert.equal(firstAttempt.finishReason, "stop");
   assert.equal(firstAttempt.usage.total_tokens, 15);
+  assert.equal(
+    (await fs.stat(path.join(firstSuccess.directory, "generator-attempt-1.json"))).mode & 0o777,
+    0o600,
+  );
 
   const parseRetry = await invoke("parse-retry", [
     { content: invalidJsonResult },

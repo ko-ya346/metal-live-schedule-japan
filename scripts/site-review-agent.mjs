@@ -551,6 +551,7 @@ async function writeAttemptRecord(attemptsOutput, record, attempts) {
   await fs.writeFile(
     path.join(directory, `generator-attempt-${record.attempt}.json`),
     JSON.stringify(record, null, 2),
+    { mode: 0o600 },
   );
   await fs.writeFile(
     attemptsOutput,
@@ -563,6 +564,7 @@ async function writeAttemptRecord(attemptsOutput, record, attempts) {
         Object.entries(attempt).filter(([key]) => key !== "rawResponse"),
       )),
     }, null, 2),
+    { mode: 0o600 },
   );
 }
 
