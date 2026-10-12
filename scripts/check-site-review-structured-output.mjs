@@ -14,6 +14,7 @@ let completionRequests = [];
 
 const validResult = JSON.stringify({ summary: "fixture summary", findings: [] });
 const invalidSchemaResult = JSON.stringify({ summary: "missing findings" });
+const extraFieldResult = JSON.stringify({ summary: "extra field", findings: [], extra: true });
 const invalidJsonResult = '{"summary":"unfinished","findings":[';
 
 const server = http.createServer(async (request, response) => {
@@ -134,6 +135,28 @@ try {
   assert.equal(schemaSummary.attempts[0].error.kind, "schema_error");
   assert.equal(schemaSummary.finalStatus, "success");
 
+  const extraFieldRetry = await invoke("extra-field-retry", [
+    { content: extraFieldResult },
+    { content: validResult },
+  ]);
+  assert.equal(extraFieldRetry.status, 0, extraFieldRetry.stderr);
+  const extraFieldSummary = JSON.parse(
+    await fs.readFile(path.join(extraFieldRetry.directory, "generator-attempts.json"), "utf8"),
+  );
+  assert.equal(extraFieldSummary.attempts[0].error.kind, "schema_error");
+  assert.equal(extraFieldSummary.finalStatus, "success");
+
+  const lengthRetry = await invoke("length-retry", [
+    { content: invalidJsonResult, finishReason: "length" },
+    { content: validResult },
+  ]);
+  assert.equal(lengthRetry.status, 0, lengthRetry.stderr);
+  const lengthSummary = JSON.parse(
+    await fs.readFile(path.join(lengthRetry.directory, "generator-attempts.json"), "utf8"),
+  );
+  assert.equal(lengthSummary.attempts[0].error.kind, "output_length");
+  assert.equal(lengthSummary.finalStatus, "success");
+
   const finalFailure = await invoke("final-failure", [
     { content: invalidJsonResult },
     { content: invalidJsonResult },
@@ -150,7 +173,7 @@ try {
   await fs.access(path.join(finalFailure.directory, "generator-attempt-1.json"));
   await fs.access(path.join(finalFailure.directory, "generator-attempt-2.json"));
 
-  console.log("Site review structured-output checks passed: schema request, first success, parse retry, schema retry, final failure diagnostics.");
+  console.log("Site review structured-output checks passed: schema request, first success, parse retry, schema retry, extra-field rejection, length retry, final failure diagnostics.");
 } finally {
   await new Promise((resolve, reject) => server.close((error) => error ? reject(error) : resolve()));
   await fs.rm(temporaryDirectory, { recursive: true, force: true });

@@ -514,12 +514,34 @@ function validateReviewResult(value) {
   if (typeof value.summary !== "string" || !Array.isArray(value.findings)) {
     throw new Error("summary must be a string and findings must be an array");
   }
+  const unexpectedResultFields = Object.keys(value).filter(
+    (field) => !["summary", "findings"].includes(field),
+  );
+  if (unexpectedResultFields.length > 0) {
+    throw new Error(`response includes unexpected fields: ${unexpectedResultFields.join(", ")}`);
+  }
   if (value.findings.length > 3) {
     throw new Error("findings must contain at most 3 items");
   }
   for (const [index, finding] of value.findings.entries()) {
     if (!finding || typeof finding !== "object" || Array.isArray(finding)) {
       throw new Error(`findings[${index}] must be an object`);
+    }
+    const unexpectedFindingFields = Object.keys(finding).filter(
+      (field) => ![
+        "title",
+        "priority",
+        "category",
+        "observation",
+        "hypothesis",
+        "suggestedIssueBody",
+        "evidence",
+      ].includes(field),
+    );
+    if (unexpectedFindingFields.length > 0) {
+      throw new Error(
+        `findings[${index}] includes unexpected fields: ${unexpectedFindingFields.join(", ")}`,
+      );
     }
     if (typeof finding.title !== "string" || !finding.title.trim()) {
       throw new Error(`findings[${index}].title must be a non-empty string`);
