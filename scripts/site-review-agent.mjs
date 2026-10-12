@@ -478,17 +478,15 @@ function suppressExactHistoryDuplicates(findings, previousProposals) {
   const suppressedDuplicates = [];
 
   for (const finding of findings) {
-    const title = normalizeDedupeText(finding.title);
     const observation = normalizeDedupeText(finding.observation);
     const match = history.find(({ finding: previous }) =>
-      title === normalizeDedupeText(previous?.title) &&
-      observation === normalizeDedupeText(previous?.observation));
+      observation.length > 0 && observation === normalizeDedupeText(previous?.observation));
     if (match) {
       suppressedDuplicates.push({
         title: finding.title,
         matchedRunId: match.runId,
         matchedTitle: String(match.finding?.title ?? ""),
-        reason: "normalized_title_and_observation_exact_match",
+        reason: "normalized_observation_exact_match",
       });
     } else {
       kept.push(finding);

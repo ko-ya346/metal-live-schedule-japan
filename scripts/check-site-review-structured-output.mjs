@@ -16,7 +16,7 @@ const validResult = JSON.stringify({ summary: "fixture summary", findings: [] })
 const duplicateResult = JSON.stringify({
   summary: "fixture duplicate",
   findings: [{
-    title: "ＴＨＥ ＣＲＯＷＮの同じ提案！",
+    title: "タイトルだけを言い換えた提案",
     priority: "medium",
     category: "seo",
     observation: "同じ 観察。",
