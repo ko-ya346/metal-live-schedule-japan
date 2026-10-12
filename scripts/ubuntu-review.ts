@@ -17,8 +17,49 @@ if (process.env.UBUNTU_REVIEW_DATE && mode !== "notify") throw new Error("Date o
 const runDir = path.join(stateDir, mode === "prompt-only" ? `${day}-prompt` : day);
 const resultPath = path.join(runDir, "result.json");
 const reportPath = path.join(runDir, "report.md");
+const contextPath = path.join(runDir, "generator-context.txt");
+const evidenceResultPath = path.join(runDir, "evidence-review.json");
+const evidenceReportPath = path.join(runDir, "evidence-review.md");
 const pendingPath = path.join(runDir, "notification.md");
 const model = process.env.SITE_REVIEW_LLM_MODEL || "metals-review:8b";
+const evidenceReviewMaxRuns = 3;
+
+type EvidenceCandidateReview = {
+  candidateIndex: number;
+  title: string;
+  verdict: "APPROVE" | "REQUEST_CHANGES" | "REJECT";
+  summary: string;
+  claims: Array<{
+    claim: string;
+    classification: "supported" | "mismatch" | "unsupported";
+    source: string;
+    reason: string;
+  }>;
+};
+
+type EvidenceReviewerOutput = {
+  verdict: "APPROVE" | "REQUEST_CHANGES" | "REJECT";
+  artifactDigest: string;
+  contextDigest: string;
+  promptVersion: number;
+  durationMs: number;
+  candidateReviews: EvidenceCandidateReview[];
+};
+
+type EvidenceReviewState = {
+  status: "completed" | "failed" | "skipped";
+  reason?: string;
+  experimentRun?: number;
+  completedRuns?: number;
+  maxRuns: number;
+  verdict?: EvidenceReviewerOutput["verdict"];
+  artifactDigest?: string;
+  contextDigest?: string;
+  reviewDigest?: string;
+  promptVersion?: number;
+  durationMs?: number;
+  candidateReviews?: EvidenceCandidateReview[];
+};
 
 async function run(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
   await new Promise<void>((resolve, reject) => {
@@ -26,6 +67,52 @@ async function run(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
     child.once("error", reject);
     child.once("exit", (code, signal) => code === 0 ? resolve() : reject(new Error(`Review exited: ${code ?? signal}`)));
   });
+}
+
+async function getEvidenceReviewRunCount(): Promise<number> {
+  const entries = await fs.readdir(stateDir, { withFileTypes: true });
+  let count = 0;
+
+  for (const entry of entries) {
+    if (!entry.isDirectory() || entry.name.endsWith("-prompt") || entry.name === "review.lock") continue;
+    try {
+      const finished = JSON.parse(await fs.readFile(path.join(stateDir, entry.name, "finished.json"), "utf8"));
+      if (["completed", "failed"].includes(finished?.evidenceReview?.status)) count += 1;
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+
+  return count;
+}
+
+function buildHumanReviewCard(evidenceReview: EvidenceReviewState): string {
+  const lines = [
+    "## C. Human decision（ここだけ確認してください）",
+    "",
+    "Evidence Reviewerは助言だけを行います。採用、REQUEST CHANGES、却下の最終判断は人間が行います。",
+    "",
+  ];
+
+  if (evidenceReview.status !== "completed") {
+    lines.push(
+      `Reviewer状態: **${evidenceReview.status}**${evidenceReview.reason ? `（${evidenceReview.reason}）` : ""}`,
+      "",
+      "Reviewerが完了していないため、提案を次工程へ進めず、実行状態だけ確認してください。",
+    );
+    return lines.join("\n");
+  }
+
+  lines.push(
+    "| 候補 | Generatorの提案 | Reviewer推奨 | Human decision |",
+    "|---:|---|---|---|",
+  );
+  for (const candidate of evidenceReview.candidateReviews ?? []) {
+    const title = String(candidate.title).replaceAll("|", "\\|").replaceAll("\n", " ");
+    lines.push(`| ${candidate.candidateIndex} | ${title} | **${candidate.verdict}** | 未決定 |`);
+  }
+  lines.push("", "回答例: `1却下、2 REQUEST CHANGES、3採用、確認2分`");
+  return lines.join("\n");
 }
 
 async function notify() {
@@ -90,6 +177,14 @@ try {
       let baseSha = "unknown";
       let modelDigest = "unknown";
       let scriptDigest = "unknown";
+      let artifactDigest = "unknown";
+      let contextDigest = "unknown";
+      let generatorFindingCount = 0;
+      let evidenceReview: EvidenceReviewState = {
+        status: "skipped",
+        reason: mode === "prompt-only" ? "prompt_only" : "generator_not_completed",
+        maxRuns: evidenceReviewMaxRuns,
+      };
       try {
         // The dedicated checkout must not contain application secrets.
         if (await fs.access(path.join(root, ".env.local")).then(() => true, () => false)) {
@@ -99,6 +194,7 @@ try {
         scriptDigest = createHash("sha256")
           .update(await fs.readFile(new URL(import.meta.url)))
           .update(await fs.readFile(path.join(root, "scripts/site-review-agent.mjs")))
+          .update(await fs.readFile(path.join(root, "scripts/review-site-artifact.mjs")))
           .digest("hex");
         if (mode !== "prompt-only") {
           const response = await fetch("http://127.0.0.1:11434/api/tags", { signal: AbortSignal.timeout(10_000) });
@@ -109,13 +205,83 @@ try {
           modelDigest = installed.digest;
         }
         await run(["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/site-review-agent.mjs",
-          "--compact", `--output=${reportPath}`, `--json-output=${resultPath}`, ...(mode === "prompt-only" ? ["--prompt-only"] : [])], env);
+          "--compact", `--output=${reportPath}`, `--json-output=${resultPath}`, `--prompt-output=${contextPath}`,
+          ...(mode === "prompt-only" ? ["--prompt-only"] : [])], env);
         if (mode === "prompt-only") {
           console.log(`Prompt saved: ${reportPath}`);
         } else {
-          const result = JSON.parse(await fs.readFile(resultPath, "utf8")) as { skippedReason?: string };
+          const result = JSON.parse(await fs.readFile(resultPath, "utf8")) as {
+            skippedReason?: string;
+            findings?: unknown[];
+          };
           if (result.skippedReason) throw new Error(result.skippedReason);
+          generatorFindingCount = Array.isArray(result.findings) ? result.findings.length : 0;
           report = await fs.readFile(reportPath, "utf8");
+          const context = await fs.readFile(contextPath, "utf8");
+          artifactDigest = createHash("sha256").update(report).digest("hex");
+          contextDigest = createHash("sha256").update(context).digest("hex");
+
+          const completedReviews = await getEvidenceReviewRunCount();
+          if (completedReviews >= evidenceReviewMaxRuns) {
+            evidenceReview = {
+              status: "skipped",
+              reason: "experiment_limit_reached",
+              completedRuns: completedReviews,
+              maxRuns: evidenceReviewMaxRuns,
+            };
+          } else {
+            const experimentRun = completedReviews + 1;
+            try {
+              await run([
+                "scripts/review-site-artifact.mjs",
+                `--context=${contextPath}`,
+                `--artifact=${reportPath}`,
+                `--output=${evidenceReportPath}`,
+                `--json-output=${evidenceResultPath}`,
+              ], env);
+              const reviewed = JSON.parse(
+                await fs.readFile(evidenceResultPath, "utf8"),
+              ) as EvidenceReviewerOutput;
+              if (reviewed.artifactDigest !== artifactDigest || reviewed.contextDigest !== contextDigest) {
+                throw new Error("Evidence Reviewer digest mismatch");
+              }
+              const reviewedIndices = reviewed.candidateReviews.map((candidate) => candidate.candidateIndex);
+              const expectedIndices = Array.from(
+                { length: generatorFindingCount },
+                (_, index) => index + 1,
+              );
+              if (JSON.stringify(reviewedIndices) !== JSON.stringify(expectedIndices)) {
+                throw new Error("Evidence Reviewer did not evaluate every Generator candidate in order");
+              }
+              evidenceReview = {
+                status: "completed",
+                experimentRun,
+                maxRuns: evidenceReviewMaxRuns,
+                verdict: reviewed.verdict,
+                artifactDigest: reviewed.artifactDigest,
+                contextDigest: reviewed.contextDigest,
+                reviewDigest: createHash("sha256")
+                  .update(await fs.readFile(evidenceResultPath, "utf8"))
+                  .digest("hex"),
+                promptVersion: reviewed.promptVersion,
+                durationMs: reviewed.durationMs,
+                candidateReviews: reviewed.candidateReviews,
+              };
+            } catch (error) {
+              evidenceReview = {
+                status: "failed",
+                experimentRun,
+                maxRuns: evidenceReviewMaxRuns,
+                artifactDigest,
+                contextDigest,
+                reason: error instanceof Error ? error.message : String(error),
+              };
+              await fs.writeFile(
+                evidenceReportPath,
+                `## B. open-weight Evidence Reviewer\n\n状態: **failed**\n\n${evidenceReview.reason}`,
+              );
+            }
+          }
         }
       } catch (error) {
         status = "failed";
@@ -123,9 +289,15 @@ try {
       }
       if (mode !== "prompt-only") {
         const hash = createHash("sha256").update(report).digest("hex").slice(0, 16);
-        const body = `<!-- ubuntu-review:${day}:${hash} -->\n## Ubuntu提案専用試行 ${day}\n\n状態: ${status} / モデル: ${model}\n実装・公開・マージは行っていません。モデルの提案は未検証です。\n\n${report.slice(0, 30_000)}`;
+        const evidenceReport = evidenceReview.status === "skipped"
+          ? `## B. open-weight Evidence Reviewer\n\n状態: **skipped**（${evidenceReview.reason}）`
+          : await fs.readFile(evidenceReportPath, "utf8");
+        const body = `<!-- ubuntu-review:${day}:${hash} -->\n## Ubuntu提案専用試行 ${day}\n\n状態: ${status} / モデル: ${model}\n実装・公開・マージは行っていません。Evidence Reviewerはshadow動作で、投稿を停止・修正しません。\n\n## A. open-weight Generator\n\n${report.slice(0, 30_000)}\n\n${evidenceReport.slice(0, 20_000)}\n\n${buildHumanReviewCard(evidenceReview)}`;
         await fs.writeFile(pendingPath, body);
-        await fs.writeFile(path.join(runDir, "finished.json"), JSON.stringify({ startedAt, finishedAt: new Date().toISOString(), status, model, modelDigest, baseSha, scriptDigest, promptVersion: 1 }, null, 2));
+        await fs.writeFile(path.join(runDir, "finished.json"), JSON.stringify({
+          startedAt, finishedAt: new Date().toISOString(), status, model, modelDigest, baseSha,
+          scriptDigest, promptVersion: 1, artifactDigest, contextDigest, evidenceReview,
+        }, null, 2));
         await notify();
       }
       if (status === "failed") process.exitCode = 1;
