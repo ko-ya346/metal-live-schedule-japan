@@ -136,6 +136,7 @@ async function collectGeneratorHistory(): Promise<GeneratorHistory> {
           evidence: value.evidence.filter((item): item is string => typeof item === "string"),
         }];
       });
+      if (findings.length === 0) continue;
       runs.push({ runId: entry.name, finishedAt: String(finished.finishedAt ?? ""), findings });
     } catch (error) {
       if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;

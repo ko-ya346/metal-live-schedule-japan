@@ -149,12 +149,20 @@ globalThis.fetch = async (url, options = {}) => {
       })),
     }));
   }
+  const emptyRun = path.join(historyState, "run-9-empty");
+  await fs.mkdir(emptyRun, { recursive: true });
+  await fs.writeFile(path.join(emptyRun, "finished.json"), JSON.stringify({
+    status: "success",
+    finishedAt: "2026-10-09T00:00:00.000Z",
+  }));
+  await fs.writeFile(path.join(emptyRun, "result.json"), JSON.stringify({ findings: [] }));
   assert.equal(invoke("review", "history-state").status, 0);
   const history = JSON.parse(await fs.readFile(path.join(historyState, day, "generator-history.json")));
   assert.equal(history.sourceRuns.length, 5);
   assert.equal(history.findingCount, 18);
   assert.deepEqual(Object.keys(history.sourceRuns[0].findings[0]), ["title", "category", "observation", "evidence"]);
   assert.equal(history.sourceRuns.some(item => item.runId === "run-8"), false);
+  assert.equal(history.sourceRuns.some(item => item.runId === "run-9-empty"), false);
   assert.equal(history.sourceRuns[0].runId, "run-7");
   const historyFinished = JSON.parse(await fs.readFile(path.join(historyState, day, "finished.json")));
   assert.equal(historyFinished.generatorHistoryFindingCount, 18);

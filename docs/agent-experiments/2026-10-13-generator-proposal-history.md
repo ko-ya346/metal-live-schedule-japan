@@ -11,7 +11,7 @@
 - Final task count: one seed run and five history-aware runs
 - Change description: pass recent successful findings into the prompt, then suppress generated findings whose normalized observation exactly matches recent history.
 
-The history is limited to six successful runs and 18 findings. It contains only `title`, `category`, `observation`, and `evidence`. Each run stores the exact history artifact, its SHA-256 digest, and any suppressed findings.
+The history is limited to six successful runs that contain findings and 18 findings total. Successful no-action runs do not evict older proposal history. The artifact contains only `title`, `category`, `observation`, and `evidence`. Each run stores the exact history artifact, its SHA-256 digest, and any suppressed findings.
 
 ## Baseline
 
