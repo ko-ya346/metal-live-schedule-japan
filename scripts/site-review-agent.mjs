@@ -379,27 +379,47 @@ async function getLatestMarkdown(dirPath) {
   };
 }
 
-function extractMarkdownSection(content, heading, maxLines) {
+function extractMarkdownSection(content, heading) {
   const lines = content.split("\n");
   const start = lines.findIndex((line) => line.trim() === `## ${heading}`);
   if (start === -1) return null;
   const nextHeading = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
   const end = nextHeading === -1 ? lines.length : nextHeading;
-  return lines.slice(start, end).slice(0, maxLines).join("\n").trim();
+  return lines.slice(start, end).join("\n").trim();
 }
 
 function extractSearchConsoleEvidence(content) {
-  const sections = [
-    ["Summary", 10],
-    ["Top Queries", 10],
-    ["Low CTR Queries", 10],
-    ["Top Pages", 10],
-    ["Low CTR Pages", 10],
-  ].flatMap(([heading, maxLines]) => {
-    const section = extractMarkdownSection(content, heading, maxLines);
-    return section ? [section] : [];
-  });
-  return truncateText(sections.join("\n\n"), 3000);
+  const summary = Object.fromEntries(
+    (extractMarkdownSection(content, "Summary") ?? "")
+      .split("\n")
+      .flatMap((line) => {
+        const match = line.match(/^- ([^:]+): (.+)$/);
+        return match ? [[match[1], match[2]]] : [];
+      }),
+  );
+  const parseTable = (heading) => {
+    const rows = (extractMarkdownSection(content, heading) ?? "")
+      .split("\n")
+      .filter((line) => line.trim().startsWith("|"))
+      .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+    if (rows.length < 3) return [];
+    const headers = rows[0];
+    return rows.slice(2, 7).map((cells) => Object.fromEntries(
+      headers.map((header, index) => [header.toLowerCase(), cells[index] ?? ""]),
+    ));
+  };
+  const evidence = {
+    summary,
+    topQueries: parseTable("Top Queries"),
+    lowCtrQueries: parseTable("Low CTR Queries"),
+    topPages: parseTable("Top Pages"),
+    lowCtrPages: parseTable("Low CTR Pages"),
+  };
+  const arrays = [evidence.topQueries, evidence.lowCtrQueries, evidence.topPages, evidence.lowCtrPages];
+  while (JSON.stringify(evidence).length > 3000 && arrays.some((rows) => rows.length > 0)) {
+    arrays.sort((left, right) => right.length - left.length)[0].pop();
+  }
+  return evidence;
 }
 
 async function collectContext(options, today) {
@@ -459,6 +479,8 @@ function buildPrompt(context) {
     "- previousProposalsに同じ問題と同じ根拠の提案がある場合、言い換えて再提案しない。",
     "- 同じ問題でも、previousProposalsにない新しい根拠を具体的に示せる場合だけ再提案してよい。",
     "- 新しい価値のある提案がなければ findings は空配列にする。件数を埋めない。",
+    "- Search Consoleの数値は同じJSON object内のquery/pageとだけ対応付け、別の行のCTRやpositionを混ぜない。",
+    "- 高いCTRを低いと評価しない。入力にないqueryとpageの対応関係や導線不足を事実として断定しない。",
     "- findings は重要なものから最大3件。短く、根拠付きで書く。",
     "- issue化する価値が低いものは findings から外す。",
     "- GitHub Issueに貼る前提で、具体的な作業に落とせる内容にする。",

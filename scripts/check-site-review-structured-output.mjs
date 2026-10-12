@@ -107,13 +107,17 @@ try {
   const firstPrompt = firstSuccess.requests[0].messages.at(-1).content;
   const promptContext = JSON.parse(firstPrompt.slice(firstPrompt.indexOf("Context:\n") + "Context:\n".length));
   const searchConsoleContext = promptContext.docs.latestSearchConsole.content;
-  assert.match(searchConsoleContext, /## Top Queries/);
-  assert.match(searchConsoleContext, /## Low CTR Queries/);
-  assert.match(searchConsoleContext, /## Top Pages/);
-  assert.match(searchConsoleContext, /## Low CTR Pages/);
-  assert.doesNotMatch(searchConsoleContext, /## Daily Trend/);
-  assert.doesNotMatch(searchConsoleContext, /## Improvement Notes/);
-  assert.ok(searchConsoleContext.length <= 3000);
+  assert.equal(searchConsoleContext.summary.Period, "2026-09-12 - 2026-10-09");
+  assert.deepEqual(searchConsoleContext.topQueries[3], {
+    query: "draconian 来日", clicks: "12", impressions: "36", ctr: "33.3%", position: "2.2",
+  });
+  assert.deepEqual(searchConsoleContext.lowCtrQueries[0], {
+    query: "beast in black 来日 2026", clicks: "0", impressions: "152", ctr: "0.0%", position: "8.4",
+  });
+  assert.equal(searchConsoleContext.topPages[0].page, "https://metalscalendar.com/international");
+  assert.equal(searchConsoleContext.lowCtrPages[0].ctr, "0.4%");
+  assert.ok(JSON.stringify(searchConsoleContext).length <= 3000);
+  assert.doesNotMatch(JSON.stringify(searchConsoleContext), /Daily Trend|Improvement Notes/);
   assert.equal(firstSuccess.requests[0].response_format.type, "json_schema");
   assert.deepEqual(
     firstSuccess.requests[0].response_format.json_schema.schema.required,
