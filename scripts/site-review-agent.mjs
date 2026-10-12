@@ -30,6 +30,7 @@ function parseArgs(argv) {
     siteUrl: process.env.SITE_REVIEW_SITE_URL || defaultSiteUrl,
     output: "site-review-report.md",
     jsonOutput: "site-review-result.json",
+    promptOutput: null,
     githubOutput: process.env.GITHUB_OUTPUT || null,
     promptOnly: false,
     compact: false,
@@ -53,6 +54,12 @@ function parseArgs(argv) {
 
     if (key === "--json-output") {
       options.jsonOutput = value ?? argv[index + 1];
+      index += value === undefined ? 1 : 0;
+      continue;
+    }
+
+    if (key === "--prompt-output") {
+      options.promptOutput = value ?? argv[index + 1];
       index += value === undefined ? 1 : 0;
       continue;
     }
@@ -659,6 +666,10 @@ async function main() {
     },
   } : context;
   const prompt = buildPrompt(promptContext);
+
+  if (options.promptOutput) {
+    await fs.writeFile(options.promptOutput, prompt);
+  }
 
   if (options.promptOnly) {
     await fs.writeFile(options.output, prompt);

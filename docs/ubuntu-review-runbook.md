@@ -31,6 +31,20 @@ node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON s
 
 生成内容には2026-08-24の古いSearch Consoleレポートに基づく提案と、UIについて根拠の弱い断定があった。推論完了と提案品質の合格は別であり、実装指示へ自動変換しない。
 
+## Evidence Reviewer shadow experiment
+
+Human承認済みの#92では、次の3回だけGeneratorの後に同じ`metals-review:8b`を別callでEvidence Reviewerとして実行する。
+
+- `generator-context.txt`: Generatorへ渡した正確なprompt/context
+- `report.md`: Generatorの最終artifact
+- `evidence-review.json`: Reviewerの構造化判定
+- `evidence-review.md`: 人間向けの照合結果
+- `finished.json`: context、artifact、reviewのdigest、判定、所要時間
+
+Reviewerは`report.md`のhash確定後に読み、確認後の再生成は行わない。各主張を`supported / mismatch / unsupported`へ分類する。shadow期間中はReviewer判定でGitHub投稿を止めたり本文を修正したりしない。GitHubコメントは`Generator / Evidence Reviewer / Human decision`を分けて表示する。
+
+完了ログ内のEvidence Reviewer成功・失敗を1回と数え、3回後は`experiment_limit_reached`でskipする。正式gateへの昇格は3回分のprecision、recall、見逃し、誤検知、人間確認時間を評価する別判断とする。
+
 ## Issue通知
 
 通知先はこのリポジトリの#78に固定。モデルが通知先や操作を選ぶことはない。
@@ -81,6 +95,7 @@ systemctl --user enable --now metals-review.timer
 
 ```bash
 node scripts/check-ubuntu-review.mjs
+npm run check:ubuntu-review
 npm run lint
 npm run data:validate
 npm run copy:check
