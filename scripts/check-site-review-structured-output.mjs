@@ -44,7 +44,7 @@ const address = server.address();
 assert.ok(address && typeof address === "object");
 const origin = `http://127.0.0.1:${address.port}`;
 
-async function invoke(name, responses) {
+async function invoke(name, responses, history = null) {
   const directory = path.join(temporaryDirectory, name);
   await fs.mkdir(directory, { recursive: true, mode: 0o700 });
   queuedResponses = [...responses];
@@ -60,6 +60,11 @@ async function invoke(name, responses) {
     `--prompt-output=${path.join(directory, "prompt.txt")}`,
     `--attempts-output=${path.join(directory, "generator-attempts.json")}`,
   ];
+  if (history) {
+    const historyPath = path.join(directory, "generator-history.json");
+    await fs.writeFile(historyPath, JSON.stringify(history));
+    args.push(`--history-input=${historyPath}`);
+  }
   const child = spawn(process.execPath, args, {
     cwd: root,
     env: {
@@ -109,6 +114,26 @@ try {
     (await fs.stat(path.join(firstSuccess.directory, "generator-attempt-1.json"))).mode & 0o777,
     0o600,
   );
+
+  const withHistory = await invoke("with-history", [{ content: validResult }], {
+    schemaVersion: 1,
+    sourceRuns: [{
+      runId: "seed",
+      finishedAt: "2026-10-13T00:00:00.000Z",
+      findings: [{
+        title: "THE CROWNの同じ提案",
+        category: "seo",
+        observation: "同じ観察",
+        evidence: ["同じ根拠"],
+      }],
+    }],
+    findingCount: 1,
+  });
+  assert.equal(withHistory.status, 0, withHistory.stderr);
+  const historyPrompt = withHistory.requests[0].messages.at(-1).content;
+  assert.match(historyPrompt, /previousProposals/);
+  assert.match(historyPrompt, /THE CROWNの同じ提案/);
+  assert.match(historyPrompt, /新しい価値のある提案がなければ findings は空配列/);
 
   const parseRetry = await invoke("parse-retry", [
     { content: invalidJsonResult },

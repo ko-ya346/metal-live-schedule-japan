@@ -75,6 +75,7 @@ function parseArgs(argv) {
     jsonOutput: "site-review-result.json",
     promptOutput: null,
     attemptsOutput: null,
+    historyInput: null,
     githubOutput: process.env.GITHUB_OUTPUT || null,
     promptOnly: false,
     compact: false,
@@ -110,6 +111,12 @@ function parseArgs(argv) {
 
     if (key === "--attempts-output") {
       options.attemptsOutput = value ?? argv[index + 1];
+      index += value === undefined ? 1 : 0;
+      continue;
+    }
+
+    if (key === "--history-input") {
+      options.historyInput = value ?? argv[index + 1];
       index += value === undefined ? 1 : 0;
       continue;
     }
@@ -426,6 +433,9 @@ function buildPrompt(context) {
     "- 入力が抜粋の場合、省略された情報が存在しないとは判断しない。",
     "- 薄いSEO量産ページや過剰な機能追加は避ける。",
     "- 同じような提案を複数に分けすぎない。",
+    "- previousProposalsに同じ問題と同じ根拠の提案がある場合、言い換えて再提案しない。",
+    "- 同じ問題でも、previousProposalsにない新しい根拠を具体的に示せる場合だけ再提案してよい。",
+    "- 新しい価値のある提案がなければ findings は空配列にする。件数を埋めない。",
     "- findings は重要なものから最大3件。短く、根拠付きで書く。",
     "- issue化する価値が低いものは findings から外す。",
     "- GitHub Issueに貼る前提で、具体的な作業に落とせる内容にする。",
@@ -871,6 +881,9 @@ async function main() {
 
   const today = getJstToday();
   const context = await collectContext(options, today);
+  const previousProposals = options.historyInput
+    ? JSON.parse(await fs.readFile(options.historyInput, "utf8"))
+    : { schemaVersion: 1, sourceRuns: [], findingCount: 0 };
   // Fit the pilot's small local model; explicitly mark excerpts to avoid absence claims.
   const promptContext = options.compact ? {
     siteUrl: context.siteUrl,
@@ -888,7 +901,8 @@ async function main() {
       latestGa4: context.docs.latestGa4 ? { path: context.docs.latestGa4.path, content: truncateText(context.docs.latestGa4.content ?? "", 700) } : null,
       latestSearchConsole: context.docs.latestSearchConsole ? { path: context.docs.latestSearchConsole.path, content: truncateText(context.docs.latestSearchConsole.content ?? "", 700) } : null,
     },
-  } : context;
+    previousProposals,
+  } : { ...context, previousProposals };
   const prompt = buildPrompt(promptContext);
 
   if (options.promptOutput) {
