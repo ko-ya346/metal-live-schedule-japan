@@ -17,7 +17,7 @@
     "analytics:search-console": "node scripts/search-console-report.mjs",
     "analytics:ga4": "node scripts/ga4-report.mjs",
     "site:review": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/site-review-agent.mjs",
-    "check:ubuntu-review": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-ubuntu-review.mjs && node scripts/check-evidence-reviewer.mjs",
+    "check:ubuntu-review": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-ubuntu-review.mjs && node scripts/check-site-review-structured-output.mjs && node scripts/check-evidence-reviewer.mjs",
     "candidates:review": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/review-candidates.mjs",
     "check:candidate-review": "node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON scripts/check-candidate-review.mjs"
   },

@@ -36,6 +36,8 @@ node --experimental-strip-types --disable-warning=MODULE_TYPELESS_PACKAGE_JSON s
 Human承認済みの#92では、次の3回だけGeneratorの後に同じ`metals-review:8b`を別callでEvidence Reviewerとして実行する。
 
 - `generator-context.txt`: Generatorへ渡した正確なprompt/context
+- `generator-attempt-N.json`: 各Generator attemptのraw response、finish reason、usage、error
+- `generator-attempts.json`: 初回成功、retry回数、最終状態の要約
 - `report.md`: Generatorの最終artifact
 - `evidence-review.json`: Reviewerの構造化判定
 - `evidence-review.md`: 人間向けの照合結果
@@ -84,6 +86,8 @@ systemctl --user enable --now metals-review.timer
 ## 失敗・復旧・停止
 
 - モデル未導入、API失敗、回答空、設定不備は`finished.json`にfailedとして残し、通知本文を作る。
+- GeneratorはJSON Schema違反、JSON parse失敗、出力上限到達時だけ最大1回再試行する。2回とも失敗した場合はfailedとし、attempt記録を残す。
+- raw responseはmode 0700のrun directoryだけに保存し、GitHub通知には含めない。
 - 当日完了済みの再実行は推論せず通知だけ再送する。失敗済みは終了コード1を維持する。
 - 修正後に再評価する場合は`UBUNTU_REVIEW_STATE_DIR`へ別の試行用ディレクトリを指定し、失敗記録を保存する。
 - `review.lock/owner.json`のPIDと実行状況を確認する。強制終了後の古いロックは、人間が稼働プロセス不在を確認して削除する。自動解除しない。

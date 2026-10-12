@@ -77,6 +77,10 @@ npm run site:review -- --prompt-only --output=site-review-prompt.md
 - `site-review-report.md`
 - `site-review-result.json`
 
+モデルには既存の出力構造をJSON Schemaとして渡す。JSONの構文、必須field、最大3件の制約に違反した場合と、出力上限到達時だけ1回再試行する。
+
+Ubuntu wrapperは `--attempts-output` を指定し、各attemptのraw response、finish reason、usage、parse/schema errorをmode 0700のrun directoryへ保存する。raw responseはGitHub Issueへ含めない。
+
 ## 運用ルール
 
 - このAI社員はIssueを作るだけにする

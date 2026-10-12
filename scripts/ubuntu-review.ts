@@ -18,6 +18,7 @@ const runDir = path.join(stateDir, mode === "prompt-only" ? `${day}-prompt` : da
 const resultPath = path.join(runDir, "result.json");
 const reportPath = path.join(runDir, "report.md");
 const contextPath = path.join(runDir, "generator-context.txt");
+const generatorAttemptsPath = path.join(runDir, "generator-attempts.json");
 const evidenceResultPath = path.join(runDir, "evidence-review.json");
 const evidenceReportPath = path.join(runDir, "evidence-review.md");
 const pendingPath = path.join(runDir, "notification.md");
@@ -59,6 +60,13 @@ type EvidenceReviewState = {
   promptVersion?: number;
   durationMs?: number;
   candidateReviews?: EvidenceCandidateReview[];
+};
+
+type GeneratorAttemptState = {
+  attemptCount: number;
+  initialAttemptSucceeded: boolean;
+  retryCount: number;
+  finalStatus: "success" | "failed" | "unknown";
 };
 
 async function run(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
@@ -180,6 +188,7 @@ try {
       let artifactDigest = "unknown";
       let contextDigest = "unknown";
       let generatorFindingCount = 0;
+      let generatorAttempts: GeneratorAttemptState | null = null;
       let evidenceReview: EvidenceReviewState = {
         status: "skipped",
         reason: mode === "prompt-only" ? "prompt_only" : "generator_not_completed",
@@ -206,6 +215,7 @@ try {
         }
         await run(["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/site-review-agent.mjs",
           "--compact", `--output=${reportPath}`, `--json-output=${resultPath}`, `--prompt-output=${contextPath}`,
+          ...(mode === "prompt-only" ? [] : [`--attempts-output=${generatorAttemptsPath}`]),
           ...(mode === "prompt-only" ? ["--prompt-only"] : [])], env);
         if (mode === "prompt-only") {
           console.log(`Prompt saved: ${reportPath}`);
@@ -288,6 +298,12 @@ try {
         report = `Review failed: ${error instanceof Error ? error.message : String(error)}`;
       }
       if (mode !== "prompt-only") {
+        generatorAttempts = await fs.readFile(generatorAttemptsPath, "utf8")
+          .then((content) => JSON.parse(content) as GeneratorAttemptState)
+          .catch((error: NodeJS.ErrnoException) => {
+            if (error.code === "ENOENT") return null;
+            throw error;
+          });
         const hash = createHash("sha256").update(report).digest("hex").slice(0, 16);
         const evidenceReport = evidenceReview.status === "skipped"
           ? `## B. open-weight Evidence Reviewer\n\n状態: **skipped**（${evidenceReview.reason}）`
@@ -296,7 +312,9 @@ try {
         await fs.writeFile(pendingPath, body);
         await fs.writeFile(path.join(runDir, "finished.json"), JSON.stringify({
           startedAt, finishedAt: new Date().toISOString(), status, model, modelDigest, baseSha,
-          scriptDigest, promptVersion: 1, artifactDigest, contextDigest, evidenceReview,
+          scriptDigest, promptVersion: 1, artifactDigest, contextDigest,
+          generator: generatorAttempts,
+          evidenceReview,
         }, null, 2));
         await notify();
       }
