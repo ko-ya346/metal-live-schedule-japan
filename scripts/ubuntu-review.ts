@@ -20,6 +20,7 @@ const reportPath = path.join(runDir, "report.md");
 const contextPath = path.join(runDir, "generator-context.txt");
 const generatorAttemptsPath = path.join(runDir, "generator-attempts.json");
 const generatorHistoryPath = path.join(runDir, "generator-history.json");
+const generatorSuppressedPath = path.join(runDir, "generator-suppressed.json");
 const evidenceResultPath = path.join(runDir, "evidence-review.json");
 const evidenceReportPath = path.join(runDir, "evidence-review.md");
 const pendingPath = path.join(runDir, "notification.md");
@@ -253,6 +254,7 @@ try {
       let generatorAttempts: GeneratorAttemptState | null = null;
       let generatorHistoryDigest = "unknown";
       let generatorHistoryFindingCount = 0;
+      let generatorSuppressedCount = 0;
       let evidenceReview: EvidenceReviewState = {
         status: "skipped",
         reason: mode === "prompt-only" ? "prompt_only" : "generator_not_completed",
@@ -293,9 +295,13 @@ try {
           const result = JSON.parse(await fs.readFile(resultPath, "utf8")) as {
             skippedReason?: string;
             findings?: unknown[];
+            suppressedDuplicates?: unknown[];
           };
           if (result.skippedReason) throw new Error(result.skippedReason);
           generatorFindingCount = Array.isArray(result.findings) ? result.findings.length : 0;
+          const suppressedDuplicates = Array.isArray(result.suppressedDuplicates) ? result.suppressedDuplicates : [];
+          generatorSuppressedCount = suppressedDuplicates.length;
+          await fs.writeFile(generatorSuppressedPath, JSON.stringify(suppressedDuplicates, null, 2), { mode: 0o600 });
           report = await fs.readFile(reportPath, "utf8");
           const context = await fs.readFile(contextPath, "utf8");
           artifactDigest = createHash("sha256").update(report).digest("hex");
@@ -384,6 +390,7 @@ try {
           startedAt, finishedAt: new Date().toISOString(), status, model, modelDigest, baseSha,
           scriptDigest, promptVersion: 1, artifactDigest, contextDigest,
           generatorHistoryDigest, generatorHistoryFindingCount,
+          generatorSuppressedCount,
           generator: generatorAttempts,
           evidenceReview,
         }, null, 2));

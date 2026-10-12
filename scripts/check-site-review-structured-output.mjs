@@ -13,6 +13,18 @@ let queuedResponses = [];
 let completionRequests = [];
 
 const validResult = JSON.stringify({ summary: "fixture summary", findings: [] });
+const duplicateResult = JSON.stringify({
+  summary: "fixture duplicate",
+  findings: [{
+    title: "ＴＨＥ ＣＲＯＷＮの同じ提案！",
+    priority: "medium",
+    category: "seo",
+    observation: "同じ 観察。",
+    hypothesis: "fixture",
+    suggestedIssueBody: "fixture",
+    evidence: ["同じ根拠"],
+  }],
+});
 const invalidSchemaResult = JSON.stringify({ summary: "missing findings" });
 const extraFieldResult = JSON.stringify({ summary: "extra field", findings: [], extra: true });
 const invalidJsonResult = '{"summary":"unfinished","findings":[';
@@ -115,7 +127,7 @@ try {
     0o600,
   );
 
-  const withHistory = await invoke("with-history", [{ content: validResult }], {
+  const withHistory = await invoke("with-history", [{ content: duplicateResult }], {
     schemaVersion: 1,
     sourceRuns: [{
       runId: "seed",
@@ -134,6 +146,13 @@ try {
   assert.match(historyPrompt, /previousProposals/);
   assert.match(historyPrompt, /THE CROWNの同じ提案/);
   assert.match(historyPrompt, /新しい価値のある提案がなければ findings は空配列/);
+  const deduplicatedResult = JSON.parse(
+    await fs.readFile(path.join(withHistory.directory, "result.json"), "utf8"),
+  );
+  assert.equal(deduplicatedResult.findings.length, 0);
+  assert.equal(deduplicatedResult.suppressedDuplicates.length, 1);
+  assert.equal(deduplicatedResult.suppressedDuplicates[0].matchedRunId, "seed");
+  assert.equal(deduplicatedResult.shouldCreateIssue, false);
 
   const parseRetry = await invoke("parse-retry", [
     { content: invalidJsonResult },

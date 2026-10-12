@@ -461,6 +461,43 @@ function buildPrompt(context) {
   ].join("\n");
 }
 
+function normalizeDedupeText(value) {
+  return String(value)
+    .normalize("NFKC")
+    .toLowerCase()
+    .replace(/[\p{P}\p{S}\s]/gu, "");
+}
+
+function suppressExactHistoryDuplicates(findings, previousProposals) {
+  const history = Array.isArray(previousProposals?.sourceRuns)
+    ? previousProposals.sourceRuns.flatMap((run) => Array.isArray(run?.findings)
+      ? run.findings.map((finding) => ({ runId: String(run.runId ?? "unknown"), finding }))
+      : [])
+    : [];
+  const kept = [];
+  const suppressedDuplicates = [];
+
+  for (const finding of findings) {
+    const title = normalizeDedupeText(finding.title);
+    const observation = normalizeDedupeText(finding.observation);
+    const match = history.find(({ finding: previous }) =>
+      title === normalizeDedupeText(previous?.title) &&
+      observation === normalizeDedupeText(previous?.observation));
+    if (match) {
+      suppressedDuplicates.push({
+        title: finding.title,
+        matchedRunId: match.runId,
+        matchedTitle: String(match.finding?.title ?? ""),
+        reason: "normalized_title_and_observation_exact_match",
+      });
+    } else {
+      kept.push(finding);
+    }
+  }
+
+  return { findings: kept, suppressedDuplicates };
+}
+
 function extractJsonObject(content) {
   const trimmed = content.trim();
 
@@ -922,7 +959,9 @@ async function main() {
 
   const rawResult = await callLlm(prompt, options.attemptsOutput);
   const skippedReason = rawResult?.skippedReason ?? null;
-  const result = skippedReason ? { summary: "", findings: [] } : normalizeResult(rawResult);
+  const normalizedResult = skippedReason ? { summary: "", findings: [] } : normalizeResult(rawResult);
+  const deduplicated = suppressExactHistoryDuplicates(normalizedResult.findings, previousProposals);
+  const result = { ...normalizedResult, findings: deduplicated.findings };
   const report = buildReport({ result, today, skippedReason, promptOnly: false });
   const shouldCreateIssue = !skippedReason && result.findings.length > 0;
 
@@ -935,6 +974,7 @@ async function main() {
         siteUrl: context.siteUrl,
         skippedReason,
         shouldCreateIssue,
+        suppressedDuplicates: deduplicated.suppressedDuplicates,
         ...result,
       },
       null,

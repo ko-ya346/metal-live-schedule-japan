@@ -28,7 +28,7 @@ if (attempts && await fs.access('fail-generator').then(() => true, () => false))
   process.exit(1);
 }
 await fs.writeFile(output, args.includes('--prompt-only') ? 'prompt' : 'fixture report');
-await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }] }));
+await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }], suppressedDuplicates: [] }));
 if (prompt) await fs.writeFile(prompt, 'fixture context');
 if (attempts) await fs.writeFile(attempts, JSON.stringify({ attemptCount: 1, initialAttemptSucceeded: true, retryCount: 0, finalStatus: 'success' }));
 await fs.appendFile('calls', 'review\\n');
@@ -86,6 +86,7 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(initial.generator.initialAttemptSucceeded, true);
   assert.equal(initial.generator.retryCount, 0);
   assert.equal(initial.generatorHistoryFindingCount, 0);
+  assert.equal(initial.generatorSuppressedCount, 0);
   assert.match(initial.generatorHistoryDigest, /^[a-f0-9]{64}$/);
   assert.equal((await fs.stat(path.join(dir, "state", day, "generator-history.json"))).mode & 0o777, 0o600);
   assert.equal(initial.evidenceReview.status, "completed");
@@ -157,6 +158,8 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(history.sourceRuns[0].runId, "run-7");
   const historyFinished = JSON.parse(await fs.readFile(path.join(historyState, day, "finished.json")));
   assert.equal(historyFinished.generatorHistoryFindingCount, 18);
+  assert.equal(historyFinished.generatorSuppressedCount, 0);
+  assert.equal((await fs.stat(path.join(historyState, day, "generator-suppressed.json"))).mode & 0o777, 0o600);
   assert.match(historyFinished.generatorHistoryDigest, /^[a-f0-9]{64}$/);
   await fs.mkdir(path.join(dir, "state", "review.lock"));
   assert.notEqual(invoke("review").status, 0);
