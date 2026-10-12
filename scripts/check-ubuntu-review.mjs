@@ -19,9 +19,15 @@ const args = process.argv.slice(2);
 const output = args.find(a => a.startsWith('--output=')).slice(9);
 const json = args.find(a => a.startsWith('--json-output=')).slice(14);
 const prompt = args.find(a => a.startsWith('--prompt-output='))?.slice(16);
+const attempts = args.find(a => a.startsWith('--attempts-output='))?.slice(18);
+if (attempts && await fs.access('fail-generator').then(() => true, () => false)) {
+  await fs.writeFile(attempts, JSON.stringify({ attemptCount: 2, initialAttemptSucceeded: false, retryCount: 1, finalStatus: 'failed' }));
+  process.exit(1);
+}
 await fs.writeFile(output, args.includes('--prompt-only') ? 'prompt' : 'fixture report');
 await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }] }));
 if (prompt) await fs.writeFile(prompt, 'fixture context');
+if (attempts) await fs.writeFile(attempts, JSON.stringify({ attemptCount: 1, initialAttemptSucceeded: true, retryCount: 0, finalStatus: 'success' }));
 await fs.appendFile('calls', 'review\\n');
 `);
   await fs.writeFile(path.join(dir, "scripts/review-site-artifact.mjs"), `
@@ -73,6 +79,9 @@ globalThis.fetch = async (url, options = {}) => {
   const initial = JSON.parse(await fs.readFile(path.join(dir, "state", day, "finished.json")));
   assert.equal(initial.modelDigest, "fixture-digest");
   assert.equal(initial.status, "success");
+  assert.equal(initial.generator.attemptCount, 1);
+  assert.equal(initial.generator.initialAttemptSucceeded, true);
+  assert.equal(initial.generator.retryCount, 0);
   assert.equal(initial.evidenceReview.status, "completed");
   assert.equal(initial.evidenceReview.experimentRun, 1);
   assert.equal(initial.artifactDigest, initial.evidenceReview.artifactDigest);
@@ -97,6 +106,14 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(reviewerFailure.status, "success");
   assert.equal(reviewerFailure.evidenceReview.status, "failed");
   await fs.rm(path.join(dir, "fail-evidence-review"));
+  await fs.writeFile(path.join(dir, "fail-generator"), "1");
+  assert.equal(invoke("review", "generator-failure").status, 1);
+  const generatorFailure = JSON.parse(await fs.readFile(path.join(dir, "generator-failure", day, "finished.json")));
+  assert.equal(generatorFailure.status, "failed");
+  assert.equal(generatorFailure.generator.attemptCount, 2);
+  assert.equal(generatorFailure.generator.initialAttemptSucceeded, false);
+  assert.equal(generatorFailure.generator.retryCount, 1);
+  await fs.rm(path.join(dir, "fail-generator"));
   const cappedState = path.join(dir, "capped");
   for (const name of ["run-a", "run-b", "run-c"]) {
     await fs.mkdir(path.join(cappedState, name), { recursive: true });
