@@ -19,6 +19,8 @@ const resultPath = path.join(runDir, "result.json");
 const reportPath = path.join(runDir, "report.md");
 const contextPath = path.join(runDir, "generator-context.txt");
 const generatorAttemptsPath = path.join(runDir, "generator-attempts.json");
+const generatorHistoryPath = path.join(runDir, "generator-history.json");
+const generatorSuppressedPath = path.join(runDir, "generator-suppressed.json");
 const evidenceResultPath = path.join(runDir, "evidence-review.json");
 const evidenceReportPath = path.join(runDir, "evidence-review.md");
 const pendingPath = path.join(runDir, "notification.md");
@@ -69,6 +71,23 @@ type GeneratorAttemptState = {
   finalStatus: "success" | "failed" | "unknown";
 };
 
+type GeneratorHistoryFinding = {
+  title: string;
+  category: string;
+  observation: string;
+  evidence: string[];
+};
+
+type GeneratorHistory = {
+  schemaVersion: 1;
+  sourceRuns: Array<{
+    runId: string;
+    finishedAt: string;
+    findings: GeneratorHistoryFinding[];
+  }>;
+  findingCount: number;
+};
+
 async function run(args: string[], env: NodeJS.ProcessEnv): Promise<void> {
   await new Promise<void>((resolve, reject) => {
     const child = spawn(process.execPath, args, { cwd: root, env, stdio: "inherit", timeout: 20 * 60 * 1000 });
@@ -92,6 +111,51 @@ async function getEvidenceReviewRunCount(): Promise<number> {
   }
 
   return count;
+}
+
+async function collectGeneratorHistory(): Promise<GeneratorHistory> {
+  const entries = await fs.readdir(stateDir, { withFileTypes: true });
+  const runs: GeneratorHistory["sourceRuns"] = [];
+
+  for (const entry of entries) {
+    if (!entry.isDirectory() || path.join(stateDir, entry.name) === runDir || entry.name.endsWith("-prompt") || entry.name === "review.lock") continue;
+    try {
+      const [finished, result] = await Promise.all([
+        fs.readFile(path.join(stateDir, entry.name, "finished.json"), "utf8").then(JSON.parse),
+        fs.readFile(path.join(stateDir, entry.name, "result.json"), "utf8").then(JSON.parse),
+      ]);
+      if (finished?.status !== "success" || !Array.isArray(result?.findings)) continue;
+      const findings = result.findings.flatMap((finding: unknown): GeneratorHistoryFinding[] => {
+        if (!finding || typeof finding !== "object") return [];
+        const value = finding as Record<string, unknown>;
+        if (typeof value.title !== "string" || typeof value.category !== "string" || typeof value.observation !== "string" || !Array.isArray(value.evidence)) return [];
+        return [{
+          title: value.title,
+          category: value.category,
+          observation: value.observation,
+          evidence: value.evidence.filter((item): item is string => typeof item === "string"),
+        }];
+      });
+      if (findings.length === 0) continue;
+      runs.push({ runId: entry.name, finishedAt: String(finished.finishedAt ?? ""), findings });
+    } catch (error) {
+      if ((error as NodeJS.ErrnoException).code !== "ENOENT") throw error;
+    }
+  }
+
+  runs.sort((left, right) => right.finishedAt.localeCompare(left.finishedAt) || right.runId.localeCompare(left.runId));
+  let remaining = 18;
+  const sourceRuns = runs.slice(0, 6).flatMap((run) => {
+    if (remaining === 0) return [];
+    const findings = run.findings.slice(0, remaining);
+    remaining -= findings.length;
+    return findings.length > 0 ? [{ ...run, findings }] : [];
+  });
+  return {
+    schemaVersion: 1,
+    sourceRuns,
+    findingCount: sourceRuns.reduce((total, run) => total + run.findings.length, 0),
+  };
 }
 
 function buildHumanReviewCard(evidenceReview: EvidenceReviewState): string {
@@ -189,6 +253,9 @@ try {
       let contextDigest = "unknown";
       let generatorFindingCount = 0;
       let generatorAttempts: GeneratorAttemptState | null = null;
+      let generatorHistoryDigest = "unknown";
+      let generatorHistoryFindingCount = 0;
+      let generatorSuppressedCount = 0;
       let evidenceReview: EvidenceReviewState = {
         status: "skipped",
         reason: mode === "prompt-only" ? "prompt_only" : "generator_not_completed",
@@ -213,8 +280,14 @@ try {
           if (!installed) throw new Error(`Model not installed: ${model}`);
           modelDigest = installed.digest;
         }
+        const generatorHistory = await collectGeneratorHistory();
+        const generatorHistoryJson = JSON.stringify(generatorHistory, null, 2);
+        await fs.writeFile(generatorHistoryPath, generatorHistoryJson, { mode: 0o600 });
+        generatorHistoryDigest = createHash("sha256").update(generatorHistoryJson).digest("hex");
+        generatorHistoryFindingCount = generatorHistory.findingCount;
         await run(["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/site-review-agent.mjs",
           "--compact", `--output=${reportPath}`, `--json-output=${resultPath}`, `--prompt-output=${contextPath}`,
+          `--history-input=${generatorHistoryPath}`,
           ...(mode === "prompt-only" ? [] : [`--attempts-output=${generatorAttemptsPath}`]),
           ...(mode === "prompt-only" ? ["--prompt-only"] : [])], env);
         if (mode === "prompt-only") {
@@ -223,9 +296,13 @@ try {
           const result = JSON.parse(await fs.readFile(resultPath, "utf8")) as {
             skippedReason?: string;
             findings?: unknown[];
+            suppressedDuplicates?: unknown[];
           };
           if (result.skippedReason) throw new Error(result.skippedReason);
           generatorFindingCount = Array.isArray(result.findings) ? result.findings.length : 0;
+          const suppressedDuplicates = Array.isArray(result.suppressedDuplicates) ? result.suppressedDuplicates : [];
+          generatorSuppressedCount = suppressedDuplicates.length;
+          await fs.writeFile(generatorSuppressedPath, JSON.stringify(suppressedDuplicates, null, 2), { mode: 0o600 });
           report = await fs.readFile(reportPath, "utf8");
           const context = await fs.readFile(contextPath, "utf8");
           artifactDigest = createHash("sha256").update(report).digest("hex");
@@ -313,6 +390,8 @@ try {
         await fs.writeFile(path.join(runDir, "finished.json"), JSON.stringify({
           startedAt, finishedAt: new Date().toISOString(), status, model, modelDigest, baseSha,
           scriptDigest, promptVersion: 1, artifactDigest, contextDigest,
+          generatorHistoryDigest, generatorHistoryFindingCount,
+          generatorSuppressedCount,
           generator: generatorAttempts,
           evidenceReview,
         }, null, 2));

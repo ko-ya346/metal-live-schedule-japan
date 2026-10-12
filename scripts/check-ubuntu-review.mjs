@@ -20,12 +20,15 @@ const output = args.find(a => a.startsWith('--output=')).slice(9);
 const json = args.find(a => a.startsWith('--json-output=')).slice(14);
 const prompt = args.find(a => a.startsWith('--prompt-output='))?.slice(16);
 const attempts = args.find(a => a.startsWith('--attempts-output='))?.slice(18);
+const history = args.find(a => a.startsWith('--history-input='))?.slice(16);
+if (!history) throw new Error('History input missing');
+await fs.access(history);
 if (attempts && await fs.access('fail-generator').then(() => true, () => false)) {
   await fs.writeFile(attempts, JSON.stringify({ attemptCount: 2, initialAttemptSucceeded: false, retryCount: 1, finalStatus: 'failed' }));
   process.exit(1);
 }
 await fs.writeFile(output, args.includes('--prompt-only') ? 'prompt' : 'fixture report');
-await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }] }));
+await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }], suppressedDuplicates: [] }));
 if (prompt) await fs.writeFile(prompt, 'fixture context');
 if (attempts) await fs.writeFile(attempts, JSON.stringify({ attemptCount: 1, initialAttemptSucceeded: true, retryCount: 0, finalStatus: 'success' }));
 await fs.appendFile('calls', 'review\\n');
@@ -82,6 +85,10 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(initial.generator.attemptCount, 1);
   assert.equal(initial.generator.initialAttemptSucceeded, true);
   assert.equal(initial.generator.retryCount, 0);
+  assert.equal(initial.generatorHistoryFindingCount, 0);
+  assert.equal(initial.generatorSuppressedCount, 0);
+  assert.match(initial.generatorHistoryDigest, /^[a-f0-9]{64}$/);
+  assert.equal((await fs.stat(path.join(dir, "state", day, "generator-history.json"))).mode & 0o777, 0o600);
   assert.equal(initial.evidenceReview.status, "completed");
   assert.equal(initial.evidenceReview.experimentRun, 1);
   assert.equal(initial.artifactDigest, initial.evidenceReview.artifactDigest);
@@ -123,6 +130,45 @@ globalThis.fetch = async (url, options = {}) => {
   const capped = JSON.parse(await fs.readFile(path.join(cappedState, day, "finished.json")));
   assert.equal(capped.evidenceReview.status, "skipped");
   assert.equal(capped.evidenceReview.reason, "experiment_limit_reached");
+  const historyState = path.join(dir, "history-state");
+  for (let runIndex = 1; runIndex <= 8; runIndex += 1) {
+    const run = path.join(historyState, `run-${runIndex}`);
+    await fs.mkdir(run, { recursive: true });
+    await fs.writeFile(path.join(run, "finished.json"), JSON.stringify({
+      status: runIndex === 8 ? "failed" : "success",
+      finishedAt: `2026-10-${String(runIndex).padStart(2, "0")}T00:00:00.000Z`,
+    }));
+    await fs.writeFile(path.join(run, "result.json"), JSON.stringify({
+      findings: Array.from({ length: 4 }, (_, findingIndex) => ({
+        title: `run-${runIndex}-finding-${findingIndex}`,
+        category: "operation",
+        observation: "fixture observation",
+        hypothesis: "must not be copied",
+        suggestedIssueBody: "must not be copied",
+        evidence: ["fixture evidence"],
+      })),
+    }));
+  }
+  const emptyRun = path.join(historyState, "run-9-empty");
+  await fs.mkdir(emptyRun, { recursive: true });
+  await fs.writeFile(path.join(emptyRun, "finished.json"), JSON.stringify({
+    status: "success",
+    finishedAt: "2026-10-09T00:00:00.000Z",
+  }));
+  await fs.writeFile(path.join(emptyRun, "result.json"), JSON.stringify({ findings: [] }));
+  assert.equal(invoke("review", "history-state").status, 0);
+  const history = JSON.parse(await fs.readFile(path.join(historyState, day, "generator-history.json")));
+  assert.equal(history.sourceRuns.length, 5);
+  assert.equal(history.findingCount, 18);
+  assert.deepEqual(Object.keys(history.sourceRuns[0].findings[0]), ["title", "category", "observation", "evidence"]);
+  assert.equal(history.sourceRuns.some(item => item.runId === "run-8"), false);
+  assert.equal(history.sourceRuns.some(item => item.runId === "run-9-empty"), false);
+  assert.equal(history.sourceRuns[0].runId, "run-7");
+  const historyFinished = JSON.parse(await fs.readFile(path.join(historyState, day, "finished.json")));
+  assert.equal(historyFinished.generatorHistoryFindingCount, 18);
+  assert.equal(historyFinished.generatorSuppressedCount, 0);
+  assert.equal((await fs.stat(path.join(historyState, day, "generator-suppressed.json"))).mode & 0o777, 0o600);
+  assert.match(historyFinished.generatorHistoryDigest, /^[a-f0-9]{64}$/);
   await fs.mkdir(path.join(dir, "state", "review.lock"));
   assert.notEqual(invoke("review").status, 0);
   await fs.rm(path.join(dir, "state", "review.lock"), { recursive: true });
