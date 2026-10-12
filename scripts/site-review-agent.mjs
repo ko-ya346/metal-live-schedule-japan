@@ -379,6 +379,29 @@ async function getLatestMarkdown(dirPath) {
   };
 }
 
+function extractMarkdownSection(content, heading, maxLines) {
+  const lines = content.split("\n");
+  const start = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (start === -1) return null;
+  const nextHeading = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
+  const end = nextHeading === -1 ? lines.length : nextHeading;
+  return lines.slice(start, end).slice(0, maxLines).join("\n").trim();
+}
+
+function extractSearchConsoleEvidence(content) {
+  const sections = [
+    ["Summary", 10],
+    ["Top Queries", 10],
+    ["Low CTR Queries", 10],
+    ["Top Pages", 10],
+    ["Low CTR Pages", 10],
+  ].flatMap(([heading, maxLines]) => {
+    const section = extractMarkdownSection(content, heading, maxLines);
+    return section ? [section] : [];
+  });
+  return truncateText(sections.join("\n\n"), 3000);
+}
+
 async function collectContext(options, today) {
   const siteUrl = options.siteUrl.replace(/\/$/, "");
   const routes = [
@@ -934,7 +957,10 @@ async function main() {
     docs: {
       roadmap: truncateText(context.docs.roadmap ?? "Unavailable", 1000),
       latestGa4: context.docs.latestGa4 ? { path: context.docs.latestGa4.path, content: truncateText(context.docs.latestGa4.content ?? "", 700) } : null,
-      latestSearchConsole: context.docs.latestSearchConsole ? { path: context.docs.latestSearchConsole.path, content: truncateText(context.docs.latestSearchConsole.content ?? "", 700) } : null,
+      latestSearchConsole: context.docs.latestSearchConsole ? {
+        path: context.docs.latestSearchConsole.path,
+        content: extractSearchConsoleEvidence(context.docs.latestSearchConsole.content ?? ""),
+      } : null,
     },
     previousProposals,
   } : { ...context, previousProposals };

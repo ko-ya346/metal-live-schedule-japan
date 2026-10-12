@@ -104,6 +104,16 @@ try {
   const firstSuccess = await invoke("first-success", [{ content: validResult }]);
   assert.equal(firstSuccess.status, 0, firstSuccess.stderr);
   assert.equal(firstSuccess.requests.length, 1);
+  const firstPrompt = firstSuccess.requests[0].messages.at(-1).content;
+  const promptContext = JSON.parse(firstPrompt.slice(firstPrompt.indexOf("Context:\n") + "Context:\n".length));
+  const searchConsoleContext = promptContext.docs.latestSearchConsole.content;
+  assert.match(searchConsoleContext, /## Top Queries/);
+  assert.match(searchConsoleContext, /## Low CTR Queries/);
+  assert.match(searchConsoleContext, /## Top Pages/);
+  assert.match(searchConsoleContext, /## Low CTR Pages/);
+  assert.doesNotMatch(searchConsoleContext, /## Daily Trend/);
+  assert.doesNotMatch(searchConsoleContext, /## Improvement Notes/);
+  assert.ok(searchConsoleContext.length <= 3000);
   assert.equal(firstSuccess.requests[0].response_format.type, "json_schema");
   assert.deepEqual(
     firstSuccess.requests[0].response_format.json_schema.schema.required,
