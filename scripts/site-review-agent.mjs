@@ -587,6 +587,73 @@ function suppressInvalidSearchConsoleFindings(findings, searchConsoleEvidence) {
   return { findings: kept, suppressedFindings };
 }
 
+function groundSearchConsoleFindingsByReference(findings, searchConsoleEvidence) {
+  const records = [
+    ...(searchConsoleEvidence?.topQueries ?? []),
+    ...(searchConsoleEvidence?.lowCtrQueries ?? []),
+    ...(searchConsoleEvidence?.topPages ?? []),
+    ...(searchConsoleEvidence?.lowCtrPages ?? []),
+  ].filter((record) => record && typeof record === "object");
+  const grounded = [];
+  const suppressedFindings = [];
+
+  for (const finding of findings) {
+    const findingText = [
+      finding.title,
+      finding.observation,
+      finding.hypothesis,
+      finding.suggestedIssueBody,
+      ...(Array.isArray(finding.evidence) ? finding.evidence : []),
+    ].join("\n");
+
+    if (!/(?:search\s*console|サーチ\s*コンソール)/iu.test(findingText)) {
+      grounded.push(finding);
+      continue;
+    }
+
+    const matches = records.filter((record) => {
+      const identifier = record.query ?? record.page;
+      return typeof identifier === "string" && identifier.length > 0 && findingText.includes(identifier);
+    });
+
+    if (matches.length !== 1) {
+      suppressedFindings.push({
+        title: finding.title,
+        reason: "search_console_reference_not_unique",
+        matchedRecordCount: matches.length,
+      });
+      continue;
+    }
+
+    const record = matches[0];
+    const identifierType = typeof record.query === "string" ? "query" : "page";
+    const identifier = record[identifierType];
+    const metricLine = `clicks ${record.clicks}, impressions ${record.impressions}, ctr ${record.ctr}, position ${record.position}`;
+    grounded.push({
+      title: `Search Console: ${identifierType}「${identifier}」の検索結果を調査する`,
+      priority: "medium",
+      category: "analytics",
+      observation: `Search Consoleの${identifierType}「${identifier}」は ${metricLine}。これらは同じ入力行の値。`,
+      hypothesis: "この数値だけでは原因を特定できない。検索順位、検索意図、検索結果の表示内容を確認する余地がある。",
+      suggestedIssueBody: [
+        "### Problem",
+        `Search Consoleの${identifierType}「${identifier}」について、CTRの背景をこの集計値だけでは判断できない。`,
+        "",
+        "### Evidence",
+        `- ${metricLine}`,
+        "",
+        "### Suggested investigation",
+        "- Search Consoleで期間とランディングページを確認する。",
+        "- 実際の検索結果、検索順位、タイトル、説明文、掲載イベントとの関係を確認する。",
+        "- 原因を確認できるまではページ不足や導線不足を断定しない。",
+      ].join("\n"),
+      evidence: [`Search Console ${identifierType}: ${identifier}; ${metricLine}`],
+    });
+  }
+
+  return { findings: grounded, suppressedFindings };
+}
+
 function extractJsonObject(content) {
   const trimmed = content.trim();
 
@@ -1052,12 +1119,23 @@ async function main() {
   const rawResult = await callLlm(prompt, options.attemptsOutput);
   const skippedReason = rawResult?.skippedReason ?? null;
   const normalizedResult = skippedReason ? { summary: "", findings: [] } : normalizeResult(rawResult);
+  const searchConsoleGroundingMode = process.env.SITE_REVIEW_SEARCH_CONSOLE_GROUNDING || "exact-citation";
+  if (!["exact-citation", "reference"].includes(searchConsoleGroundingMode)) {
+    throw new Error(`Unsupported SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: ${searchConsoleGroundingMode}`);
+  }
+  const grounded = searchConsoleGroundingMode === "reference"
+    ? groundSearchConsoleFindingsByReference(
+      normalizedResult.findings,
+      promptContext.docs.latestSearchConsole?.content,
+    )
+    : { findings: normalizedResult.findings, suppressedFindings: [] };
   const evidenceChecked = suppressInvalidSearchConsoleFindings(
-    normalizedResult.findings,
+    grounded.findings,
     promptContext.docs.latestSearchConsole?.content,
   );
   const deduplicated = suppressExactHistoryDuplicates(evidenceChecked.findings, previousProposals);
   const suppressedFindings = [
+    ...grounded.suppressedFindings,
     ...evidenceChecked.suppressedFindings,
     ...deduplicated.suppressedDuplicates,
   ];
@@ -1073,6 +1151,7 @@ async function main() {
         today,
         siteUrl: context.siteUrl,
         skippedReason,
+        searchConsoleGroundingMode,
         shouldCreateIssue,
         suppressedDuplicates: suppressedFindings,
         ...result,

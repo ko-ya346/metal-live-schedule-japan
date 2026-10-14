@@ -37,6 +37,30 @@ const incompleteSearchConsoleResult = JSON.stringify({
     evidence: ["Search Console"],
   }],
 });
+const ambiguousSearchConsoleResult = JSON.stringify({
+  summary: "fixture ambiguous reference",
+  findings: [{
+    title: "Search Consoleの複数クエリをまとめて改善する",
+    priority: "medium",
+    category: "seo",
+    observation: "Search Consoleの beast in black 来日 2026 と a perfect circle 来日 を比較する。",
+    hypothesis: "fixture",
+    suggestedIssueBody: "fixture",
+    evidence: ["Search Console"],
+  }],
+});
+const unknownSearchConsoleResult = JSON.stringify({
+  summary: "fixture unknown reference",
+  findings: [{
+    title: "Search Consoleの未知クエリを改善する",
+    priority: "medium",
+    category: "seo",
+    observation: "Search Consoleの inputにないクエリ を調査する。",
+    hypothesis: "fixture",
+    suggestedIssueBody: "fixture",
+    evidence: ["Search Console"],
+  }],
+});
 const exactSearchConsoleResult = JSON.stringify({
   summary: "fixture exact citation",
   findings: [{
@@ -92,7 +116,7 @@ const address = server.address();
 assert.ok(address && typeof address === "object");
 const origin = `http://127.0.0.1:${address.port}`;
 
-async function invoke(name, responses, history = null) {
+async function invoke(name, responses, history = null, envOverrides = {}) {
   const directory = path.join(temporaryDirectory, name);
   await fs.mkdir(directory, { recursive: true, mode: 0o700 });
   queuedResponses = [...responses];
@@ -122,6 +146,7 @@ async function invoke(name, responses, history = null) {
       SITE_REVIEW_LLM_BASE_URL: `${origin}/v1`,
       SITE_REVIEW_LLM_MODEL: "fixture-model",
       SITE_REVIEW_LLM_REASONING_EFFORT: "none",
+      ...envOverrides,
     },
     stdio: ["ignore", "pipe", "pipe"],
   });
@@ -221,6 +246,42 @@ try {
     "search_console_citation_incomplete_or_mismatched",
   );
 
+  const referencedCitation = await invoke("referenced-search-console", [
+    { content: incompleteSearchConsoleResult },
+  ], null, { SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: "reference" });
+  assert.equal(referencedCitation.status, 0, referencedCitation.stderr);
+  const referencedCitationResult = JSON.parse(
+    await fs.readFile(path.join(referencedCitation.directory, "result.json"), "utf8"),
+  );
+  assert.equal(referencedCitationResult.searchConsoleGroundingMode, "reference");
+  assert.equal(referencedCitationResult.findings.length, 1);
+  assert.match(referencedCitationResult.findings[0].observation, /clicks 0, impressions 152, ctr 0\.0%, position 8\.4/);
+  assert.doesNotMatch(JSON.stringify(referencedCitationResult.findings[0]), /存在しない/);
+  assert.equal(referencedCitationResult.findings[0].category, "analytics");
+  assert.equal(referencedCitationResult.findings[0].priority, "medium");
+
+  const ambiguousReference = await invoke("ambiguous-search-console", [
+    { content: ambiguousSearchConsoleResult },
+  ], null, { SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: "reference" });
+  assert.equal(ambiguousReference.status, 0, ambiguousReference.stderr);
+  const ambiguousReferenceResult = JSON.parse(
+    await fs.readFile(path.join(ambiguousReference.directory, "result.json"), "utf8"),
+  );
+  assert.equal(ambiguousReferenceResult.findings.length, 0);
+  assert.equal(ambiguousReferenceResult.suppressedDuplicates[0].reason, "search_console_reference_not_unique");
+  assert.equal(ambiguousReferenceResult.suppressedDuplicates[0].matchedRecordCount, 2);
+
+  const unknownReference = await invoke("unknown-search-console", [
+    { content: unknownSearchConsoleResult },
+  ], null, { SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: "reference" });
+  assert.equal(unknownReference.status, 0, unknownReference.stderr);
+  const unknownReferenceResult = JSON.parse(
+    await fs.readFile(path.join(unknownReference.directory, "result.json"), "utf8"),
+  );
+  assert.equal(unknownReferenceResult.findings.length, 0);
+  assert.equal(unknownReferenceResult.suppressedDuplicates[0].reason, "search_console_reference_not_unique");
+  assert.equal(unknownReferenceResult.suppressedDuplicates[0].matchedRecordCount, 0);
+
   const exactCitation = await invoke("exact-search-console", [
     { content: exactSearchConsoleResult },
   ]);
@@ -234,7 +295,7 @@ try {
 
   const nonSearchConsole = await invoke("non-search-console", [
     { content: nonSearchConsoleResult },
-  ]);
+  ], null, { SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: "reference" });
   assert.equal(nonSearchConsole.status, 0, nonSearchConsole.stderr);
   const nonSearchConsoleOutput = JSON.parse(
     await fs.readFile(path.join(nonSearchConsole.directory, "result.json"), "utf8"),
