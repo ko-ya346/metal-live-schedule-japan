@@ -61,6 +61,18 @@ const unknownSearchConsoleResult = JSON.stringify({
     evidence: ["Search Console"],
   }],
 });
+const topOnlySearchConsoleResult = JSON.stringify({
+  summary: "fixture top-only reference",
+  findings: [{
+    title: "Search Consoleのtop queryを調査する",
+    priority: "medium",
+    category: "seo",
+    observation: "Search Consoleの draconian 来日 を調査する。",
+    hypothesis: "fixture",
+    suggestedIssueBody: "fixture",
+    evidence: ["Search Console"],
+  }],
+});
 const exactSearchConsoleResult = JSON.stringify({
   summary: "fixture exact citation",
   findings: [{
@@ -254,6 +266,7 @@ try {
     await fs.readFile(path.join(referencedCitation.directory, "result.json"), "utf8"),
   );
   assert.equal(referencedCitationResult.searchConsoleGroundingMode, "reference");
+  assert.match(referencedCitationResult.summary, /決定的に組み立てた/);
   assert.equal(referencedCitationResult.findings.length, 1);
   assert.match(referencedCitationResult.findings[0].observation, /clicks 0, impressions 152, ctr 0\.0%, position 8\.4/);
   assert.doesNotMatch(JSON.stringify(referencedCitationResult.findings[0]), /存在しない/);
@@ -281,6 +294,17 @@ try {
   assert.equal(unknownReferenceResult.findings.length, 0);
   assert.equal(unknownReferenceResult.suppressedDuplicates[0].reason, "search_console_reference_not_unique");
   assert.equal(unknownReferenceResult.suppressedDuplicates[0].matchedRecordCount, 0);
+
+  const topOnlyReference = await invoke("top-only-search-console", [
+    { content: topOnlySearchConsoleResult },
+  ], null, { SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: "reference" });
+  assert.equal(topOnlyReference.status, 0, topOnlyReference.stderr);
+  const topOnlyReferenceResult = JSON.parse(
+    await fs.readFile(path.join(topOnlyReference.directory, "result.json"), "utf8"),
+  );
+  assert.equal(topOnlyReferenceResult.findings.length, 0);
+  assert.equal(topOnlyReferenceResult.suppressedDuplicates[0].reason, "search_console_reference_not_unique");
+  assert.equal(topOnlyReferenceResult.suppressedDuplicates[0].matchedRecordCount, 0);
 
   const exactCitation = await invoke("exact-search-console", [
     { content: exactSearchConsoleResult },

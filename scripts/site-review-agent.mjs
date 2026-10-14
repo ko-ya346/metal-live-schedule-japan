@@ -589,9 +589,7 @@ function suppressInvalidSearchConsoleFindings(findings, searchConsoleEvidence) {
 
 function groundSearchConsoleFindingsByReference(findings, searchConsoleEvidence) {
   const records = [
-    ...(searchConsoleEvidence?.topQueries ?? []),
     ...(searchConsoleEvidence?.lowCtrQueries ?? []),
-    ...(searchConsoleEvidence?.topPages ?? []),
     ...(searchConsoleEvidence?.lowCtrPages ?? []),
   ].filter((record) => record && typeof record === "object");
   const grounded = [];
@@ -1139,7 +1137,13 @@ async function main() {
     ...evidenceChecked.suppressedFindings,
     ...deduplicated.suppressedDuplicates,
   ];
-  const result = { ...normalizedResult, findings: deduplicated.findings };
+  const result = {
+    ...normalizedResult,
+    summary: searchConsoleGroundingMode === "reference"
+      ? `モデルが選択した低CTR識別子を元行へ照合し、${deduplicated.findings.length}件の調査候補を決定的に組み立てた。`
+      : normalizedResult.summary,
+    findings: deduplicated.findings,
+  };
   const report = buildReport({ result, today, skippedReason, promptOnly: false });
   const shouldCreateIssue = !skippedReason && result.findings.length > 0;
 
