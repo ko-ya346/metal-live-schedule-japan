@@ -25,6 +25,42 @@ const duplicateResult = JSON.stringify({
     evidence: ["同じ根拠"],
   }],
 });
+const incompleteSearchConsoleResult = JSON.stringify({
+  summary: "fixture incomplete citation",
+  findings: [{
+    title: "Search Consoleの低CTRクエリを改善する",
+    priority: "medium",
+    category: "seo",
+    observation: "Search Consoleでは beast in black 来日 2026 の表示回数が152、CTRが0.0%だった。",
+    hypothesis: "fixture",
+    suggestedIssueBody: "fixture",
+    evidence: ["Search Console"],
+  }],
+});
+const exactSearchConsoleResult = JSON.stringify({
+  summary: "fixture exact citation",
+  findings: [{
+    title: "Search Consoleの低CTRクエリを調査する",
+    priority: "medium",
+    category: "seo",
+    observation: "Search Consoleの beast in black 来日 2026 は clicks 0、impressions 152、ctr 0.0%、position 8.4。",
+    hypothesis: "検索結果上の訴求を確認する余地がある。",
+    suggestedIssueBody: "検索結果と対象ページを調査する。",
+    evidence: ["beast in black 来日 2026 / 0 / 152 / 0.0% / 8.4"],
+  }],
+});
+const nonSearchConsoleResult = JSON.stringify({
+  summary: "fixture non Search Console",
+  findings: [{
+    title: "候補確認画面の説明を改善する",
+    priority: "low",
+    category: "ux",
+    observation: "候補確認画面の冒頭説明が短い。",
+    hypothesis: "初回利用時に判断基準が伝わりにくい。",
+    suggestedIssueBody: "説明文を調査する。",
+    evidence: ["画面の抜粋"],
+  }],
+});
 const invalidSchemaResult = JSON.stringify({ summary: "missing findings" });
 const extraFieldResult = JSON.stringify({ summary: "extra field", findings: [], extra: true });
 const invalidJsonResult = '{"summary":"unfinished","findings":[';
@@ -169,6 +205,42 @@ try {
   assert.equal(deduplicatedResult.suppressedDuplicates.length, 1);
   assert.equal(deduplicatedResult.suppressedDuplicates[0].matchedRunId, "seed");
   assert.equal(deduplicatedResult.shouldCreateIssue, false);
+
+  const incompleteCitation = await invoke("incomplete-search-console", [
+    { content: incompleteSearchConsoleResult },
+  ]);
+  assert.equal(incompleteCitation.status, 0, incompleteCitation.stderr);
+  const incompleteCitationResult = JSON.parse(
+    await fs.readFile(path.join(incompleteCitation.directory, "result.json"), "utf8"),
+  );
+  assert.equal(incompleteCitationResult.findings.length, 0);
+  assert.equal(incompleteCitationResult.shouldCreateIssue, false);
+  assert.equal(incompleteCitationResult.suppressedDuplicates.length, 1);
+  assert.equal(
+    incompleteCitationResult.suppressedDuplicates[0].reason,
+    "search_console_citation_incomplete_or_mismatched",
+  );
+
+  const exactCitation = await invoke("exact-search-console", [
+    { content: exactSearchConsoleResult },
+  ]);
+  assert.equal(exactCitation.status, 0, exactCitation.stderr);
+  const exactCitationResult = JSON.parse(
+    await fs.readFile(path.join(exactCitation.directory, "result.json"), "utf8"),
+  );
+  assert.equal(exactCitationResult.findings.length, 1);
+  assert.equal(exactCitationResult.shouldCreateIssue, true);
+  assert.equal(exactCitationResult.suppressedDuplicates.length, 0);
+
+  const nonSearchConsole = await invoke("non-search-console", [
+    { content: nonSearchConsoleResult },
+  ]);
+  assert.equal(nonSearchConsole.status, 0, nonSearchConsole.stderr);
+  const nonSearchConsoleOutput = JSON.parse(
+    await fs.readFile(path.join(nonSearchConsole.directory, "result.json"), "utf8"),
+  );
+  assert.equal(nonSearchConsoleOutput.findings.length, 1);
+  assert.equal(nonSearchConsoleOutput.shouldCreateIssue, true);
 
   const parseRetry = await invoke("parse-retry", [
     { content: invalidJsonResult },

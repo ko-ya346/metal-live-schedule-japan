@@ -544,6 +544,49 @@ function suppressExactHistoryDuplicates(findings, previousProposals) {
   return { findings: kept, suppressedDuplicates };
 }
 
+function suppressInvalidSearchConsoleFindings(findings, searchConsoleEvidence) {
+  const records = [
+    ...(searchConsoleEvidence?.topQueries ?? []),
+    ...(searchConsoleEvidence?.lowCtrQueries ?? []),
+    ...(searchConsoleEvidence?.topPages ?? []),
+    ...(searchConsoleEvidence?.lowCtrPages ?? []),
+  ].filter((record) => record && typeof record === "object");
+  const kept = [];
+  const suppressedFindings = [];
+
+  for (const finding of findings) {
+    const findingText = [
+      finding.title,
+      finding.observation,
+      finding.hypothesis,
+      finding.suggestedIssueBody,
+      ...(Array.isArray(finding.evidence) ? finding.evidence : []),
+    ].join("\n");
+
+    if (!/(?:search\s*console|サーチ\s*コンソール)/iu.test(findingText)) {
+      kept.push(finding);
+      continue;
+    }
+
+    const matchingRecord = records.find((record) => {
+      const identifier = record.query ?? record.page;
+      return [identifier, record.clicks, record.impressions, record.ctr, record.position]
+        .every((value) => typeof value === "string" && value.length > 0 && findingText.includes(value));
+    });
+
+    if (matchingRecord) {
+      kept.push(finding);
+    } else {
+      suppressedFindings.push({
+        title: finding.title,
+        reason: "search_console_citation_incomplete_or_mismatched",
+      });
+    }
+  }
+
+  return { findings: kept, suppressedFindings };
+}
+
 function extractJsonObject(content) {
   const trimmed = content.trim();
 
@@ -1009,7 +1052,15 @@ async function main() {
   const rawResult = await callLlm(prompt, options.attemptsOutput);
   const skippedReason = rawResult?.skippedReason ?? null;
   const normalizedResult = skippedReason ? { summary: "", findings: [] } : normalizeResult(rawResult);
-  const deduplicated = suppressExactHistoryDuplicates(normalizedResult.findings, previousProposals);
+  const evidenceChecked = suppressInvalidSearchConsoleFindings(
+    normalizedResult.findings,
+    promptContext.docs.latestSearchConsole?.content,
+  );
+  const deduplicated = suppressExactHistoryDuplicates(evidenceChecked.findings, previousProposals);
+  const suppressedFindings = [
+    ...evidenceChecked.suppressedFindings,
+    ...deduplicated.suppressedDuplicates,
+  ];
   const result = { ...normalizedResult, findings: deduplicated.findings };
   const report = buildReport({ result, today, skippedReason, promptOnly: false });
   const shouldCreateIssue = !skippedReason && result.findings.length > 0;
@@ -1023,7 +1074,7 @@ async function main() {
         siteUrl: context.siteUrl,
         skippedReason,
         shouldCreateIssue,
-        suppressedDuplicates: deduplicated.suppressedDuplicates,
+        suppressedDuplicates: suppressedFindings,
         ...result,
       },
       null,
