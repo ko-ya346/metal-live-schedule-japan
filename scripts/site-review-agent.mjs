@@ -379,6 +379,49 @@ async function getLatestMarkdown(dirPath) {
   };
 }
 
+function extractMarkdownSection(content, heading) {
+  const lines = content.split("\n");
+  const start = lines.findIndex((line) => line.trim() === `## ${heading}`);
+  if (start === -1) return null;
+  const nextHeading = lines.findIndex((line, index) => index > start && /^##\s+/.test(line));
+  const end = nextHeading === -1 ? lines.length : nextHeading;
+  return lines.slice(start, end).join("\n").trim();
+}
+
+function extractSearchConsoleEvidence(content) {
+  const summary = Object.fromEntries(
+    (extractMarkdownSection(content, "Summary") ?? "")
+      .split("\n")
+      .flatMap((line) => {
+        const match = line.match(/^- ([^:]+): (.+)$/);
+        return match ? [[match[1], match[2]]] : [];
+      }),
+  );
+  const parseTable = (heading) => {
+    const rows = (extractMarkdownSection(content, heading) ?? "")
+      .split("\n")
+      .filter((line) => line.trim().startsWith("|"))
+      .map((line) => line.split("|").slice(1, -1).map((cell) => cell.trim()));
+    if (rows.length < 3) return [];
+    const headers = rows[0];
+    return rows.slice(2, 7).map((cells) => Object.fromEntries(
+      headers.map((header, index) => [header.toLowerCase(), cells[index] ?? ""]),
+    ));
+  };
+  const evidence = {
+    summary,
+    topQueries: parseTable("Top Queries"),
+    lowCtrQueries: parseTable("Low CTR Queries"),
+    topPages: parseTable("Top Pages"),
+    lowCtrPages: parseTable("Low CTR Pages"),
+  };
+  const arrays = [evidence.topQueries, evidence.lowCtrQueries, evidence.topPages, evidence.lowCtrPages];
+  while (JSON.stringify(evidence).length > 3000 && arrays.some((rows) => rows.length > 0)) {
+    arrays.sort((left, right) => right.length - left.length)[0].pop();
+  }
+  return evidence;
+}
+
 async function collectContext(options, today) {
   const siteUrl = options.siteUrl.replace(/\/$/, "");
   const routes = [
@@ -436,6 +479,11 @@ function buildPrompt(context) {
     "- previousProposalsに同じ問題と同じ根拠の提案がある場合、言い換えて再提案しない。",
     "- 同じ問題でも、previousProposalsにない新しい根拠を具体的に示せる場合だけ再提案してよい。",
     "- 新しい価値のある提案がなければ findings は空配列にする。件数を埋めない。",
+    "- Search Consoleの数値は同じJSON object内のquery/pageとだけ対応付け、別の行のCTRやpositionを混ぜない。",
+    "- 高いCTRを低いと評価しない。入力にないqueryとpageの対応関係や導線不足を事実として断定しない。",
+    "- Search Consoleから問題を探す場合は lowCtrQueries と lowCtrPages を優先する。topQueriesやtopPagesの高CTRだけを理由に改善案を作らない。",
+    "- Search Console由来のfindingは、同じobjectのqueryまたはpage、clicks、impressions、ctr、positionを原文どおりobservationかevidenceへ全て書く。識別子を翻訳・言い換えしない。",
+    "- Search Consoleの識別子と4数値を正確に引用できない場合、そのfindingは出さない。",
     "- findings は重要なものから最大3件。短く、根拠付きで書く。",
     "- issue化する価値が低いものは findings から外す。",
     "- GitHub Issueに貼る前提で、具体的な作業に落とせる内容にする。",
@@ -494,6 +542,49 @@ function suppressExactHistoryDuplicates(findings, previousProposals) {
   }
 
   return { findings: kept, suppressedDuplicates };
+}
+
+function suppressInvalidSearchConsoleFindings(findings, searchConsoleEvidence) {
+  const records = [
+    ...(searchConsoleEvidence?.topQueries ?? []),
+    ...(searchConsoleEvidence?.lowCtrQueries ?? []),
+    ...(searchConsoleEvidence?.topPages ?? []),
+    ...(searchConsoleEvidence?.lowCtrPages ?? []),
+  ].filter((record) => record && typeof record === "object");
+  const kept = [];
+  const suppressedFindings = [];
+
+  for (const finding of findings) {
+    const findingText = [
+      finding.title,
+      finding.observation,
+      finding.hypothesis,
+      finding.suggestedIssueBody,
+      ...(Array.isArray(finding.evidence) ? finding.evidence : []),
+    ].join("\n");
+
+    if (!/(?:search\s*console|サーチ\s*コンソール)/iu.test(findingText)) {
+      kept.push(finding);
+      continue;
+    }
+
+    const matchingRecord = records.find((record) => {
+      const identifier = record.query ?? record.page;
+      return [identifier, record.clicks, record.impressions, record.ctr, record.position]
+        .every((value) => typeof value === "string" && value.length > 0 && findingText.includes(value));
+    });
+
+    if (matchingRecord) {
+      kept.push(finding);
+    } else {
+      suppressedFindings.push({
+        title: finding.title,
+        reason: "search_console_citation_incomplete_or_mismatched",
+      });
+    }
+  }
+
+  return { findings: kept, suppressedFindings };
 }
 
 function extractJsonObject(content) {
@@ -934,7 +1025,10 @@ async function main() {
     docs: {
       roadmap: truncateText(context.docs.roadmap ?? "Unavailable", 1000),
       latestGa4: context.docs.latestGa4 ? { path: context.docs.latestGa4.path, content: truncateText(context.docs.latestGa4.content ?? "", 700) } : null,
-      latestSearchConsole: context.docs.latestSearchConsole ? { path: context.docs.latestSearchConsole.path, content: truncateText(context.docs.latestSearchConsole.content ?? "", 700) } : null,
+      latestSearchConsole: context.docs.latestSearchConsole ? {
+        path: context.docs.latestSearchConsole.path,
+        content: extractSearchConsoleEvidence(context.docs.latestSearchConsole.content ?? ""),
+      } : null,
     },
     previousProposals,
   } : { ...context, previousProposals };
@@ -958,7 +1052,15 @@ async function main() {
   const rawResult = await callLlm(prompt, options.attemptsOutput);
   const skippedReason = rawResult?.skippedReason ?? null;
   const normalizedResult = skippedReason ? { summary: "", findings: [] } : normalizeResult(rawResult);
-  const deduplicated = suppressExactHistoryDuplicates(normalizedResult.findings, previousProposals);
+  const evidenceChecked = suppressInvalidSearchConsoleFindings(
+    normalizedResult.findings,
+    promptContext.docs.latestSearchConsole?.content,
+  );
+  const deduplicated = suppressExactHistoryDuplicates(evidenceChecked.findings, previousProposals);
+  const suppressedFindings = [
+    ...evidenceChecked.suppressedFindings,
+    ...deduplicated.suppressedDuplicates,
+  ];
   const result = { ...normalizedResult, findings: deduplicated.findings };
   const report = buildReport({ result, today, skippedReason, promptOnly: false });
   const shouldCreateIssue = !skippedReason && result.findings.length > 0;
@@ -972,7 +1074,7 @@ async function main() {
         siteUrl: context.siteUrl,
         skippedReason,
         shouldCreateIssue,
-        suppressedDuplicates: deduplicated.suppressedDuplicates,
+        suppressedDuplicates: suppressedFindings,
         ...result,
       },
       null,
