@@ -326,6 +326,7 @@ try {
   );
   assert.equal(nonSearchConsoleOutput.findings.length, 1);
   assert.equal(nonSearchConsoleOutput.shouldCreateIssue, true);
+  assert.match(nonSearchConsoleOutput.summary, /0件のSearch Console調査候補/);
 
   const parseRetry = await invoke("parse-retry", [
     { content: invalidJsonResult },

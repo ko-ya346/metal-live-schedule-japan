@@ -49,3 +49,5 @@ The accepted Evergrey candidate became Issue #105. Query-page Search Console dat
 The evidence-integrity objective passed: all eight grounded findings used exact source-row metrics and contained no model-written absence claims. The human-triage objective passed at its two-minute boundary. The downstream value objective did not pass: the one accepted investigation produced no implementation action.
 
 Keep the mode opt-in and the timer disabled. Do not enable it as the routine path until later samples show that grounded candidates lead to useful investigations often enough to justify human review time.
+
+Post-evaluation Codex review fixed two bookkeeping issues without changing candidate construction: failed runs now retain the attempted grounding mode in `finished.json`, and the deterministic summary counts only grounded Search Console findings rather than unrelated passthrough findings. Fixtures cover the corrected behavior; the five model runs were not repeated because their candidate selection and grounding logic did not change.

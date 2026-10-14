@@ -594,6 +594,7 @@ function groundSearchConsoleFindingsByReference(findings, searchConsoleEvidence)
   ].filter((record) => record && typeof record === "object");
   const grounded = [];
   const suppressedFindings = [];
+  let groundedSearchConsoleCount = 0;
 
   for (const finding of findings) {
     const findingText = [
@@ -647,9 +648,10 @@ function groundSearchConsoleFindingsByReference(findings, searchConsoleEvidence)
       ].join("\n"),
       evidence: [`Search Console ${identifierType}: ${identifier}; ${metricLine}`],
     });
+    groundedSearchConsoleCount += 1;
   }
 
-  return { findings: grounded, suppressedFindings };
+  return { findings: grounded, suppressedFindings, groundedSearchConsoleCount };
 }
 
 function extractJsonObject(content) {
@@ -1126,7 +1128,7 @@ async function main() {
       normalizedResult.findings,
       promptContext.docs.latestSearchConsole?.content,
     )
-    : { findings: normalizedResult.findings, suppressedFindings: [] };
+    : { findings: normalizedResult.findings, suppressedFindings: [], groundedSearchConsoleCount: 0 };
   const evidenceChecked = suppressInvalidSearchConsoleFindings(
     grounded.findings,
     promptContext.docs.latestSearchConsole?.content,
@@ -1140,7 +1142,7 @@ async function main() {
   const result = {
     ...normalizedResult,
     summary: searchConsoleGroundingMode === "reference"
-      ? `モデルが選択した低CTR識別子を元行へ照合し、${deduplicated.findings.length}件の調査候補を決定的に組み立てた。`
+      ? `モデルが選択した低CTR識別子を元行へ照合し、${grounded.groundedSearchConsoleCount}件のSearch Console調査候補を決定的に組み立てた。Search Console以外のfindingは従来処理のまま。`
       : normalizedResult.summary,
     findings: deduplicated.findings,
   };

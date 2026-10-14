@@ -259,7 +259,7 @@ try {
       let generatorHistoryDigest = "unknown";
       let generatorHistoryFindingCount = 0;
       let generatorSuppressedCount = 0;
-      let searchConsoleGroundingMode = "exact-citation";
+      let searchConsoleGroundingMode = process.env.SITE_REVIEW_SEARCH_CONSOLE_GROUNDING || "exact-citation";
       let evidenceReview: EvidenceReviewState = {
         status: "skipped",
         reason: mode === "prompt-only" ? "prompt_only" : "generator_not_completed",
