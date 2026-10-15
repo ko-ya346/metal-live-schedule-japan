@@ -1,5 +1,7 @@
 # Ubuntu提案専用ジョブ（#78の初期段階）
 
+> **Legacy/manual only:** open-weightチームは2026-10-15に候補生成専用へ役割変更した。このsite-review jobは実験再現用として残すが、通常運用では起動せず、timerも無効のままにする。現行方針は[open-weight candidate operations team](openweight-candidate-team.md)を参照。
+
 この実装はサイト改善の提案とIssue通知だけを行う。コード編集、候補追加、公開、PR承認、マージは行わない。
 自動実装の承認判定や候補抽出モデルの評価は後続段階であり、未実装。
 
