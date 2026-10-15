@@ -78,8 +78,19 @@ const knownSummaryLimit = Number(args.get("known-limit") ?? "16");
 const fetchTimeoutMs = Number(args.get("fetch-timeout-ms") ?? "25000");
 const fetchRetryCount = Number(args.get("fetch-retries") ?? "3");
 const retryBaseDelayMs = Number(args.get("fetch-retry-delay-ms") ?? "1500");
-const model = process.env.OPENAI_MODEL || "gpt-4.1-mini";
-const apiKey = process.env.OPENAI_API_KEY || "";
+const model =
+  process.env.CANDIDATE_LLM_MODEL ||
+  process.env.OPENAI_MODEL ||
+  "gpt-4.1-mini";
+const apiKey =
+  process.env.CANDIDATE_LLM_API_KEY ||
+  process.env.OPENAI_API_KEY ||
+  "";
+const llmBaseUrl = (
+  process.env.CANDIDATE_LLM_BASE_URL ||
+  process.env.OPENAI_BASE_URL ||
+  "https://api.openai.com/v1"
+).replace(/\/+$/, "");
 const datePattern = /^\d{4}-\d{2}-\d{2}$/;
 const today = new Intl.DateTimeFormat("sv-SE", {
   timeZone: "Asia/Tokyo",
@@ -947,21 +958,35 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
   return normalizedCandidate;
 }
 
-async function callOpenAI(prompt) {
+function isLoopbackUrl(value) {
+  try {
+    const hostname = new URL(value).hostname;
+    return hostname === "localhost" || hostname === "127.0.0.1" || hostname === "[::1]";
+  } catch {
+    return false;
+  }
+}
+
+async function callCandidateLlm(prompt) {
   if (promptOnly) {
-    return { candidates: [], skippedReason: "prompt-only mode; OpenAI request was skipped." };
+    return { candidates: [], skippedReason: "prompt-only mode; candidate LLM request was skipped." };
   }
 
-  if (!apiKey) {
-    return { candidates: [], skippedReason: "OPENAI_API_KEY is not configured." };
+  if (!apiKey && !isLoopbackUrl(llmBaseUrl)) {
+    return {
+      candidates: [],
+      skippedReason: "Candidate LLM API key is not configured for a non-local endpoint.",
+    };
   }
 
-  const response = await fetch("https://api.openai.com/v1/chat/completions", {
+  const headers = { "Content-Type": "application/json" };
+  if (apiKey) {
+    headers.Authorization = `Bearer ${apiKey}`;
+  }
+
+  const response = await fetch(`${llmBaseUrl}/chat/completions`, {
     method: "POST",
-    headers: {
-      Authorization: `Bearer ${apiKey}`,
-      "Content-Type": "application/json",
-    },
+    headers,
     body: JSON.stringify({
       model,
       temperature: 0.1,
@@ -983,7 +1008,7 @@ async function callOpenAI(prompt) {
     const body = await response.text();
     return {
       candidates: [],
-      skippedReason: `OpenAI request failed: HTTP ${response.status} ${body}`,
+      skippedReason: `Candidate LLM request failed: HTTP ${response.status} ${body}`,
     };
   }
 
@@ -991,7 +1016,7 @@ async function callOpenAI(prompt) {
   const content = data?.choices?.[0]?.message?.content;
 
   if (typeof content !== "string" || content.trim().length === 0) {
-    throw new Error("OpenAI response was empty");
+    throw new Error("Candidate LLM response was empty");
   }
 
   return extractJsonObject(content);
@@ -1098,6 +1123,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     `- 候補リンクがあったソース数: ${sections.length}`,
     `- 取得ページ数: ${summaries.length}`,
     `- プロンプトモード: ${promptMode}`,
+    `- 生成モデル: ${model}`,
     `- プロンプト概算: ${prompt.length.toLocaleString()} chars / 約${estimateTokens(prompt).toLocaleString()} tokens`,
     `- 追加候補数: ${candidates.length}`,
     `- 重複/不正で除外: ${skipped}`,
@@ -1165,7 +1191,7 @@ async function main() {
   const knownIds = buildKnownIdSet();
   const knownSummary = getKnownSummary();
   const prompt = buildPrompt(summaries, knownSummary);
-  const parsed = await callOpenAI(prompt);
+  const parsed = await callCandidateLlm(prompt);
   const rawCandidates = Array.isArray(parsed.candidates) ? parsed.candidates : [];
   const candidates = [];
   let skipped = parsed.skippedReason ? 1 : 0;
