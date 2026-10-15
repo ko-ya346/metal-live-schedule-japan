@@ -242,6 +242,9 @@ try {
         SITE_REVIEW_LLM_BASE_URL: "http://127.0.0.1:11434/v1",
         SITE_REVIEW_LLM_MODEL: model,
         SITE_REVIEW_LLM_REASONING_EFFORT: "none",
+        ...(process.env.SITE_REVIEW_SEARCH_CONSOLE_GROUNDING
+          ? { SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: process.env.SITE_REVIEW_SEARCH_CONSOLE_GROUNDING }
+          : {}),
       };
       const startedAt = new Date().toISOString();
       let status = "success";
@@ -256,6 +259,7 @@ try {
       let generatorHistoryDigest = "unknown";
       let generatorHistoryFindingCount = 0;
       let generatorSuppressedCount = 0;
+      let searchConsoleGroundingMode = process.env.SITE_REVIEW_SEARCH_CONSOLE_GROUNDING || "exact-citation";
       let evidenceReview: EvidenceReviewState = {
         status: "skipped",
         reason: mode === "prompt-only" ? "prompt_only" : "generator_not_completed",
@@ -297,9 +301,11 @@ try {
             skippedReason?: string;
             findings?: unknown[];
             suppressedDuplicates?: unknown[];
+            searchConsoleGroundingMode?: string;
           };
           if (result.skippedReason) throw new Error(result.skippedReason);
           generatorFindingCount = Array.isArray(result.findings) ? result.findings.length : 0;
+          searchConsoleGroundingMode = result.searchConsoleGroundingMode || searchConsoleGroundingMode;
           const suppressedDuplicates = Array.isArray(result.suppressedDuplicates) ? result.suppressedDuplicates : [];
           generatorSuppressedCount = suppressedDuplicates.length;
           await fs.writeFile(generatorSuppressedPath, JSON.stringify(suppressedDuplicates, null, 2), { mode: 0o600 });
@@ -392,6 +398,7 @@ try {
           scriptDigest, promptVersion: 1, artifactDigest, contextDigest,
           generatorHistoryDigest, generatorHistoryFindingCount,
           generatorSuppressedCount,
+          searchConsoleGroundingMode,
           generator: generatorAttempts,
           evidenceReview,
         }, null, 2));

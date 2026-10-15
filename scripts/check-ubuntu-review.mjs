@@ -28,7 +28,7 @@ if (attempts && await fs.access('fail-generator').then(() => true, () => false))
   process.exit(1);
 }
 await fs.writeFile(output, args.includes('--prompt-only') ? 'prompt' : 'fixture report');
-await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }], suppressedDuplicates: [] }));
+await fs.writeFile(json, JSON.stringify({ findings: [{ title: 'fixture' }], suppressedDuplicates: [], searchConsoleGroundingMode: process.env.SITE_REVIEW_SEARCH_CONSOLE_GROUNDING || 'exact-citation' }));
 if (prompt) await fs.writeFile(prompt, 'fixture context');
 if (attempts) await fs.writeFile(attempts, JSON.stringify({ attemptCount: 1, initialAttemptSucceeded: true, retryCount: 0, finalStatus: 'success' }));
 await fs.appendFile('calls', 'review\\n');
@@ -87,6 +87,7 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(initial.generator.retryCount, 0);
   assert.equal(initial.generatorHistoryFindingCount, 0);
   assert.equal(initial.generatorSuppressedCount, 0);
+  assert.equal(initial.searchConsoleGroundingMode, "exact-citation");
   assert.match(initial.generatorHistoryDigest, /^[a-f0-9]{64}$/);
   assert.equal((await fs.stat(path.join(dir, "state", day, "generator-history.json"))).mode & 0o777, 0o600);
   assert.equal(initial.evidenceReview.status, "completed");
@@ -95,6 +96,11 @@ globalThis.fetch = async (url, options = {}) => {
   assert.equal(initial.contextDigest, initial.evidenceReview.contextDigest);
   assert.equal(invoke("review").status, 0);
   assert.equal(await fs.readFile(path.join(dir, "calls"), "utf8"), "review\nevidence\n");
+  assert.equal(invoke("review", "grounding-mode", "", {
+    SITE_REVIEW_SEARCH_CONSOLE_GROUNDING: "reference",
+  }).status, 0);
+  const groundingModeRun = JSON.parse(await fs.readFile(path.join(dir, "grounding-mode", day, "finished.json")));
+  assert.equal(groundingModeRun.searchConsoleGroundingMode, "reference");
   assert.equal(invoke("prompt-only").status, 0);
   assert.equal(await fs.readFile(path.join(dir, "state", day, "report.md"), "utf8"), "fixture report");
   assert.equal(invoke("notify", "state", "fake-test-token").status, 0);
