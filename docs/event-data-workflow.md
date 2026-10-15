@@ -149,6 +149,14 @@ LLM に候補収集を依頼する場合は、未 close の候補確認 issue �
 - `OPENAI_API_KEY`
 - 任意: `OPENAI_MODEL`
 
+Ubuntu の localhost で動く OpenAI 互換APIを手動検証するときは、以下を使えます。APIキーなしを許可するのは localhost だけです。
+
+- `CANDIDATE_LLM_BASE_URL`（例: `http://127.0.0.1:11434/v1`）
+- `CANDIDATE_LLM_MODEL`（例: `metals-review:8b`）
+- 任意: `CANDIDATE_LLM_API_KEY`
+
+これらを指定しない既存の GitHub Actions は、引き続き `OPENAI_API_KEY` と `OPENAI_MODEL` を使います。
+
 候補生成は通常、低トークンの compact モードで動きます。各ページの本文全文ではなく、日付、会場、出演、チケット、価格、優先アーティスト周辺の短い抜粋だけをLLMに渡します。
 
 ```bash

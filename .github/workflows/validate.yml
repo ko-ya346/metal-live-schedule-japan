@@ -28,6 +28,9 @@ jobs:
       - name: Check candidate review synchronization
         run: npm run check:candidate-review
 
+      - name: Check local candidate LLM compatibility
+        run: npm run check:research-candidates
+
       - name: Validate data
         run: npm run data:validate
 
