@@ -2,6 +2,14 @@
 
 This is a Next.js app for a Japan heavy metal live event calendar.
 
+## open-weight team role
+
+Ubuntu open-weight agents are a candidate-operations team. Their routine work is limited to finding official event sources, extracting candidate events, validating material fields, checking duplicates and tour dates, and preparing reviewable candidate data.
+
+They do not routinely propose product/UI/SEO changes, implement application code, or review application PRs. Human and Codex handle those responsibilities. Routine candidate work must remain reviewable in `/admin/candidates` and must never auto-publish or auto-merge.
+
+See `docs/openweight-candidate-team.md` for the canonical roles, workflow, boundaries, metrics, and rollout gate.
+
 ## LLM context policy
 
 When an agent needs project context, prefer the compact entry points first:

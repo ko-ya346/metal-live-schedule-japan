@@ -54,6 +54,8 @@ Candidate review issues are notifications only. Do not treat GitHub issues as a 
 
 ## Candidate Collection
 
+Ubuntu open-weight agents operate as a candidate-operations team. They scout official sources, extract events, validate fields and tour coverage, and prepare candidate data for human review. They do not routinely propose product/UI/SEO changes or implement application code. See `docs/openweight-candidate-team.md`.
+
 Preferred sources:
 
 1. Official promoter pages
