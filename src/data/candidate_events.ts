@@ -12351,7 +12351,7 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: false,
         ticketUrl: "https://w.pia.jp/t/mixedhell2026/",
         ticketLinks: [
-            {
+                        {
                 provider: "pia",
                 url: "https://w.pia.jp/t/mixedhell2026/",
                 affiliateUrl: null,
@@ -12371,10 +12371,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "CLUB CITTA'",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "CLUB CITTA'公式で2026-11-28、出演者、開場/開演、チケットぴあ、公式HPを確認。ラウド/メタルコア寄り出演者を含むため候補化。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "shadows-10th-anniversary-tour-final-2026-kanagawa",
