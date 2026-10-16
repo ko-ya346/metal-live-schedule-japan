@@ -10122,6 +10122,45 @@ const realEvents: Event[] = [
         publishedAt: "2026-10-16",
         updatedAt: "2026-10-16",
     },
+    {
+        id: "koshigaya-metal-bash-vol2-2026-saitama",
+        artists: [
+            "DOOM",
+            "SxOxB",
+            "HELLCHILD",
+            "KRISHNV",
+        ],
+        tourName: "KOSHIGAYA METAL BASH Vol.2 ～extreme dimension～",
+        date: "2026-11-22",
+        endDate: null,
+        prefecture: "埼玉県",
+        venue: "越谷EASY GOINGS",
+        genres: [
+            "Heavy Metal",
+            "Extreme Metal",
+        ],
+        isInternational: false,
+        ticketUrl: "https://eplus.jp/sf/detail/4606980001-P0030001P021001",
+        ticketLinks: [
+                        {
+                provider: "eplus",
+                url: "https://eplus.jp/sf/detail/4606980001-P0030001P021001",
+                affiliateUrl: null,
+                saleStartsAt: "2026-09-26",
+                saleStatus: "on_sale",
+                saleEndsAt: "2026-11-21",
+                priority: 1,
+            },
+        ],
+        imageUrl: null,
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: null,
+        status: "scheduled",
+        candidateCreatedAt: "2026-10-16",
+        publishedAt: "2026-10-16",
+        updatedAt: "2026-10-16",
+    },
 ];
 
 export const publishedEvents = realEvents;

@@ -12717,17 +12717,25 @@ export const candidateEvents: CandidateEvent[] = [
 
     {
         id: "koshigaya-metal-bash-vol2-2026-saitama",
-        artists: ["DOOM", "SxOxB", "HELLCHILD", "KRISHNV"],
+        artists: [
+            "DOOM",
+            "SxOxB",
+            "HELLCHILD",
+            "KRISHNV",
+        ],
         tourName: "KOSHIGAYA METAL BASH Vol.2 ～extreme dimension～",
         date: "2026-11-22",
         endDate: null,
         prefecture: "埼玉県",
         venue: "越谷EASY GOINGS",
-        genres: ["Heavy Metal", "Extreme Metal"],
+        genres: [
+            "Heavy Metal",
+            "Extreme Metal",
+        ],
         isInternational: false,
         ticketUrl: "https://eplus.jp/sf/detail/4606980001-P0030001P021001",
         ticketLinks: [
-            {
+                        {
                 provider: "eplus",
                 url: "https://eplus.jp/sf/detail/4606980001-P0030001P021001",
                 affiliateUrl: null,
@@ -12746,9 +12754,9 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "eplus",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "open-weight抽出では出演者不足で除外されたため再調査。eplusで日付、会場、出演4組、開演17:30、一般発売期間を確認。",
         collectedAt: "2026-10-16",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
 ];
