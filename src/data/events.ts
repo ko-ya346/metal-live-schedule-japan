@@ -10085,6 +10085,43 @@ const realEvents: Event[] = [
         publishedAt: "2026-10-16",
         updatedAt: "2026-10-16",
     },
+    {
+        id: "sex-machineguns-2027-01-30-shibuya-cyclone",
+        artists: [
+            "Sally",
+            "SEX MACHINEGUNS",
+        ],
+        tourName: "Sally 2nd Album “RE:RAIGN” Release Tour Tokyo Final",
+        date: "2027-01-30",
+        endDate: null,
+        prefecture: "東京都",
+        venue: "SHIBUYA CYCLONE",
+        genres: [
+            "Heavy Metal",
+        ],
+        isInternational: false,
+        ticketUrl: "https://livepocket.jp/e/270130_s_smg",
+        ticketLinks: [
+                        {
+                provider: "livepocket",
+                url: "https://livepocket.jp/e/270130_s_smg",
+                affiliateUrl: null,
+                price: 6000,
+                saleStartsAt: "2026-10-17",
+                saleStatus: "not_started",
+                saleEndsAt: "2027-01-29",
+                priority: 1,
+            },
+        ],
+        imageUrl: "http://sexmachineguns.smg-fire.com/wp-content/uploads/20270130.png",
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: "http://sexmachineguns.smg-fire.com/?p=4121",
+        status: "scheduled",
+        candidateCreatedAt: "2026-10-16",
+        publishedAt: "2026-10-16",
+        updatedAt: "2026-10-16",
+    },
 ];
 
 export const publishedEvents = realEvents;

@@ -12674,17 +12674,22 @@ export const candidateEvents: CandidateEvent[] = [
 
     {
         id: "sex-machineguns-2027-01-30-shibuya-cyclone",
-        artists: ["Sally", "SEX MACHINEGUNS"],
+        artists: [
+            "Sally",
+            "SEX MACHINEGUNS",
+        ],
         tourName: "Sally 2nd Album “RE:RAIGN” Release Tour Tokyo Final",
         date: "2027-01-30",
         endDate: null,
         prefecture: "東京都",
         venue: "SHIBUYA CYCLONE",
-        genres: ["Heavy Metal"],
+        genres: [
+            "Heavy Metal",
+        ],
         isInternational: false,
         ticketUrl: "https://livepocket.jp/e/270130_s_smg",
         ticketLinks: [
-            {
+                        {
                 provider: "livepocket",
                 url: "https://livepocket.jp/e/270130_s_smg",
                 affiliateUrl: null,
@@ -12704,10 +12709,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "SEX MACHINEGUNS Official Site",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "open-weight生成後、別モデルで検証。SEX MACHINEGUNS公式とLivePocketで日付・会場・出演・前売価格・販売期間を確認。国内2組の公演のためisInternationalをfalseへ修正。",
         collectedAt: "2026-10-16",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
 
     {
