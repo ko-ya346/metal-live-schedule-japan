@@ -12291,7 +12291,7 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: false,
         ticketUrl: "https://eplus.jp/strikeback2026/",
         ticketLinks: [
-            {
+                        {
                 provider: "eplus",
                 url: "https://eplus.jp/strikeback2026/",
                 affiliateUrl: null,
@@ -12301,10 +12301,11 @@ export const candidateEvents: CandidateEvent[] = [
                 saleEndsAt: null,
                 priority: 1,
             },
-            {
+                        {
                 provider: "other",
                 url: "https://livepocket.jp/p/strikeback",
                 affiliateUrl: null,
+                saleStartsAt: null,
                 saleStatus: "unknown",
                 saleEndsAt: null,
                 priority: 2,
@@ -12319,10 +12320,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "CLUB CITTA'",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "CLUB CITTA'公式で2026-11-15、出演者、開場/開演、e+とLivepocket導線を確認。国内メタル/ラウド系イベントとして候補化。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "mixed-hell-2026-second-kanagawa-club-citta",
