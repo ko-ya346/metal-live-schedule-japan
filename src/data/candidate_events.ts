@@ -12494,29 +12494,32 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: true,
         ticketUrl: "https://www.marquee.co.jp/avalon_new/legends_of_avalon_2027/",
         ticketLinks: [
-            {
+                        {
                 provider: "pia",
                 url: "https://w.pia.jp/",
                 affiliateUrl: null,
                 price: 15000,
+                saleStartsAt: null,
                 saleStatus: "on_sale",
                 saleEndsAt: null,
                 priority: 1,
             },
-            {
+                        {
                 provider: "lawson",
                 url: "https://l-tike.com/",
                 affiliateUrl: null,
                 price: 15000,
+                saleStartsAt: null,
                 saleStatus: "on_sale",
                 saleEndsAt: null,
                 priority: 2,
             },
-            {
+                        {
                 provider: "eplus",
                 url: "https://eplus.jp/",
                 affiliateUrl: null,
                 price: 15000,
+                saleStartsAt: null,
                 saleStatus: "presale",
                 saleEndsAt: null,
                 priority: 3,
@@ -12531,10 +12534,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "CLUB CITTA'",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "CLUB CITTA'公式で2027-03-22、FROZEN CROWN / MOONLIGHT SORCERY など来日系メタル出演者、会場、開場/開演、複数チケット導線を確認。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "you-vs-fest-2027-kanagawa-club-citta",
