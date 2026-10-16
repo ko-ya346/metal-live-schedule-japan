@@ -12556,11 +12556,12 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: false,
         ticketUrl: "https://livepocket.jp/e/595d9",
         ticketLinks: [
-            {
+                        {
                 provider: "other",
                 url: "https://livepocket.jp/e/595d9",
                 affiliateUrl: null,
                 price: 6500,
+                saleStartsAt: null,
                 saleStatus: "presale",
                 saleEndsAt: null,
                 priority: 1,
@@ -12575,10 +12576,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "CLUB CITTA'",
         confidence: "medium",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "ignored",
         reviewNotes: "CLUB CITTA'公式HTMLで2027-04-03、See You Smile、Livepocket導線を確認。メタル専業ではないため掲載範囲はレビュー判断。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "cosmic-kaiju-clash-2027-tokyo-day1",
