@@ -10005,6 +10005,46 @@ const realEvents: Event[] = [
         publishedAt: "2026-10-16",
         updatedAt: "2026-10-16",
     },
+    {
+        id: "cosmic-kaiju-clash-2027-tokyo-day1",
+        artists: [
+            "Victorius",
+            "Serious Black",
+            "All for Metal",
+            "Allegiance Reign",
+        ],
+        tourName: "COSMIC KAIJU CLASH - Day.1",
+        date: "2027-03-05",
+        endDate: null,
+        prefecture: "東京都",
+        venue: "Daikanyama UNIT",
+        genres: [
+            "Power Metal",
+            "Heavy Metal",
+        ],
+        isInternational: true,
+        ticketUrl: "https://evp.jp/?event_place=&genre=&held=&project_artist=&sort=newest",
+        ticketLinks: [
+                        {
+                provider: "other",
+                url: "https://evp.jp/?event_place=&genre=&held=&project_artist=&sort=newest",
+                affiliateUrl: null,
+                price: 12000,
+                saleStartsAt: "2026-09-26",
+                saleStatus: "presale",
+                saleEndsAt: null,
+                priority: 1,
+            },
+        ],
+        imageUrl: null,
+        organizerName: "EVP4U",
+        organizerUrl: "https://evp.jp/",
+        officialUrl: null,
+        status: "scheduled",
+        candidateCreatedAt: "2026-10-12",
+        publishedAt: "2026-10-16",
+        updatedAt: "2026-10-16",
+    },
 ];
 
 export const publishedEvents = realEvents;

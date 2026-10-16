@@ -12601,7 +12601,7 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: true,
         ticketUrl: "https://evp.jp/?event_place=&genre=&held=&project_artist=&sort=newest",
         ticketLinks: [
-            {
+                        {
                 provider: "other",
                 url: "https://evp.jp/?event_place=&genre=&held=&project_artist=&sort=newest",
                 affiliateUrl: null,
@@ -12621,10 +12621,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "EVP4U",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "EVP4U公開中プロジェクトで2027-03-05、Daikanyama UNIT、Victorius / Serious Black / All for Metal / Allegiance Reignを確認。開催可否型プロジェクトのため販売状況はレビュー時に再確認推奨。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "cosmic-kaiju-clash-2027-tokyo-day2",
