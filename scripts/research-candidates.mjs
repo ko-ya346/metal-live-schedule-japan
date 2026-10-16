@@ -990,6 +990,7 @@ async function callCandidateLlm(prompt) {
     body: JSON.stringify({
       model,
       temperature: 0.1,
+      response_format: { type: "json_object" },
       messages: [
         {
           role: "system",
