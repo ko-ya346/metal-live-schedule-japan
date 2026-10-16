@@ -12393,7 +12393,7 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: false,
         ticketUrl: "https://eplus.jp/shadows/",
         ticketLinks: [
-            {
+                        {
                 provider: "eplus",
                 url: "https://eplus.jp/shadows/",
                 affiliateUrl: null,
@@ -12413,10 +12413,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "CLUB CITTA'",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "ignored",
         reviewNotes: "CLUB CITTA'公式で2026-11-29、SHADOWS、対バンあり、開場/開演、e+導線を確認。対バン未発表のため出演者追加余地あり。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "thick-festival-2027-kanagawa-club-citta",
