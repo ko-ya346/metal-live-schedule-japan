@@ -12447,7 +12447,7 @@ export const candidateEvents: CandidateEvent[] = [
         isInternational: false,
         ticketUrl: "https://eplus.jp/thickfestival/",
         ticketLinks: [
-            {
+                        {
                 provider: "eplus",
                 url: "https://eplus.jp/thickfestival/",
                 affiliateUrl: null,
@@ -12467,10 +12467,10 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "CLUB CITTA'",
         confidence: "medium",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "ignored",
         reviewNotes: "CLUB CITTA'公式で2027-01-10、出演者、開場/開演、e+導線を確認。メタル専業ではないが、ラウド/ハードコア寄りフェスとしてレビュー対象に追加。",
         collectedAt: "2026-10-12",
-        reviewedAt: null,
+        reviewedAt: "2026-10-16",
     },
     {
         id: "legends-of-avalon-2027-kanagawa-club-citta",
