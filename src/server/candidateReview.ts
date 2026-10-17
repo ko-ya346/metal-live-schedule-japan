@@ -10,9 +10,10 @@ import type { Event } from "../data/events";
 const exec = promisify(execFile);
 export const reviewFiles = ["src/data/candidate_events.ts", "src/data/event_update_candidates.ts", "src/data/events.ts"];
 export const reviewRepo = "ko-ya346/metal-live-schedule-japan";
-export type ReviewInfo = { revision: string; url: string; pending: boolean };
+export type ReviewInfo = { revision: string; url: string; pending: boolean; unsentChanges: number };
 type Config = { root: string; localBranch: string; branch: string; pr: number; url: string; origin: string };
-type Journal = { base: string; commit?: string; originals: string[] };
+type Journal = { base: string; commit?: string; originals: string[]; previousBatch?: Batch | null };
+type Batch = { base: string; actions: number };
 export type ReviewData = { candidateEvents: CandidateEvent[]; eventUpdateCandidates: EventUpdateCandidate[]; publishedEvents: Event[] };
 
 export function reviewEnabled() {
@@ -45,12 +46,23 @@ async function saveJournal(value: Journal) {
   await rename(`${file}.tmp`, file);
 }
 async function clearJournal() { await rm(path.join(await storage(), "candidate-review-pending.json"), { force: true }); }
+async function batch(): Promise<Batch | null> {
+  try { return JSON.parse(await readFile(path.join(await storage(), "candidate-review-batch.json"), "utf8")); }
+  catch (error) { if ((error as NodeJS.ErrnoException).code === "ENOENT") return null; throw error; }
+}
+async function saveBatch(value: Batch) {
+  const file = path.join(await storage(), "candidate-review-batch.json");
+  await writeFile(`${file}.tmp`, JSON.stringify(value), { mode: 0o600 });
+  await rename(`${file}.tmp`, file);
+}
+async function clearBatch() { await rm(path.join(await storage(), "candidate-review-batch.json"), { force: true }); }
 async function contents() { return Promise.all(reviewFiles.map((file) => readFile(/* turbopackIgnore: true */ file, "utf8"))); }
 async function revision() { return createHash("sha256").update(JSON.stringify([await git("rev-parse", "HEAD"), await contents()])).digest("hex"); }
 export async function reviewInfo(): Promise<ReviewInfo | null> {
   if (!reviewEnabled()) return null;
   const settings = await config();
-  return { revision: await revision(), url: settings.url, pending: !!await journal() };
+  const [pending, currentBatch] = await Promise.all([journal(), batch()]);
+  return { revision: await revision(), url: settings.url, pending: !!pending, unsentChanges: currentBatch?.actions ?? 0 };
 }
 class ReviewBusyError extends Error {}
 
@@ -98,8 +110,20 @@ async function checkPR(settings: Config) {
 async function remoteHead(settings: Config) {
   return (await git("ls-remote", "--heads", "origin", `refs/heads/${settings.branch}`)).split(/\s/)[0];
 }
+async function reviewChanges() {
+  const [changed, staged, untracked] = await Promise.all([
+    git("diff", "--name-only", "HEAD"),
+    git("diff", "--cached", "--name-only"),
+    git("ls-files", "--others", "--exclude-standard"),
+  ]);
+  const files = changed.split("\n").filter(Boolean);
+  if (files.some((file) => !reviewFiles.includes(file)) || staged || untracked) {
+    throw new Error("別の変更を検出したため保存を中止しました。");
+  }
+  return files;
+}
 async function clean() {
-  if (await git("status", "--porcelain")) throw new Error("作業場所に別の変更があります。自動保存を停止しました。変更を確認してください。");
+  if ((await reviewChanges()).length) throw new Error("作業場所に別の変更があります。自動保存を停止しました。変更を確認してください。");
 }
 async function pushPending(settings: Config, pending: Journal) {
   if (!pending.commit) throw new Error("ファイル保存が中断されています。運用手順の復旧コマンドを実行してください。");
@@ -116,15 +140,50 @@ async function pushPending(settings: Config, pending: Journal) {
   }
   if (await remoteHead(settings) !== pending.commit) throw new Error("PRの保存確認に失敗しました。再送で状態を確認してください。");
   await checkPR(settings);
+  // Keep the retry journal until the batch marker is gone. A crash between
+  // these operations can then safely retry the already-pushed commit.
+  await clearBatch();
   await clearJournal();
 }
-export async function retryReview(request: Request) {
+export async function saveReview(request: Request) {
   if (!reviewEnabled()) throw new Error("レビュー専用モードではありません。");
   assertReviewOrigin(request);
   return locked(async () => {
     const settings = await config();
     const pending = await journal();
-    if (pending) await pushPending(settings, pending);
+    if (pending) {
+      await pushPending(settings, pending);
+      return reviewInfo();
+    }
+    const currentBatch = await batch();
+    if (!currentBatch) return reviewInfo();
+    if (await git("rev-parse", "HEAD") !== currentBatch.base) throw new Error("確認開始後にHEADが変わっています。差分を確認してください。");
+    const changed = await reviewChanges();
+    if (!changed.length) {
+      await clearBatch();
+      return reviewInfo();
+    }
+    await command("npm", ["run", "data:validate"]);
+    await checkPR(settings);
+    if (await remoteHead(settings) !== currentBatch.base) {
+      throw new Error("PRが別の場所で更新されています。結果はUbuntuに保持しました。競合の解消が必要です。");
+    }
+    const nextPending: Journal = { base: currentBatch.base, originals: await contents() };
+    await saveJournal(nextPending);
+    try {
+      await git("add", "--", ...reviewFiles);
+      await git("commit", "--only", "-m", "Apply human candidate review", "--", ...reviewFiles);
+      nextPending.commit = await git("rev-parse", "HEAD");
+      await saveJournal(nextPending);
+    } catch (error) {
+      // Preserve the reviewed files for another save attempt when no commit exists.
+      if (await git("rev-parse", "HEAD") === currentBatch.base) {
+        await git("reset", "--", ...reviewFiles);
+        await clearJournal();
+      }
+      throw error;
+    }
+    await pushPending(settings, nextPending);
     return reviewInfo();
   });
 }
@@ -134,33 +193,27 @@ export async function withReviewWrite(request: Request, operation: (data?: Revie
   try {
     assertReviewOrigin(request);
     return await locked(async () => {
-      const settings = await config();
-      if (await journal()) throw new Error("前の確認結果が未送信です。再読み込みして「PRへ再送」を押してください。");
+      await config();
+      if (await journal()) throw new Error("前の処理が中断されています。画面を再読み込みして保存状態を確認してください。");
       if (request.headers.get("x-review-revision") !== await revision()) throw new Error("画面を開いた後にデータが変わりました。再読み込みして確認してください。");
-      await clean();
-      await checkPR(settings);
       const base = await git("rev-parse", "HEAD");
-      if (await remoteHead(settings) !== base) throw new Error("PRが更新されています。レビュー環境を再起動してください。");
-      const pending: Journal = { base, originals: await contents() };
+      const currentBatch = await batch();
+      if (currentBatch && currentBatch.base !== base) throw new Error("確認開始後にHEADが変わっています。差分を確認してください。");
+      const existingChanges = await reviewChanges();
+      if (!currentBatch && existingChanges.length) throw new Error("未記録の変更があります。差分を確認してください。");
+      const pending: Journal = { base, originals: await contents(), previousBatch: currentBatch };
       await saveJournal(pending);
       let response: Response;
       try {
         response = await operation(await readReviewData());
         if (!response.ok) throw new Error((await response.clone().json()).error ?? "保存に失敗しました。");
         await command("npm", ["run", "data:validate"]);
-        // Only the three review data files may be changed or staged.
-        const changed = (await git("diff", "--name-only", "HEAD")).split("\n").filter(Boolean);
-        if (changed.some((file) => !reviewFiles.includes(file)) || await git("diff", "--cached", "--name-only")) {
-          throw new Error("別の変更を検出したため保存を中止しました。");
-        }
-        if (changed.length) {
-          await git("add", "--", ...reviewFiles);
-          await git("commit", "--only", "-m", "Save human candidate review", "--", ...reviewFiles);
-          pending.commit = await git("rev-parse", "HEAD");
-          await saveJournal(pending);
-        } else { await clearJournal(); }
+        await reviewChanges();
+        const nextContents = await contents();
+        const operationChanged = nextContents.some((value, index) => value !== pending.originals[index]);
+        if (operationChanged) await saveBatch({ base, actions: (currentBatch?.actions ?? 0) + 1 });
+        await clearJournal();
       } catch (error) {
-        // Never erase a commit if interruption occurred just after git commit.
         if (await git("rev-parse", "HEAD") === base) {
           await Promise.all(reviewFiles.map((file, index) => writeFile(file, pending.originals[index])));
           await git("reset", "--", ...reviewFiles);
@@ -168,7 +221,6 @@ export async function withReviewWrite(request: Request, operation: (data?: Revie
         }
         throw error;
       }
-      if (pending.commit) await pushPending(settings, pending);
       return response;
     });
   } catch (error) {
@@ -181,10 +233,14 @@ export async function recoverReview() {
   return locked(async () => {
     await config();
     const pending = await journal();
-    if (!pending || pending.commit) throw new Error("復旧対象の中断ファイル保存がありません。送信待ちは画面から再送してください。");
+    if (!pending || pending.commit) throw new Error("復旧対象の中断ファイル保存がありません。送信待ちは画面から保存してください。");
     if (await git("rev-parse", "HEAD") !== pending.base) throw new Error("HEADが変わっています。手動で差分を確認してください。");
     await Promise.all(reviewFiles.map((file, index) => writeFile(file, pending.originals[index])));
     await git("reset", "--", ...reviewFiles);
+    if ("previousBatch" in pending) {
+      if (pending.previousBatch) await saveBatch(pending.previousBatch);
+      else await clearBatch();
+    }
     await clearJournal();
   });
 }

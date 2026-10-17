@@ -1,4 +1,4 @@
-import { reviewInfo, retryReview } from "@/src/server/candidateReview";
+import { reviewInfo, saveReview } from "@/src/server/candidateReview";
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 export async function GET() {
@@ -6,6 +6,6 @@ export async function GET() {
   catch { return Response.json({ error: "レビュー環境を確認してください。" }, { status: 409 }); }
 }
 export async function POST(request: Request) {
-  try { return Response.json({ sync: await retryReview(request) }); }
-  catch (error) { return Response.json({ error: error instanceof Error ? error.message : "再送に失敗しました。" }, { status: 409 }); }
+  try { return Response.json({ sync: await saveReview(request) }); }
+  catch (error) { return Response.json({ error: error instanceof Error ? error.message : "PRへの保存に失敗しました。" }, { status: 409 }); }
 }

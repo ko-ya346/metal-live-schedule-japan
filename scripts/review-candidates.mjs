@@ -53,11 +53,13 @@ const marker = path.join(gitDir, "candidate-review.json");
 // Git uses a dedicated local branch; its name must be stable throughout the session.
 const localBranch = await runGit("branch", "--show-current");
 if (localBranch !== `review-pr-${number}`) throw new Error("レビュー用のローカルブランチが変わっています。");
-let pending = false;
-try { await readFile(path.join(gitDir, "candidate-review-pending.json")); pending = true; }
-catch (error) { if (error.code !== "ENOENT") throw error; }
-if (await runGit("status", "--porcelain")) throw new Error(`未保存の変更があります。${root} の差分を確認してください。`);
-if (!pending) {
+let resume = false;
+for (const stateFile of ["candidate-review-pending.json", "candidate-review-batch.json"]) {
+  try { await readFile(path.join(gitDir, stateFile)); resume = true; }
+  catch (error) { if (error.code !== "ENOENT") throw error; }
+}
+if (!resume && await runGit("status", "--porcelain")) throw new Error(`未保存の変更があります。${root} の差分を確認してください。`);
+if (!resume) {
   await runGit("fetch", "origin", "main", pr.headRefName);
   await runGit("merge", "--ff-only", `origin/${pr.headRefName}`);
   // Existing candidate PRs receive the reviewed implementation after it lands on main.
@@ -73,7 +75,7 @@ async function run(file, args, env = process.env) {
   });
 }
 await run("npm", ["ci", "--no-audit", "--no-fund"]);
-if (!pending) {
+if (!resume) {
   for (const check of ["data:validate", "copy:check", "build"]) await run("npm", ["run", check]);
   const current = await getPR();
   if (current.headRefOid !== pr.headRefOid) throw new Error("準備中にPRが更新されました。起動コマンドをやり直してください。");
