@@ -1,0 +1,18 @@
+[Unit]
+Description=Always-on Metals Calendar candidate review page
+After=network-online.target
+
+[Service]
+Type=simple
+WorkingDirectory=%h/.local/share/metals-calendar/control
+Environment=PATH=%h/.local/share/metals-calendar/runtime/node-v24.21.0-linux-x64/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/serve-candidate-review.sh
+Restart=on-failure
+RestartSec=15s
+TimeoutStartSec=30min
+UMask=0077
+NoNewPrivileges=true
+
+[Install]
+WantedBy=default.target
+

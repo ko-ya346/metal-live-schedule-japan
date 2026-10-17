@@ -1,0 +1,12 @@
+[Unit]
+Description=Collect Metals Calendar candidates every eight hours
+
+[Timer]
+OnCalendar=*-*-* 01,09,17:30:00 Asia/Tokyo
+Persistent=true
+RandomizedDelaySec=10min
+Unit=metals-candidate-collection.service
+
+[Install]
+WantedBy=timers.target
+

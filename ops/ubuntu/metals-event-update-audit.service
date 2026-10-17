@@ -1,0 +1,15 @@
+[Unit]
+Description=Audit published Metals Calendar events with local open-weight model
+After=network-online.target ollama.service
+
+[Service]
+Type=oneshot
+WorkingDirectory=%h/.local/share/metals-calendar/control
+Environment=PATH=%h/.local/share/metals-calendar/runtime/node-v24.21.0-linux-x64/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=CANDIDATE_LLM_BASE_URL=http://127.0.0.1:11434/v1
+Environment=CANDIDATE_LLM_MODEL=metals-review:8b
+ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/run-event-update-audit.sh
+TimeoutStartSec=90min
+UMask=0077
+NoNewPrivileges=true
+
