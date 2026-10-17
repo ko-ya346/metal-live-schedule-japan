@@ -39,8 +39,8 @@ Normal data flow:
 2. Human reviews candidates in `/admin/candidates`.
 3. Human publishes or ignores candidates.
 4. Published events end up in `src/data/events.ts`.
-5. In `npm run candidates:review -- <PR>` mode, each human review is validated and committed/pushed to that same PR automatically. Human merges after checks. Normal dev mode still needs an explicitly requested commit/push.
-6. The dedicated review worktree is localhost-only; pending sends are retried without repeating review actions. See `docs/event-data-workflow.md` for recovery.
+5. In `npm run candidates:review -- <PR>` mode, each human review is validated and saved in the dedicated Ubuntu worktree. After reviewing all candidates, the human uses the page's save button to create and push one review commit to that PR. Human merges after checks. Normal dev mode still needs an explicitly requested commit/push.
+6. The dedicated review worktree is localhost-only; unsent batches and pending sends survive restarts. See `docs/event-data-workflow.md` for recovery.
 
 Published-event updates are a separate review queue:
 

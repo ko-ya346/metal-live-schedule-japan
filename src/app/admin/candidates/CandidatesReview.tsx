@@ -430,12 +430,12 @@ export function CandidatesReview({
           <div>
             <h2>ローカル管理</h2>
             <p className={styles.summary}>
-              {sync ? "確認結果を候補PRへ保存します。" : "この画面の編集、ignore、公開はローカル開発サーバー上のデータファイルへ保存します。"}
+              {sync ? "候補ごとの確認結果をUbuntuに保存します。全件確認後、画面上部からまとめてPRへ保存してください。" : "この画面の編集、ignore、公開はローカル開発サーバー上のデータファイルへ保存します。"}
             </p>
           </div>
         </div>
         <p className={adminStyles.adminMutedText}>
-          {sync ? "保存後に画面を更新します。PRのチェックが成功してからマージしてください。" : "本番環境では書き込みを無効にしています。操作後は npm run build で確認してください。"}
+          {sync ? "候補ボタンではGitHubへ送信しません。最後の一括保存後、PRのチェックが成功してからマージしてください。" : "本番環境では書き込みを無効にしています。操作後は npm run build で確認してください。"}
         </p>
         {statusMessage && (
           <p className={adminStyles.adminInlineStatus} role="status">
