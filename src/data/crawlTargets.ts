@@ -23,6 +23,8 @@ export type CrawlTarget = {
     priority: CrawlTargetPriority;
     notes: string;
     lastCheckedAt: string | null;
+    // Include schedule links even when the act name is not in the keyword list.
+    broadDiscovery?: boolean;
 };
 
 // Keep targets source-specific. Do not build a generic crawler framework yet.
@@ -202,5 +204,41 @@ export const crawlTargets: CrawlTarget[] = [
         priority: "high",
         notes: "関東首都圏の取りこぼし確認に使う。",
         lastCheckedAt: null,
+    },
+    {
+        id: "klub-counter-action",
+        name: "KLUB COUNTER ACTION Sapporo",
+        type: "venue",
+        url: "https://klubcounteraction.com/schedule/",
+        region: "other",
+        enabled: true,
+        priority: "high",
+        notes: "札幌の公式スケジュール。国内メタル/ハードコア/ラウド系の出演者を確認する。",
+        lastCheckedAt: null,
+        broadDiscovery: true,
+    },
+    {
+        id: "queblick-fukuoka",
+        name: "LIVEHOUSE Queblick",
+        type: "venue",
+        url: "https://queblick.com/",
+        region: "other",
+        enabled: true,
+        priority: "high",
+        notes: "福岡の公式スケジュール。国内メタル/ハードコア/ラウド系の出演者を確認する。",
+        lastCheckedAt: null,
+        broadDiscovery: true,
+    },
+    {
+        id: "club-3star-imaike",
+        name: "CLUB 3STAR IMAIKE",
+        type: "venue",
+        url: "https://club3star.com/",
+        region: "tokai",
+        enabled: true,
+        priority: "medium",
+        notes: "名古屋・今池の公式スケジュール。国内メタル/ハードコア/ラウド系の出演者を確認する。",
+        lastCheckedAt: null,
+        broadDiscovery: true,
     },
 ];

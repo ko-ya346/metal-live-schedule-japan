@@ -1,6 +1,7 @@
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { crawlTargets } from "../src/data/crawlTargets.ts";
 import { events } from "../src/data/events.ts";
+import { canFetchUrl } from "./lib/robots-policy.mjs";
 import {
   discoveryArtistKeywords,
   manualSnsSources,
@@ -108,6 +109,7 @@ const sources = [
     url: source.url,
     region: source.region,
     maxLinks: source.priority === "high" ? 8 : 5,
+    broadDiscovery: source.broadDiscovery,
   })),
   ...priorityArtistSources.map((source) => ({
     name: source.name,
@@ -134,6 +136,7 @@ const sources = [
           : target.priority === "high"
             ? 6
             : 4,
+      broadDiscovery: target.broadDiscovery,
     })),
 ];
 
@@ -342,6 +345,10 @@ function getKnownUrls() {
 }
 
 async function fetchHtml(url) {
+  if (!(await canFetchUrl(url))) {
+    throw new Error("robots.txt disallows this URL or its policy could not be fetched");
+  }
+
   let lastError;
 
   for (let attempt = 1; attempt <= fetchRetryCount; attempt += 1) {
@@ -391,7 +398,7 @@ async function collectSource(source, knownUrls, globalSeenUrls) {
 
       const matchedKeywords = getMatchedKeywords(link.title, link.url);
 
-      if (matchedKeywords.length === 0) {
+      if (matchedKeywords.length === 0 && !source.broadDiscovery) {
         continue;
       }
 
@@ -456,7 +463,10 @@ function renderMarkdown(results) {
     lines.push("");
 
     for (const result of regionResults) {
-      lines.push(`#### ${result.source.name}`);
+      const sourceName = result.source.broadDiscovery
+        ? `${result.source.name}（国内広域確認）`
+        : result.source.name;
+      lines.push(`#### ${sourceName}`);
       lines.push("");
 
       if (result.error) {
@@ -474,7 +484,11 @@ function renderMarkdown(results) {
       for (const link of result.links) {
         lines.push(`- ${link.title}`);
         lines.push(`  ${link.url}`);
-        lines.push(`  keywords: ${link.matchedKeywords.join(", ")}`);
+        lines.push(
+          `  ${link.matchedKeywords.length > 0
+            ? `keywords: ${link.matchedKeywords.join(", ")}`
+            : "国内地域公式スケジュールから収集。ジャンルは候補生成モデルが判定。"}`,
+        );
       }
 
       lines.push("");
