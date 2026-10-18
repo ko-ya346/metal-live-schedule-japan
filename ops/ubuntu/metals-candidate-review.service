@@ -6,6 +6,7 @@ After=network-online.target
 Type=simple
 WorkingDirectory=%h/.local/share/metals-calendar/control
 Environment=PATH=%h/.local/share/metals-calendar/runtime/node-v24.21.0-linux-x64/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
+Environment=CANDIDATE_REVIEW_LOCAL=1
 ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/serve-candidate-review.sh
 Restart=on-failure
 RestartSec=15s

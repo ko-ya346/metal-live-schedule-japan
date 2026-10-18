@@ -35,6 +35,10 @@ trap cleanup EXIT
 
 git -C "$source_repo" worktree add -b "$branch" "$worktree" origin/main
 cd "$worktree"
+if ! node --input-type=commonjs -e 'process.exit(require("./package.json").scripts?.["research:updates"] ? 0 : 1)'; then
+  echo "main does not include the published-event audit yet; skipping until the automation PR is merged."
+  exit 0
+fi
 npm ci --no-audit --no-fund
 CANDIDATE_LLM_BASE_URL="$base_url" CANDIDATE_LLM_MODEL="$model" \
   npm run research:updates -- --write --max-pages=8 \
