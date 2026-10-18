@@ -1,0 +1,12 @@
+[Unit]
+Description=Weekly audit of published Metals Calendar events
+
+[Timer]
+OnCalendar=Sun *-*-* 04:30:00 Asia/Tokyo
+Persistent=true
+RandomizedDelaySec=15min
+Unit=metals-event-update-audit.service
+
+[Install]
+WantedBy=timers.target
+

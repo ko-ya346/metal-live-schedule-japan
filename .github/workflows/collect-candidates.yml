@@ -2,9 +2,6 @@ name: Collect research links
 
 on:
   workflow_dispatch:
-  schedule:
-    # 09:00 JST on Tuesdays, Thursdays, and Saturdays.
-    - cron: "0 0 * * 2,4,6"
 
 permissions:
   contents: write

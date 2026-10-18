@@ -38,6 +38,13 @@ function getBasicAuthCredentials(authorizationHeader: string | null) {
 export function proxy(request: NextRequest) {
   const adminUsername = process.env.ADMIN_USERNAME;
   const adminPassword = process.env.ADMIN_PASSWORD;
+  const localCandidateReview =
+    process.env.CANDIDATE_REVIEW_LOCAL === "1" &&
+    ["localhost", "127.0.0.1", "::1"].includes(request.nextUrl.hostname);
+
+  if (localCandidateReview) {
+    return NextResponse.next();
+  }
 
   if (!adminUsername || !adminPassword) {
     if (process.env.NODE_ENV !== "production") {
