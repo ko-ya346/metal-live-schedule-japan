@@ -2,6 +2,7 @@ import { createHash } from "node:crypto";
 import { readFile, writeFile } from "node:fs/promises";
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { events } from "../src/data/events.ts";
+import { canFetchUrl } from "./lib/robots-policy.mjs";
 import {
   discoveryArtistKeywords,
   priorityArtistKeywords,
@@ -539,6 +540,10 @@ function scoreResearchEntry(section, entry) {
     score += 3;
   }
 
+  if (section.sourceName.includes("国内広域確認")) {
+    score += 6;
+  }
+
   if (
     priorityArtistKeywords.some((keyword) =>
       normalizedValue.includes(normalizeForMatch(keyword)),
@@ -555,6 +560,10 @@ function scoreResearchEntry(section, entry) {
 }
 
 async function fetchHtml(url) {
+  if (!(await canFetchUrl(url))) {
+    throw new Error("robots.txt disallows this URL or its policy could not be fetched");
+  }
+
   let lastError;
 
   for (let attempt = 1; attempt <= fetchRetryCount; attempt += 1) {
@@ -786,6 +795,8 @@ async function buildPageSummaries(sections) {
         error: error instanceof Error ? error.message : "fetch failed",
       });
     }
+
+    await delay(1200);
   }
 
   return summaries;

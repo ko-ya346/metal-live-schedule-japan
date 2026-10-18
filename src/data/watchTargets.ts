@@ -13,6 +13,8 @@ export type WatchSource = {
     region: WatchSourceRegion;
     priority: "high" | "medium" | "low";
     notes: string;
+    // Include schedule links even when the act name is not in the keyword list.
+    broadDiscovery?: boolean;
 };
 
 export const priorityArtistKeywords = [
@@ -28,6 +30,11 @@ export const priorityArtistKeywords = [
     "筋少",
     "GALNERYUS",
     "ガルネリウス",
+    "NEMOPHILA",
+    "ネモフィラ",
+    "HANABIE",
+    "花冷え。",
+    "BRIDEAR",
     "BABYMETAL",
     "ANTHEM",
     "LOUDNESS",
@@ -47,13 +54,9 @@ export const priorityArtistKeywords = [
 
 export const discoveryArtistKeywords = [
     ...priorityArtistKeywords,
-    "NEMOPHILA",
-    "BRIDEAR",
     "SABLE HILLS",
     "CRYSTAL LAKE",
     "DEVILOOF",
-    "HANABIE",
-    "花冷え",
     "THE HAUNTED",
     "CARCASS",
     "BRUJERIA",
@@ -184,6 +187,30 @@ export const priorityArtistSources: WatchSource[] = [
         priority: "medium",
         notes: "Phantom Excaliverの公式情報。Xとあわせて確認する。",
     },
+    {
+        name: "NEMOPHILA official live",
+        url: "https://nemophila.tokyo/en/live/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "国内ツアーや対バン公演の公式日程を確認する。",
+    },
+    {
+        name: "HANABIE. official live",
+        url: "https://hanabie.jp/live/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "国内ツアーやフェス出演を含む公式日程を確認する。",
+    },
+    {
+        name: "BRIDEAR official live",
+        url: "https://bridear.jp/community",
+        type: "band_official",
+        region: "nationwide",
+        priority: "medium",
+        notes: "国内ツアーや自主企画の公式日程を確認する。",
+    },
 ];
 
 export const promoterTicketSources: WatchSource[] = [
@@ -258,6 +285,60 @@ export const promoterTicketSources: WatchSource[] = [
         region: "nationwide",
         priority: "high",
         notes: "来日公演の確認に使う。",
+    },
+    {
+        name: "Mount Alive schedule",
+        url: "https://www.mountalive.com/schedule/",
+        type: "promoter",
+        region: "other",
+        priority: "high",
+        notes: "北海道の公演日程。国内バンドの札幌・道内公演も確認する。",
+        broadDiscovery: true,
+    },
+    {
+        name: "GIP schedule",
+        url: "https://www.gip-web.co.jp/schedule/",
+        type: "promoter",
+        region: "other",
+        priority: "high",
+        notes: "東北の公演日程。国内バンドの仙台・東北ツアー日程も確認する。",
+        broadDiscovery: true,
+    },
+    {
+        name: "SUNDAY FOLK PROMOTION",
+        url: "https://www.sundayfolk.com/",
+        type: "promoter",
+        region: "tokai",
+        priority: "high",
+        notes: "名古屋・静岡エリアの国内バンド公演とツアー日程を確認する。",
+        broadDiscovery: true,
+    },
+    {
+        name: "GREENS schedule",
+        url: "https://www.greens-corp.co.jp/schedule/cal/",
+        type: "promoter",
+        region: "kansai",
+        priority: "high",
+        notes: "関西の公演日程。国内バンドのツアーやメタル/ラウド系公演も確認する。",
+        broadDiscovery: true,
+    },
+    {
+        name: "YUMEBANCHI",
+        url: "https://www.yumebanchi.jp/",
+        type: "promoter",
+        region: "other",
+        priority: "high",
+        notes: "中国・四国エリアを中心に、国内バンドのツアー日程を確認する。",
+        broadDiscovery: true,
+    },
+    {
+        name: "BEA schedule",
+        url: "https://www.bea-net.com/",
+        type: "promoter",
+        region: "other",
+        priority: "high",
+        notes: "九州エリアの公演日程。国内バンドの福岡・九州公演も確認する。",
+        broadDiscovery: true,
     },
 ];
 
