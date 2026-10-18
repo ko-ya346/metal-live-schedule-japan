@@ -50,6 +50,19 @@ export const priorityArtistKeywords = [
     "Phantom Excaliver",
     "PHANTOM EXCALIVER",
     "ファントムエクスカリバー",
+    // Domestic acts already appearing in published events but missing from the watch list.
+    "DIR EN GREY",
+    "ディルアングレイ",
+    "Zilqy",
+    "Broken By The Scream",
+    "HAGANE",
+    "DEXCORE",
+    "BAND-MAID",
+    "SHOW-YA",
+    "HIKAGE",
+    "HELL FREEZES OVER",
+    "Mardelas",
+    "Tears Of Tragedy",
 ] as const;
 
 export const discoveryArtistKeywords = [
@@ -210,6 +223,38 @@ export const priorityArtistSources: WatchSource[] = [
         region: "nationwide",
         priority: "medium",
         notes: "国内ツアーや自主企画の公式日程を確認する。",
+    },
+    {
+        name: "DIR EN GREY official schedule",
+        url: "https://direngrey.co.jp/jp",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "国内ツアーの全日程と地方公演を公式情報で確認する。",
+    },
+    {
+        name: "HAGANE official schedule",
+        url: "https://www.hagane-official.com/contents/schedule",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "国内ツアーやイベント出演の公式日程を確認する。",
+    },
+    {
+        name: "DEXCORE official schedule",
+        url: "https://dexcore.jp/schedule_top/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "東名阪を含む国内ツアーやイベント出演の全日程を確認する。",
+    },
+    {
+        name: "HIKAGE official",
+        url: "https://www.hikagesapporo.com/",
+        type: "band_official",
+        region: "nationwide",
+        priority: "medium",
+        notes: "札幌拠点のバンド。北海道発着の全国ツアーや地方公演を確認する。",
     },
 ];
 
