@@ -154,6 +154,9 @@ Ubuntu の localhost で動く OpenAI 互換APIを手動検証するときは、
 - `CANDIDATE_LLM_BASE_URL`（例: `http://127.0.0.1:11434/v1`）
 - `CANDIDATE_LLM_MODEL`（例: `metals-review:8b`）
 - 任意: `CANDIDATE_LLM_API_KEY`
+- 任意: `CANDIDATE_LLM_TIMEOUT_MS`（LLM応答の上限。既定は15分）
+
+候補LLMはストリーミングで応答を受け取り、上限時間でリクエストをキャンセルします。ローカル Ollama がtimeoutした場合は、CPU推論が残らないよう `ollama stop <model>` も実行します。同じモデルを別の処理が同時利用している場合、その処理も中断される可能性があります。失敗時は journal / 標準エラーに処理段階、モデル名、経過時間、timeoutか通信エラーかを記録します。候補配列への書き込みはLLM応答の解析後に行うため、timeoutした応答から部分候補は保存されません。
 
 これらを指定しない既存の GitHub Actions は、引き続き `OPENAI_API_KEY` と `OPENAI_MODEL` を使います。
 

@@ -1,5 +1,9 @@
 import { createHash } from "node:crypto";
+import { execFile } from "node:child_process";
+import { request as httpRequest } from "node:http";
+import { request as httpsRequest } from "node:https";
 import { readFile, writeFile } from "node:fs/promises";
+import { promisify } from "node:util";
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { events } from "../src/data/events.ts";
 import {
@@ -78,6 +82,8 @@ const knownSummaryLimit = Number(args.get("known-limit") ?? "16");
 const fetchTimeoutMs = Number(args.get("fetch-timeout-ms") ?? "25000");
 const fetchRetryCount = Number(args.get("fetch-retries") ?? "3");
 const retryBaseDelayMs = Number(args.get("fetch-retry-delay-ms") ?? "1500");
+const llmTimeoutMs = Number(process.env.CANDIDATE_LLM_TIMEOUT_MS ?? 15 * 60 * 1000);
+const runFile = promisify(execFile);
 const model =
   process.env.CANDIDATE_LLM_MODEL ||
   process.env.OPENAI_MODEL ||
@@ -967,6 +973,109 @@ function isLoopbackUrl(value) {
   }
 }
 
+async function readChatCompletionStream(response) {
+  if (!response.body) {
+    throw new Error("Candidate LLM response stream was empty");
+  }
+
+  const decoder = new TextDecoder();
+  let buffer = "";
+  let content = "";
+
+  function readLine(line) {
+    if (!line.startsWith("data:")) return;
+    const data = line.slice(5).trim();
+    if (!data || data === "[DONE]") return;
+    const chunk = JSON.parse(data);
+    const delta = chunk?.choices?.[0]?.delta?.content;
+    if (typeof delta === "string") content += delta;
+  }
+
+  for await (const chunk of response.body) {
+    buffer += decoder.decode(chunk, { stream: true });
+
+    let newlineIndex = buffer.indexOf("\n");
+    while (newlineIndex !== -1) {
+      const line = buffer.slice(0, newlineIndex).replace(/\r$/, "");
+      buffer = buffer.slice(newlineIndex + 1);
+
+      readLine(line);
+
+      newlineIndex = buffer.indexOf("\n");
+    }
+  }
+  buffer += decoder.decode();
+  if (buffer.trim()) readLine(buffer.replace(/\r$/, ""));
+
+  if (content.trim().length === 0) {
+    throw new Error("Candidate LLM response was empty");
+  }
+
+  return content;
+}
+
+async function sendChatCompletionRequest(url, options) {
+  if (!isLoopbackUrl(url)) {
+    const response = await fetch(url, options);
+    return {
+      ok: response.ok,
+      status: response.status,
+      body: response.body,
+      cleanup: () => {},
+    };
+  }
+
+  const parsedUrl = new URL(url);
+  const request = (parsedUrl.protocol === "https:" ? httpsRequest : httpRequest)(parsedUrl, {
+    method: options.method,
+    headers: options.headers,
+  });
+  const onAbort = () => request.destroy(options.signal.reason);
+  if (options.signal.aborted) {
+    onAbort();
+  } else {
+    options.signal.addEventListener("abort", onAbort, { once: true });
+  }
+
+  return new Promise((resolve, reject) => {
+    request.once("response", (incoming) => {
+      resolve({
+        ok: incoming.statusCode >= 200 && incoming.statusCode < 300,
+        status: incoming.statusCode,
+        body: incoming,
+        cleanup: () => options.signal.removeEventListener("abort", onAbort),
+      });
+    });
+    request.once("error", (error) => {
+      options.signal.removeEventListener("abort", onAbort);
+      reject(error);
+    });
+    request.end(options.body);
+  });
+}
+
+function discardResponseBody(body) {
+  if (typeof body?.destroy === "function") {
+    body.destroy();
+  } else if (typeof body?.cancel === "function") {
+    void body.cancel().catch(() => {});
+  }
+}
+
+async function stopLocalModelAfterTimeout() {
+  const cli = process.env.OLLAMA_CLI_PATH || "ollama";
+  console.error(`[candidate-collection] stage=llm_runner_stop status=start model=${model}`);
+
+  try {
+    await runFile(cli, ["stop", model], { timeout: 30_000 });
+    console.error(`[candidate-collection] stage=llm_runner_stop status=complete model=${model}`);
+  } catch (error) {
+    console.error(
+      `[candidate-collection] stage=llm_runner_stop status=failed model=${model} error=${error instanceof Error ? error.name : "unknown"}`,
+    );
+  }
+}
+
 async function callCandidateLlm(prompt) {
   if (promptOnly) {
     return { candidates: [], skippedReason: "prompt-only mode; candidate LLM request was skipped." };
@@ -984,43 +1093,66 @@ async function callCandidateLlm(prompt) {
     headers.Authorization = `Bearer ${apiKey}`;
   }
 
-  const response = await fetch(`${llmBaseUrl}/chat/completions`, {
-    method: "POST",
-    headers,
-    body: JSON.stringify({
-      model,
-      temperature: 0.1,
-      response_format: { type: "json_object" },
-      messages: [
-        {
-          role: "system",
-          content:
-            "You extract Japan metal and heavy music live event candidates. Return JSON only. Never invent facts.",
-        },
-        {
-          role: "user",
-          content: prompt,
-        },
-      ],
-    }),
-  });
-
-  if (!response.ok) {
-    const body = await response.text();
-    return {
-      candidates: [],
-      skippedReason: `Candidate LLM request failed: HTTP ${response.status} ${body}`,
-    };
+  if (!Number.isFinite(llmTimeoutMs) || llmTimeoutMs <= 0) {
+    throw new Error("CANDIDATE_LLM_TIMEOUT_MS must be a positive finite number");
   }
 
-  const data = await response.json();
-  const content = data?.choices?.[0]?.message?.content;
+  const startedAt = Date.now();
+  const controller = new AbortController();
+  const timeout = setTimeout(() => controller.abort(), llmTimeoutMs);
+  console.error(`[candidate-collection] stage=llm status=start model=${model} timeout_ms=${llmTimeoutMs}`);
+  let response;
 
-  if (typeof content !== "string" || content.trim().length === 0) {
-    throw new Error("Candidate LLM response was empty");
+  try {
+    response = await sendChatCompletionRequest(`${llmBaseUrl}/chat/completions`, {
+      method: "POST",
+      signal: controller.signal,
+      headers,
+      body: JSON.stringify({
+        model,
+        temperature: 0.1,
+        stream: true,
+        response_format: { type: "json_object" },
+        messages: [
+          {
+            role: "system",
+            content:
+              "You extract Japan metal and heavy music live event candidates. Return JSON only. Never invent facts.",
+          },
+          {
+            role: "user",
+            content: prompt,
+          },
+        ],
+      }),
+    });
+
+    if (!response.ok) {
+      throw new Error(`HTTP ${response.status}`);
+    }
+
+    const content = await readChatCompletionStream(response);
+    response.cleanup();
+    console.error(`[candidate-collection] stage=llm status=complete model=${model} elapsed_ms=${Date.now() - startedAt}`);
+    return extractJsonObject(content);
+  } catch (error) {
+    response?.cleanup();
+    discardResponseBody(response?.body);
+    const elapsedMs = Date.now() - startedAt;
+    const timedOut = controller.signal.aborted;
+    console.error(
+      `[candidate-collection] stage=llm status=failed model=${model} elapsed_ms=${elapsedMs} timeout_ms=${llmTimeoutMs} reason=${timedOut ? "timeout" : "request_error"}`,
+    );
+    if (timedOut && isLoopbackUrl(llmBaseUrl)) {
+      await stopLocalModelAfterTimeout();
+    }
+    const message = timedOut
+      ? `Candidate LLM request timed out after ${llmTimeoutMs}ms (model=${model})`
+      : `Candidate LLM request failed (model=${model}, error=${error instanceof Error ? error.name : "unknown"})`;
+    throw new Error(message, { cause: error });
+  } finally {
+    clearTimeout(timeout);
   }
-
-  return extractJsonObject(content);
 }
 
 function buildPrompt(summaries, knownSummary) {
@@ -1186,9 +1318,12 @@ async function appendCandidates(candidates) {
 }
 
 async function main() {
+  console.error("[candidate-collection] stage=input status=start");
   const markdown = await readFile(inputPath, "utf8");
   const sections = parseResearchSections(markdown);
+  console.error(`[candidate-collection] stage=page_summary status=start sources=${sections.length}`);
   const summaries = await buildPageSummaries(sections);
+  console.error(`[candidate-collection] stage=page_summary status=complete pages=${summaries.length}`);
   const knownIds = buildKnownIdSet();
   const knownSummary = getKnownSummary();
   const prompt = buildPrompt(summaries, knownSummary);
@@ -1218,6 +1353,7 @@ async function main() {
   }
 
   await appendCandidates(candidates);
+  console.error(`[candidate-collection] stage=write_candidates status=complete count=${candidates.length}`);
   await writeReport(
     buildReport({
       sections,
