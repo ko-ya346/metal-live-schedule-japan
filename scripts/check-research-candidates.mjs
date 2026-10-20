@@ -32,21 +32,38 @@ const server = createServer(async (request, response) => {
     }
 
     const sourceUrl = `http://127.0.0.1:${server.address().port}/official-event`;
-    const content = JSON.stringify({ candidates: [{
-      id: "test-metal-2099-tokyo",
-      artists: ["TEST METAL"],
-      tourName: "JAPAN TOUR 2099",
-      date: "2099-01-02",
-      prefecture: "東京都",
-      venue: "TEST HALL",
-      genres: ["Heavy Metal"],
-      isInternational: true,
-      sourceUrl,
-      sourceType: "promoter",
-      sourceName: "Official promoter",
-      confidence: "high",
-      reviewNotes: "公式ページで全日程確認済み。",
-    }] });
+    const candidate = receivedRequest.body.model === "scope-model"
+      ? {
+          id: "test-ambiguous-domestic-2099",
+          artists: ["MIZU NO YUME"],
+          tourName: "Riverside Live",
+          date: "2099-01-02",
+          prefecture: "東京都",
+          venue: "TEST HALL",
+          genres: ["Alternative Rock"],
+          isInternational: false,
+          sourceUrl,
+          sourceType: "manual",
+          sourceName: "Community event listing",
+          confidence: "medium",
+          reviewNotes: "会場主催イベントで日付・出演者を確認。",
+        }
+      : {
+          id: "test-metal-2099-tokyo",
+          artists: ["TEST METAL"],
+          tourName: "JAPAN TOUR 2099",
+          date: "2099-01-02",
+          prefecture: "東京都",
+          venue: "TEST HALL",
+          genres: ["Heavy Metal"],
+          isInternational: true,
+          sourceUrl,
+          sourceType: "promoter",
+          sourceName: "Official promoter",
+          confidence: "high",
+          reviewNotes: "公式ページで全日程確認済み。",
+        };
+    const content = JSON.stringify({ candidates: [candidate] });
     response.writeHead(200, { "Content-Type": "text/event-stream" });
     response.write(`data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`);
     response.end("data: [DONE]\n\n");
@@ -92,6 +109,26 @@ try {
   const reportText = await readFile(report, "utf8");
   assert.match(reportText, /生成モデル: fixture-model/);
   assert.match(reportText, /test-metal-2099-tokyo/);
+
+  receivedRequest = null;
+  await run(
+    process.execPath,
+    ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/research-candidates.mjs", "--input=" + input, "--report=" + report],
+    {
+      cwd: new URL("..", import.meta.url),
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "",
+        CANDIDATE_LLM_API_KEY: "",
+        CANDIDATE_LLM_BASE_URL: "http://127.0.0.1:" + port + "/v1",
+        CANDIDATE_LLM_MODEL: "scope-model",
+      },
+    },
+  );
+  const scopeReport = await readFile(report, "utf8");
+  assert.match(scopeReport, /test-ambiguous-domestic-2099/, "an ambiguous domestic event with concrete facts remains reviewable");
+  assert.match(scopeReport, /low \/ Community event listing/, "scope uncertainty downgrades confidence");
+  assert.match(scopeReport, /対象範囲要確認/, "the report calls out scope review");
 
   receivedRequest = null;
   await assert.rejects(

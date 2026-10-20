@@ -384,36 +384,6 @@ function inferSourceType(sourceType, sourceUrl) {
   return sourceType;
 }
 
-function isDiscoverySource(candidate) {
-  const sourceName = normalizeForMatch(candidate.sourceName);
-  const sourceUrl = normalizeForMatch(candidate.sourceUrl);
-
-  return (
-    candidate.sourceType === "manual" ||
-    sourceName.includes("amass") ||
-    sourceName.includes("metal100") ||
-    sourceUrl.includes("amassjp") ||
-    sourceUrl.includes("heavymetaltourcom") ||
-    sourceUrl.includes("metal100com")
-  );
-}
-
-function hasNonGenreHeavySignal(candidate) {
-  const haystack = [
-    candidate.artists.join(" "),
-    candidate.tourName ?? "",
-    candidate.sourceName,
-    candidate.sourceUrl,
-    candidate.reviewNotes,
-  ]
-    .join(" ")
-    .toLowerCase();
-
-  return heavySignalKeywords.some((keyword) =>
-    haystack.includes(keyword.toLowerCase()),
-  );
-}
-
 function buildKnownEvents() {
   return [...events, ...candidateEvents].map((event) => ({
     id: event.id,
@@ -964,8 +934,21 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
     reviewedAt: null,
   };
 
-  if (isDiscoverySource(normalizedCandidate) && !hasNonGenreHeavySignal(normalizedCandidate)) {
-    return null;
+  if (
+    sourceType === "manual" &&
+    !heavySignalKeywords.some((keyword) =>
+      [
+        ...normalizedCandidate.artists,
+        normalizedCandidate.tourName ?? "",
+        normalizedCandidate.sourceName,
+        normalizedCandidate.reviewNotes,
+      ].some((value) => value.toLowerCase().includes(keyword.toLowerCase())),
+    )
+  ) {
+    normalizedCandidate.confidence = "low";
+    normalizedCandidate.reviewNotes =
+      "対象範囲要確認：固定ジャンル語だけでは範囲を判断しないため、イベントの趣旨・出演者の文脈を人間が確認してください。 " +
+      normalizedCandidate.reviewNotes;
   }
 
   if (isKnownEvent(normalizedCandidate, knownEvents)) {
@@ -1187,9 +1170,10 @@ function buildPrompt(summaries, knownSummary) {
     "- News or discovery pages may be used only as low/medium confidence candidates and reviewNotes must say official confirmation is needed.",
     "- SNS-only items must be official and low confidence.",
     "- Do not use fan speculation.",
-    "- If the page is mainly blues, jazz, funk, psychedelic, pop, idol, or non-heavy rock, exclude it unless the page clearly has a metal/heavy co-performing artist.",
-    "- Do not infer Heavy Metal or Hard Rock genres only because a Japan tour is listed on a music news page. The page text must clearly connect the event to heavy music or a known watch artist.",
-    "- When unsure whether the artist belongs to the project's scope, prefer excluding it over adding noisy candidates.",
+    "- Do not exclude a domestic live event only because the artist has no single clear genre label or is not on the watch list.",
+    "- Judge domestic scope from the official event description, organizer or venue context, co-performers, and known scene relationships. Do not assign a genre based on guesswork.",
+    "- If the Japan date, venue, and performers are concrete and there is a plausible event-context signal but scope remains uncertain, keep it as a low-confidence review candidate. Start reviewNotes with 対象範囲要確認: and state the evidence and uncertainty.",
+    "- Exclude generic music news without an event-specific Japan date, venue, and performers, or an event with no evidence connecting it to the site's heavy-live audience.",
     "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible.",
     "- When a candidate looks like a tour or multi-date run, do not stop at the first date. Check the artist/promoter/ticket tour page for other Japan dates and add every clearly confirmed date.",
     "- For tour-like candidates, reviewNotes must say whether the full tour schedule was checked. Use wording like `公式ツアーページとチケットページで全日程確認済み` or `他日程の有無は未確認`.",
@@ -1272,7 +1256,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     `- 追加候補数: ${candidates.length}`,
     `- 重複/不正で除外: ${skipped}`,
     "",
-    "発見用ニュースサイト由来の候補は、アーティスト名や公演名にヘヴィ系の手がかりがない場合は自動で除外します。",
+    "発見用ソースは候補探索の入口です。公演情報が具体的でも範囲が曖昧な候補は低確信度・要確認として表示します。",
     "",
   ];
 
@@ -1293,6 +1277,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
       lines.push(`  - ${candidate.date ?? "日付未定"} / ${[candidate.prefecture, candidate.venue].filter(Boolean).join(" / ") || "会場未定"}`);
       lines.push(`  - ${candidate.confidence} / ${candidate.sourceName}`);
       lines.push(`  - ${candidate.sourceUrl}`);
+      lines.push(`  - 確認メモ: ${candidate.reviewNotes}`);
     }
   }
 
