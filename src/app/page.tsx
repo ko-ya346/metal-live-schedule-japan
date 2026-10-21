@@ -333,13 +333,6 @@ export default function Page() {
     }
   }
 
-  function applyInternationalFilter() {
-    setInternationalOnly(true);
-    setSearchQuery("");
-    setQuickRange("all");
-    setSelectedDate(null);
-  }
-
   return (
     <main className={styles.page}>
       <header className={`${styles.header} ${styles.heroHeader}`}>
@@ -414,15 +407,15 @@ export default function Page() {
             </div>
 
             <div className={styles.discoveryCardGrid}>
-              <button
+              <Link
                 className={styles.discoveryCard}
-                type="button"
-                onClick={applyInternationalFilter}
+                href="/international"
+                prefetch={false}
               >
                 <span className={styles.discoveryCardLabel}>来日</span>
                 <strong>来日公演</strong>
                 <span>{upcomingInternationalCount}件</span>
-              </button>
+              </Link>
               <Link
                 className={styles.discoveryCard}
                 href={`/months/${currentMonthKey}`}
