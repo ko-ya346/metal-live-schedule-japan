@@ -6,10 +6,11 @@
 
 初回PRでは、open-weightの候補名をCodexが公式サイトで別途確認したうえで、2件の公式バンド情報源も追加しています。以降の定期モデルPRは探索語を提案し、公式URLを発明して登録することはありません。現在のイベントデータには複数回登場する未登録の主催者URLがほとんどなく、会場スケジュールURLもないためです。主催者・会場・共演関係は候補の根拠としてレポートに残します。
 
-実装PRをマージした後、Ubuntuのcontrol checkoutから週次タイマーを登録します。
+実装PRをマージした後、Ubuntuのcontrol checkoutから最新のインストーラを取得して週次タイマーを登録します。control worktreeを切り替える必要はありません。
 
 ```sh
-ops/ubuntu/install-watchlist-expansion.sh
+git -C "$HOME/.local/share/metals-calendar/control" fetch origin main
+git -C "$HOME/.local/share/metals-calendar/control" show origin/main:ops/ubuntu/install-watchlist-expansion.sh | bash
 ```
 
 毎週月曜08:00 JSTに起動し、開始時刻には最大20分のばらつきを加えます。手動実行は次のコマンドです。
