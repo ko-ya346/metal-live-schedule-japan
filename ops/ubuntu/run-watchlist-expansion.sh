@@ -41,9 +41,11 @@ npm ci --no-audit --no-fund
 CANDIDATE_LLM_BASE_URL="$base_url" CANDIDATE_LLM_MODEL="$model" \
   npm run research:watchlist-expansion -- --write --report=watchlist-expansion-report.md \
   > watchlist-expansion-run.log
+cp watchlist-expansion-report.md "$state_dir/watchlist-expansion-$stamp.md"
+cp watchlist-expansion-run.log "$state_dir/watchlist-expansion-$stamp.log"
 
 if git diff --quiet -- src/data/watchTargets.ts; then
-  echo "Open-weight model found no validated keyword additions."
+  echo "Open-weight model found no validated domestic keyword additions; report saved under $state_dir."
   exit 0
 fi
 
@@ -61,7 +63,7 @@ git push -u origin "$branch"
   cat <<'BODY'
 ## 概要
 
-公開イベントの共演関係から open-weight モデルが選んだ探索キーワード候補です。公開イベント自体は変更していません。
+国内公演の共演関係から open-weight モデルが選んだ国内アーティスト探索キーワード候補です。海外アーティストは固定監視対象に追加せず、来日情報は主催者・チケットなどの広い情報源から探します。公開イベント自体は変更していません。
 
 ## open-weightモデルの出力
 
@@ -75,7 +77,7 @@ BODY
 
 ## 人間に確認してほしいこと
 
-候補のジャンル適合性とイベント根拠を確認してください。監視元URLを追加する場合は公式サイトか確認してください。モデル出力から未確認URLを自動登録することはありません。
+候補が日本の国内アーティストか、出力された根拠が妥当か確認してください。モデル出力から監視URLを自動登録することはありません。
 
 ## 確認
 
@@ -86,5 +88,5 @@ BODY
 } > watchlist-expansion-pr.md
 
 gh pr create --repo "$repo" --base main --head "$branch" \
-  --title "共演アーティストの探索キーワードを更新する $today" \
+  --title "国内アーティストの探索キーワードを更新する $today" \
   --body-file watchlist-expansion-pr.md

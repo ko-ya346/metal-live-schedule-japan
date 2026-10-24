@@ -85,8 +85,6 @@ export const discoveryArtistKeywords = [
     "SiM",
     "UADA",
     "HYENA",
-    "Rivers Of Nihil", // open-weight co-performer discovery
-    "Psycroptic", // open-weight co-performer discovery
 ] as const;
 
 export const priorityArtistSources: WatchSource[] = [
@@ -257,24 +255,6 @@ export const priorityArtistSources: WatchSource[] = [
         region: "nationwide",
         priority: "medium",
         notes: "札幌拠点のバンド。北海道発着の全国ツアーや地方公演を確認する。",
-    },
-    {
-        name: "Rivers of Nihil official tour dates",
-        url: "https://riversofnihil.com/",
-        type: "band_official",
-        region: "nationwide",
-        priority: "medium",
-        notes: "2026-08-24のEXTREME RITUALで共演を確認。公式サイトのツアー日程を確認する。",
-        broadDiscovery: true,
-    },
-    {
-        name: "Psycroptic official tour dates",
-        url: "https://www.psycroptic.com/",
-        type: "band_official",
-        region: "nationwide",
-        priority: "medium",
-        notes: "2026-08-24のEXTREME RITUALで共演を確認。公式サイトのツアー日程を確認する。",
-        broadDiscovery: true,
     },
 ];
 
