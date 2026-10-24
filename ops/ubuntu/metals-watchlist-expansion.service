@@ -1,0 +1,8 @@
+[Unit]
+Description=Propose Metal Calendar discovery watchlist updates with open-weight model
+After=ollama.service
+
+[Service]
+Type=oneshot
+ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/run-watchlist-expansion.sh
+TimeoutStartSec=30min

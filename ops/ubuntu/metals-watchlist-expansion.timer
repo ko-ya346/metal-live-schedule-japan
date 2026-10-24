@@ -1,0 +1,11 @@
+[Unit]
+Description=Weekly Metal Calendar discovery watchlist review
+
+[Timer]
+OnCalendar=Mon *-*-* 08:00:00 Asia/Tokyo
+Persistent=true
+RandomizedDelaySec=20min
+Unit=metals-watchlist-expansion.service
+
+[Install]
+WantedBy=timers.target
