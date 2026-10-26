@@ -26,11 +26,18 @@ fi
 
 git -C "$source_repo" fetch origin main
 stamp="$(TZ=Asia/Tokyo date +%Y%m%d-%H%M%S)"
+artifact_dir="$state_dir/candidate-collection-$stamp"
+mkdir -m 700 -p "$artifact_dir"
 today="$(TZ=Asia/Tokyo date +%Y-%m-%d)"
 branch="automated-candidates-ubuntu-$stamp"
 worktree="$runs_dir/$branch"
 
 cleanup() {
+  if [[ -d "$worktree" ]]; then
+    cp -f "$worktree/research-links.md" "$artifact_dir/" 2>/dev/null || true
+    cp -f "$worktree/candidate-report.md" "$artifact_dir/" 2>/dev/null || true
+    cp -f "$worktree/candidate-pr.md" "$artifact_dir/" 2>/dev/null || true
+  fi
   git -C "$source_repo" worktree remove --force "$worktree" >/dev/null 2>&1 || true
   git -C "$source_repo" branch -D "$branch" >/dev/null 2>&1 || true
 }
@@ -38,6 +45,7 @@ trap cleanup EXIT
 
 git -C "$source_repo" worktree add -b "$branch" "$worktree" origin/main
 cd "$worktree"
+exec > >(tee -a "$artifact_dir/run.log") 2>&1
 npm ci --no-audit --no-fund
 npm run research:links > research-links.md
 

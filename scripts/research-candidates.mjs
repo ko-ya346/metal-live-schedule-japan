@@ -305,9 +305,8 @@ function parseResearchSections(markdown) {
       }
     }
 
-    if (entries.length > 0) {
-      sections.push({ sourceName, entries });
-    }
+    const error = lines.find((line) => line.trim().startsWith("- 取得失敗:"))?.trim().replace("- 取得失敗:", "").trim() ?? null;
+    sections.push({ sourceName, entries, error });
   }
 
   return sections;
@@ -1248,8 +1247,11 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "",
     "このレポートは自動生成です。公開イベントには直接反映していません。",
     "",
-    `- 候補リンクがあったソース数: ${sections.length}`,
+    `- 対象ソース数: ${sections.length}`,
+    `- 取得リンク数: ${sections.reduce((total, section) => total + section.entries.length, 0)}`,
     `- 取得ページ数: ${summaries.length}`,
+    `- リンク候補ゼロのソース数: ${sections.filter((section) => section.entries.length === 0 && !section.error).length}`,
+    `- リンク収集失敗ソース数: ${sections.filter((section) => section.error).length}`,
     `- プロンプトモード: ${promptMode}`,
     `- 生成モデル: ${model}`,
     `- プロンプト概算: ${prompt.length.toLocaleString()} chars / 約${estimateTokens(prompt).toLocaleString()} tokens`,
@@ -1257,6 +1259,19 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     `- 重複/不正で除外: ${skipped}`,
     "",
     "発見用ソースは候補探索の入口です。公演情報が具体的でも範囲が曖昧な候補は低確信度・要確認として表示します。",
+    "",
+    "## ソース別結果",
+    "",
+    "| ソース | リンク | 取得ページ | 取得失敗 | 候補 | 状態 |",
+    "|---|---:|---:|---:|---:|---|",
+    ...sections.map((section) => {
+      const pages = summaries.filter((item) => item.sourceName === section.sourceName);
+      const pageCount = pages.length;
+      const failedPages = pages.filter((item) => item.error).length;
+      const candidateCount = candidates.filter((item) => item.sourceName === section.sourceName).length;
+      const status = section.error ? `リンク収集失敗: ${section.error}` : section.entries.length === 0 ? "リンク候補なし" : "収集完了";
+      return `| ${section.sourceName.replaceAll("|", "／")} | ${section.entries.length} | ${pageCount - failedPages} | ${failedPages} | ${candidateCount} | ${status} |`;
+    }),
     "",
   ];
 
