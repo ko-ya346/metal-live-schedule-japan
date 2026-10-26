@@ -1242,60 +1242,141 @@ function estimateTokens(text) {
 }
 
 function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt }) {
+  const pilotSourceNames = new Set([
+    "仙台MACANA（国内広域確認）",
+    "広島SECOND CRUTCH（国内広域確認）",
+    "松山SALONKITTY（国内広域確認）",
+    "鹿児島SR HALL（国内広域確認）",
+  ]);
+  const sourcePages = (section) => summaries.filter((summary) => summary.sourceName === section.sourceName);
+  const candidatesForSource = (section) => {
+    const urls = new Set(sourcePages(section).map((summary) => summary.url));
+    return candidates.filter((candidate) =>
+      candidate.sourceName === section.sourceName || urls.has(normalizeUrl(candidate.sourceUrl, section.entries[0]?.url)),
+    );
+  };
+  const unselectedReason = (section, entry) => {
+    const score = scoreResearchEntry(section, entry);
+    if (score <= 0) return "スコア対象外";
+    const pages = sourcePages(section);
+    if (pages.length >= maxPagesPerSource) return "ソース別ページ上限";
+    if (summaries.length >= maxTotalPages) return "全体ページ上限";
+    return "重複URLまたは未選定";
+  };
   const lines = [
-    `# 候補自動生成レポート (${today})`,
+    "# 候補自動生成レポート (" + today + ")",
     "",
     "このレポートは自動生成です。公開イベントには直接反映していません。",
     "",
-    `- 対象ソース数: ${sections.length}`,
-    `- 取得リンク数: ${sections.reduce((total, section) => total + section.entries.length, 0)}`,
-    `- 取得ページ数: ${summaries.length}`,
-    `- リンク候補ゼロのソース数: ${sections.filter((section) => section.entries.length === 0 && !section.error).length}`,
-    `- リンク収集失敗ソース数: ${sections.filter((section) => section.error).length}`,
-    `- プロンプトモード: ${promptMode}`,
-    `- 生成モデル: ${model}`,
-    `- プロンプト概算: ${prompt.length.toLocaleString()} chars / 約${estimateTokens(prompt).toLocaleString()} tokens`,
-    `- 追加候補数: ${candidates.length}`,
-    `- 重複/不正で除外: ${skipped}`,
+    "- 対象ソース数: " + sections.length,
+    "- 取得リンク数: " + sections.reduce((total, section) => total + section.entries.length, 0),
+    "- 要約対象ページ数: " + summaries.length,
+    "- 要約ページ取得失敗数: " + summaries.filter((item) => item.error).length,
+    "- リンク候補ゼロのソース数: " + sections.filter((section) => section.entries.length === 0 && !section.error).length,
+    "- リンク収集失敗ソース数: " + sections.filter((section) => section.error).length,
+    "- プロンプトモード: " + promptMode,
+    "- 生成モデル: " + model,
+    "- プロンプト概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
+    "- 追加候補数: " + candidates.length,
+    "- 重複/不正で除外: " + skipped,
     "",
     "発見用ソースは候補探索の入口です。公演情報が具体的でも範囲が曖昧な候補は低確信度・要確認として表示します。",
     "",
     "## ソース別結果",
     "",
-    "| ソース | リンク | 取得ページ | 取得失敗 | 候補 | 状態 |",
-    "|---|---:|---:|---:|---:|---|",
+    "| ソース | リンク | 要約成功 | 要約失敗 | 未選定 | 候補 | 状態 |",
+    "|---|---:|---:|---:|---:|---:|---|",
     ...sections.map((section) => {
-      const pages = summaries.filter((item) => item.sourceName === section.sourceName);
-      const pageCount = pages.length;
+      const pages = sourcePages(section);
       const failedPages = pages.filter((item) => item.error).length;
-      const candidateCount = candidates.filter((item) => item.sourceName === section.sourceName).length;
-      const status = section.error ? `リンク収集失敗: ${section.error}` : section.entries.length === 0 ? "リンク候補なし" : "収集完了";
-      return `| ${section.sourceName.replaceAll("|", "／")} | ${section.entries.length} | ${pageCount - failedPages} | ${failedPages} | ${candidateCount} | ${status} |`;
+      const selectedUrls = new Set(pages.map((item) => item.url));
+      const unselectedCount = section.entries.filter((entry) => !selectedUrls.has(entry.url)).length;
+      const candidateCount = candidatesForSource(section).length;
+      let status = "取得・判定";
+      if (section.error) status = "リンク収集失敗";
+      else if (section.entries.length === 0) status = "リンク候補なし";
+      else if (pages.length === 0) status = "要約ページ未選定";
+      else if (failedPages === pages.length) status = "要約ページ取得失敗";
+      else if (candidateCount === 0) status = "取得後、候補なし";
+      return "| " + section.sourceName.replaceAll("|", "／") + " | " + section.entries.length + " | " + (pages.length - failedPages) + " | " + failedPages + " | " + unselectedCount + " | " + candidateCount + " | " + status + " |";
     }),
+    "",
+    "## 地方4会場のページ確認",
+    "",
+    "以下の4会場について、リンク収集、ページ要約の選定、取得結果、モデル入力に含まれた抽出根拠を分けて記録します。",
     "",
   ];
 
-  if (skippedReason) {
-    lines.push(`- 候補生成スキップ理由: ${skippedReason}`);
+  const pilotSections = sections.filter((item) => pilotSourceNames.has(item.sourceName));
+  const presentPilotNames = new Set(pilotSections.map((section) => section.sourceName));
+  const missingPilotNames = [...pilotSourceNames].filter((name) => !presentPilotNames.has(name));
+  if (missingPilotNames.length > 0) {
+    lines.push("対象ソースが調査メモにありません: " + missingPilotNames.join(" / "), "");
+  }
+
+  for (const section of pilotSections) {
+    const pages = sourcePages(section);
+    const sourceCandidates = candidatesForSource(section);
+    lines.push("### " + section.sourceName, "");
+    lines.push("- リンク収集: " + (section.error ? "失敗: " + section.error : section.entries.length + "件"));
+    lines.push("- ページ要約: " + pages.length + "件成功 / " + pages.filter((page) => page.error).length + "件失敗");
+    lines.push("- 公演候補: " + sourceCandidates.length + "件");
+    if (sourceCandidates.length > 0) {
+      lines.push("- 候補ID: " + sourceCandidates.map((candidate) => candidate.id).join(", "));
+    }
+    lines.push("", "#### ページごとの状態", "");
+    for (const entry of section.entries) {
+      const page = pages.find((item) => item.url === entry.url);
+      const state = page
+        ? page.error ? "取得失敗: " + page.error : "取得成功・モデル入力済み"
+        : "未選定: " + unselectedReason(section, entry);
+      lines.push("- " + entry.title + " — " + state);
+      lines.push("  " + entry.url);
+    }
+    if (section.entries.length === 0 && section.error) {
+      lines.push("- 個別リンクを取得できませんでした。");
+    }
+    lines.push("", "#### モデル入力に含まれたページ根拠", "");
+    if (pages.length === 0) {
+      lines.push("- モデルに渡したページはありません。", "");
+      continue;
+    }
+    for (const page of pages) {
+      lines.push("- ページ: " + (page.linkTitle || page.title || "タイトルなし"));
+      lines.push("  URL: " + page.url);
+      if (page.error) {
+        lines.push("  取得エラー: " + page.error);
+        continue;
+      }
+      if (page.title) lines.push("  HTML title: " + truncateText(page.title, 180));
+      if (page.description) lines.push("  description: " + truncateText(page.description, 240));
+      if (page.headings?.length) lines.push("  見出し: " + page.headings.slice(0, 6).map((heading) => truncateText(heading, 80)).join(" / "));
+      const extractedText = page.text || page.bodyText || "";
+      if (extractedText) {
+        const evidenceLimit = page.text ? 1200 : 500;
+        lines.push("  抽出本文（モデル入力）: " + truncateText(extractedText, evidenceLimit));
+      }
+    }
     lines.push("");
   }
 
-  lines.push("## /admin/candidates で確認してください");
-  lines.push("");
+  if (skippedReason) {
+    lines.push("- 候補生成スキップ理由: " + skippedReason, "");
+  }
 
+  lines.push("## /admin/candidates で確認してください", "");
   if (candidates.length === 0) {
     lines.push("- 新規候補なし");
   } else {
     for (const candidate of candidates) {
-      lines.push(`- ${candidate.id}`);
-      lines.push(`  - ${candidate.artists.join(" / ")}`);
-      lines.push(`  - ${candidate.date ?? "日付未定"} / ${[candidate.prefecture, candidate.venue].filter(Boolean).join(" / ") || "会場未定"}`);
-      lines.push(`  - ${candidate.confidence} / ${candidate.sourceName}`);
-      lines.push(`  - ${candidate.sourceUrl}`);
-      lines.push(`  - 確認メモ: ${candidate.reviewNotes}`);
+      lines.push("- " + candidate.id);
+      lines.push("  - " + candidate.artists.join(" / "));
+      lines.push("  - " + (candidate.date ?? "日付未定") + " / " + ([candidate.prefecture, candidate.venue].filter(Boolean).join(" / ") || "会場未定"));
+      lines.push("  - " + candidate.confidence + " / " + candidate.sourceName);
+      lines.push("  - " + candidate.sourceUrl);
+      lines.push("  - 確認メモ: " + candidate.reviewNotes);
     }
   }
-
   return lines.join("\n");
 }
 
