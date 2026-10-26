@@ -1,92 +1,54 @@
 #!/usr/bin/env bash
 set -euo pipefail
-
 root="${METALS_CALENDAR_HOME:-$HOME/.local/share/metals-calendar}"
 source_repo="${METALS_CALENDAR_REPO:-$root/control}"
 state_dir="$root/state"
 runs_dir="$root/runs"
 repo="${GH_REPO:-ko-ya346/metal-live-schedule-japan}"
 node_bin="${METALS_NODE_BIN:-$root/runtime/node-v24.21.0-linux-x64/bin}"
-model="${CANDIDATE_LLM_MODEL:-metals-review:8b}"
-base_url="${CANDIDATE_LLM_BASE_URL:-http://127.0.0.1:11434/v1}"
-
 export PATH="$node_bin:$HOME/.local/bin:/usr/local/bin:/usr/bin:/bin"
 mkdir -p "$state_dir" "$runs_dir"
 exec 9>"$state_dir/watchlist-expansion.lock"
 flock -n 9 || exit 0
-
-pending_pr="$(gh pr list --repo "$repo" --state open --base main --limit 100 \
-  --json number,headRefName \
-  --jq '[.[] | select(.headRefName | startswith("automated-watchlist-expansion-"))] | .[0].number // empty')"
-if [[ -n "$pending_pr" ]]; then
-  echo "Watchlist expansion PR #$pending_pr is awaiting human review; update skipped."
-  exit 0
-fi
-
+pending_pr="$(gh pr list --repo "$repo" --state open --base main --limit 100 --json number,headRefName --jq '[.[] | select(.headRefName | startswith("automated-watchlist-expansion-"))] | .[0].number // empty')"
+if [[ -n "$pending_pr" ]]; then echo "Watchlist report PR #$pending_pr awaits human review; skipped."; exit 0; fi
 git -C "$source_repo" fetch origin main
 stamp="$(TZ=Asia/Tokyo date +%Y%m%d-%H%M%S)"
 today="$(TZ=Asia/Tokyo date +%Y-%m-%d)"
 branch="automated-watchlist-expansion-$stamp"
 worktree="$runs_dir/$branch"
-
-cleanup() {
-  git -C "$source_repo" worktree remove --force "$worktree" >/dev/null 2>&1 || true
-  git -C "$source_repo" branch -D "$branch" >/dev/null 2>&1 || true
-}
+cleanup() { git -C "$source_repo" worktree remove --force "$worktree" >/dev/null 2>&1 || true; git -C "$source_repo" branch -D "$branch" >/dev/null 2>&1 || true; }
 trap cleanup EXIT
-
 git -C "$source_repo" worktree add -b "$branch" "$worktree" origin/main
 cd "$worktree"
 npm ci --no-audit --no-fund
-CANDIDATE_LLM_BASE_URL="$base_url" CANDIDATE_LLM_MODEL="$model" \
-  npm run research:watchlist-expansion -- --write --report=watchlist-expansion-report.md \
-  > watchlist-expansion-run.log
+npm run research:watchlist-expansion -- --report=watchlist-expansion-report.md --signature=watchlist-expansion-candidates.sha256 > watchlist-expansion-run.log
 cp watchlist-expansion-report.md "$state_dir/watchlist-expansion-$stamp.md"
 cp watchlist-expansion-run.log "$state_dir/watchlist-expansion-$stamp.log"
-
-if git diff --quiet -- src/data/watchTargets.ts; then
-  echo "Open-weight model found no validated domestic keyword additions; report saved under $state_dir."
-  exit 0
-fi
-
-npm run data:validate
-npm run copy:check
-npm run build
-
+if grep -q '既存探索語に含まれない共演者: 0組' watchlist-expansion-report.md; then echo "No candidates; report/log saved."; exit 0; fi
+signature="$(cat watchlist-expansion-candidates.sha256)"
+signature_file="$state_dir/watchlist-expansion-candidates.sha256"
+if [[ -f "$signature_file" && "$(cat "$signature_file")" == "$signature" ]]; then echo "Candidate snapshot unchanged; no duplicate PR."; exit 0; fi
 git config user.name "metals-calendar-openweight"
 git config user.email "metals-calendar-openweight@users.noreply.github.com"
-git add src/data/watchTargets.ts watchlist-expansion-report.md
-git commit -m "data: expand co-performer discovery keywords"
+git add watchlist-expansion-report.md
+git commit -m "docs: report domestic co-performer candidates"
 git push -u origin "$branch"
-
 {
-  cat <<'BODY'
+cat <<'BODY'
 ## 概要
 
-国内公演の共演関係から open-weight モデルが選んだ国内アーティスト探索キーワード候補です。海外アーティストは固定監視対象に追加せず、来日情報は主催者・チケットなどの広い情報源から探します。公開イベント自体は変更していません。
-
-## open-weightモデルの出力
-
-BODY
-  cat watchlist-expansion-report.md
-  cat <<'BODY'
-
-## 対象Issue
-
-#127 の調査に基づく変更です。
+公開イベントの共演者から、未登録の探索候補を根拠付きで一覧化しました。isInternational=false を国内公演の根拠として使い、個々の出演者の国籍はモデル判定していません。データファイルは変更せず、候補レポートのみです。
 
 ## 人間に確認してほしいこと
 
-候補が日本の国内アーティストか、出力された根拠が妥当か確認してください。モデル出力から監視URLを自動登録することはありません。
+Metal Calendar の探索範囲に加える出演名義を選んでください。国籍や対象ジャンルの最終判断は人間が行います。
 
-## 確認
+## 対象Issue
 
-- `npm run data:validate`
-- `npm run copy:check`
-- `npm run build`
+#133
 BODY
+cat watchlist-expansion-report.md
 } > watchlist-expansion-pr.md
-
-gh pr create --repo "$repo" --base main --head "$branch" \
-  --title "国内アーティストの探索キーワードを更新する $today" \
-  --body-file watchlist-expansion-pr.md
+gh pr create --repo "$repo" --base main --head "$branch" --title "国内共演者の探索候補を報告する $today" --body-file watchlist-expansion-pr.md
+cp watchlist-expansion-candidates.sha256 "$signature_file"
