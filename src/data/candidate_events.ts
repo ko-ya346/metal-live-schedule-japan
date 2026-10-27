@@ -13691,7 +13691,7 @@ export const candidateEvents: CandidateEvent[] = [
         confidence: "high",
         eventStatus: "scheduled",
         reviewStatus: "review_needed",
-        reviewNotes: "会場公式と出演者FRUITPOCHETTEの公式日程で11/1・松山SALONKITTY・出演4組を確認。TIGETで前売3,500円と予約受付を確認。AporathのTuneCore JapanプロフィールはHeavy Metal / Alternativeと記載。TIGETのツアー日程（8/22福岡、9/15東京、9/19名古屋、10/2広島、10/23高松、10/29大阪、11/1松山）を確認し、収集日時点で今後の公演は松山のみ。",
+        reviewNotes: "会場公式と出演者FRUITPOCHETTEの公式日程で11/1・松山SALONKITTY・出演4組を確認。TIGETで前売3,500円と予約受付を確認。AporathのTuneCore JapanプロフィールはHeavy Metal / Alternativeと記載。TIGETのツアー日程（8/22福岡、9/15東京、9/19名古屋、10/2広島、10/23高松、10/29大阪、11/1松山）を確認し、収集日時点で今後の公演は松山のみ。開場・開演は会場公式と出演者公式が16:00/16:30。TIGETの詳細欄に16:30/17:00の表記もあるため、時刻は人間確認を推奨。",
         collectedAt: "2026-10-27",
         reviewedAt: null,
     },
