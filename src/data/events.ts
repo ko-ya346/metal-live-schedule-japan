@@ -10917,6 +10917,45 @@ const realEvents: Event[] = [
         publishedAt: "2026-10-21",
         updatedAt: "2026-10-21",
     },
+    {
+        id: "aporath-notice-tour-final-2026-matsuyama",
+        artists: [
+            "Aporath",
+            "FRUITPOCHETTE",
+            "CrowsAlive",
+            "LENZ",
+        ],
+        tourName: "Aporath 1st Album「NOTICE」 Release TOUR FINAL",
+        date: "2026-11-01",
+        endDate: null,
+        prefecture: "愛媛県",
+        venue: "松山SALONKITTY",
+        genres: [
+            "Heavy Metal",
+        ],
+        isInternational: false,
+        ticketUrl: "https://tiget.net/events/506144",
+        ticketLinks: [
+                        {
+                provider: "TIGET",
+                url: "https://tiget.net/events/506144",
+                affiliateUrl: null,
+                price: 3500,
+                saleStartsAt: null,
+                saleStatus: "on_sale",
+                saleEndsAt: null,
+                priority: 1,
+            },
+        ],
+        imageUrl: null,
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: "https://salonkitty.co.jp/2026/08/23/6353/",
+        status: "scheduled",
+        candidateCreatedAt: "2026-10-27",
+        publishedAt: "2026-10-27",
+        updatedAt: "2026-10-27",
+    },
 ];
 
 export const publishedEvents = realEvents;
