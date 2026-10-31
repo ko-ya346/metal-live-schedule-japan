@@ -715,6 +715,125 @@ function summarizeHtml(html, pageContext) {
   };
 }
 
+function parseRegionalEntryPeriod(title, referenceDate) {
+  const dateMatch = title.match(/(20\d{2})\s*(?:[./-]|年)\s*(\d{1,2})(?:\s*(?:[./月-])\s*(\d{1,2})日?)?/);
+  const currentYear = Number(referenceDate.slice(0, 4));
+  const currentMonth = Number(referenceDate.slice(5, 7));
+
+  if (dateMatch) {
+    const year = Number(dateMatch[1]);
+    const month = Number(dateMatch[2]);
+    const day = dateMatch[3] ? Number(dateMatch[3]) : null;
+    const daysInMonth = month >= 1 && month <= 12 ? new Date(Date.UTC(year, month, 0)).getUTCDate() : 0;
+    if (month < 1 || month > 12 || (day !== null && (day < 1 || day > daysInMonth))) return null;
+    const start = `${year}-${String(month).padStart(2, "0")}-${String(day ?? 1).padStart(2, "0")}`;
+    const endDay = day ?? daysInMonth;
+    const end = `${year}-${String(month).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+    return { start, end, granularity: day === null ? "month" : "day" };
+  }
+
+  const monthDayMatch = title.match(/(?:^|\D)(\d{1,2})\s*[./月]\s*(\d{1,2})(?:日)?/);
+  if (monthDayMatch) {
+    const month = Number(monthDayMatch[1]);
+    const day = Number(monthDayMatch[2]);
+    if (month < 1 || month > 12 || day < 1 || day > new Date(Date.UTC(currentYear, month, 0)).getUTCDate()) return null;
+    let year = currentYear;
+    let date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    if (date < referenceDate) {
+      year += 1;
+      date = `${year}-${String(month).padStart(2, "0")}-${String(day).padStart(2, "0")}`;
+    }
+    return { start: date, end: date, granularity: "day" };
+  }
+
+  const monthOnlyMatch = title.match(/(?:^|\D)(\d{1,2})月/);
+  if (monthOnlyMatch) {
+    const month = Number(monthOnlyMatch[1]);
+    if (month < 1 || month > 12) return null;
+    const year = month < currentMonth ? currentYear + 1 : currentYear;
+    const start = `${year}-${String(month).padStart(2, "0")}-01`;
+    const endDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+    const end = `${year}-${String(month).padStart(2, "0")}-${String(endDay).padStart(2, "0")}`;
+    return { start, end, granularity: "month" };
+  }
+
+  return null;
+}
+
+function parseRegionalUrlPeriod(url) {
+  try {
+    const parsedUrl = new URL(url);
+    const queryDateValue = ["date", "start", "start_date", "startDate", "be", "from"]
+      .map((key) => parsedUrl.searchParams.get(key))
+      .find((value) => value && /20\d{2}[./-]\d{1,2}[./-]\d{1,2}/.test(value));
+    const queryDate = queryDateValue?.match(/(20\d{2})[./-](\d{1,2})[./-](\d{1,2})/);
+    if (queryDate) {
+      const year = Number(queryDate[1]);
+      const month = Number(queryDate[2]);
+      const day = Number(queryDate[3]);
+      const daysInMonth = month >= 1 && month <= 12 ? new Date(Date.UTC(year, month, 0)).getUTCDate() : 0;
+      if (day >= 1 && day <= daysInMonth) {
+        const date = String(year) + "-" + String(month).padStart(2, "0") + "-" + String(day).padStart(2, "0");
+        return { start: date, end: date, granularity: "day" };
+      }
+    }
+
+    const year = Number(parsedUrl.searchParams.get("year") || parsedUrl.searchParams.get("y"));
+    const month = Number(parsedUrl.searchParams.get("month") || parsedUrl.searchParams.get("m"));
+    if (year >= 2000 && month >= 1 && month <= 12) {
+      const start = String(year) + "-" + String(month).padStart(2, "0") + "-01";
+      const endDay = new Date(Date.UTC(year, month, 0)).getUTCDate();
+      const end = String(year) + "-" + String(month).padStart(2, "0") + "-" + String(endDay).padStart(2, "0");
+      return { start, end, granularity: "month" };
+    }
+
+    const scheduleMonth = decodeURIComponent(parsedUrl.pathname).match(/\/events\/date\/(20\d{2})\/(\d{1,2})(?:\/|$)/);
+    if (scheduleMonth) {
+      const scheduleYear = Number(scheduleMonth[1]);
+      const scheduleMonthNumber = Number(scheduleMonth[2]);
+      if (scheduleMonthNumber >= 1 && scheduleMonthNumber <= 12) {
+        const start = String(scheduleYear) + "-" + String(scheduleMonthNumber).padStart(2, "0") + "-01";
+        const endDay = new Date(Date.UTC(scheduleYear, scheduleMonthNumber, 0)).getUTCDate();
+        const end = String(scheduleYear) + "-" + String(scheduleMonthNumber).padStart(2, "0") + "-" + String(endDay).padStart(2, "0");
+        return { start, end, granularity: "month" };
+      }
+    }
+  } catch {
+    return null;
+  }
+
+  return null;
+}
+
+function getRegionalEntryPeriod(entry, referenceDate) {
+  return parseRegionalEntryPeriod(entry.title, referenceDate) || parseRegionalUrlPeriod(entry.url);
+}
+
+function isRegionalScheduleOverview(entry) {
+  return /schedule|スケジュール|\blive\b|公演スケジュール|近日|カレンダー|公演日/i.test(entry.title + " " + entry.url);
+}
+
+function isUpcomingRegionalEntry(entry) {
+  const value = `${entry.title} ${entry.url}`;
+  if (/archive|history|過去|アーカイブ/i.test(value)) return false;
+
+  const linkedYears = [...value.matchAll(/20\d{2}/g)].map((match) => Number(match[0]));
+  const currentYear = Number(today.slice(0, 4));
+  if (linkedYears.length > 0 && linkedYears.every((year) => year < currentYear)) return false;
+
+  const period = getRegionalEntryPeriod(entry, today);
+  const lookahead = new Date(`${today}T00:00:00Z`);
+  lookahead.setUTCDate(lookahead.getUTCDate() + 90);
+  const lookaheadDate = lookahead.toISOString().slice(0, 10);
+
+  if (period) {
+    const isStillUpcoming = period.granularity === "month" ? period.end > today : period.end >= today;
+    return isStillUpcoming && period.start <= lookaheadDate;
+  }
+
+  return isRegionalScheduleOverview(entry);
+}
+
 async function buildPageSummaries(sections) {
   const summaries = [];
   const seenUrls = new Set();
@@ -736,27 +855,55 @@ async function buildPageSummaries(sections) {
         left.sectionIndex - right.sectionIndex ||
         left.entryIndex - right.entryIndex,
     );
+  const selections = [];
 
-  for (const { section, entry } of entries) {
-    if (summaries.length >= maxTotalPages) {
-      break;
-    }
+  for (const section of sections) {
+    if (!section.sourceName.includes("国内広域確認")) continue;
 
+    const regionalEntry = entries
+      .filter((item) => item.section === section && isUpcomingRegionalEntry(item.entry))
+      .sort((left, right) => {
+        const leftPeriod = getRegionalEntryPeriod(left.entry, today);
+        const rightPeriod = getRegionalEntryPeriod(right.entry, today);
+        const getPageType = (item, period) => {
+          if (period?.granularity === "month") return 0;
+          if (!period && isRegionalScheduleOverview(item.entry)) return 1;
+          return 2;
+        };
+        const typeDifference = getPageType(left, leftPeriod) - getPageType(right, rightPeriod);
+        const leftDate = leftPeriod ? (leftPeriod.start < today ? today : leftPeriod.start) : "9999-12-31";
+        const rightDate = rightPeriod ? (rightPeriod.start < today ? today : rightPeriod.start) : "9999-12-31";
+        return typeDifference || leftDate.localeCompare(rightDate) || right.score - left.score || left.entryIndex - right.entryIndex;
+      })
+      .find((item) => !seenUrls.has(item.entry.url));
+
+    if (!regionalEntry || selections.length >= maxTotalPages) continue;
     const sourceCount = sourceCounts.get(section.sourceName) ?? 0;
+    if (sourceCount >= maxPagesPerSource) continue;
 
-    if (sourceCount >= maxPagesPerSource || seenUrls.has(entry.url)) {
-      continue;
-    }
-
-    seenUrls.add(entry.url);
+    seenUrls.add(regionalEntry.entry.url);
     sourceCounts.set(section.sourceName, sourceCount + 1);
+    selections.push({ ...regionalEntry, selectionReason: "regional-reserve" });
+  }
 
+  for (const item of entries) {
+    if (selections.length >= maxTotalPages) break;
+    const sourceCount = sourceCounts.get(item.section.sourceName) ?? 0;
+    if (sourceCount >= maxPagesPerSource || seenUrls.has(item.entry.url)) continue;
+
+    seenUrls.add(item.entry.url);
+    sourceCounts.set(item.section.sourceName, sourceCount + 1);
+    selections.push({ ...item, selectionReason: "score" });
+  }
+
+  for (const { section, entry, selectionReason } of selections) {
     try {
       const html = await fetchHtml(entry.url);
       summaries.push({
         sourceName: section.sourceName,
         url: entry.url,
         linkTitle: entry.title,
+        selectionReason,
         ...summarizeHtml(html, {
           sourceName: section.sourceName,
           linkTitle: entry.title,
@@ -767,6 +914,7 @@ async function buildPageSummaries(sections) {
         sourceName: section.sourceName,
         url: entry.url,
         linkTitle: entry.title,
+        selectionReason,
         error: error instanceof Error ? error.message : "fetch failed",
       });
     }
@@ -1301,6 +1449,30 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
       return "| " + section.sourceName.replaceAll("|", "／") + " | " + section.entries.length + " | " + (pages.length - failedPages) + " | " + failedPages + " | " + unselectedCount + " | " + candidateCount + " | " + status + " |";
     }),
     "",
+    "## 地方ソースのページ選定",
+    "",
+    "地方ソースは未来90日以内の月別予定、次に開催予定一覧、次に個別公演ページを各ソース1ページまで先行選定します。残りは通常スコア順です。",
+    "",
+    "| ソース | 地方優先枠で選定 | 通常スコアで選定 | 未選定理由 |",
+    "|---|---|---|---|",
+    ...sections.filter((section) => section.sourceName.includes("国内広域確認")).map((section) => {
+      const pages = sourcePages(section);
+      const selectedUrls = new Set(pages.map((page) => page.url));
+      const formatPages = (items) => items.length
+        ? items.map((page) => `${truncateText(page.linkTitle || page.title || "タイトルなし", 100)} — ${page.url}`).join("<br>")
+        : "なし";
+      const regionalPages = pages.filter((page) => page.selectionReason === "regional-reserve");
+      const scoredPages = pages.filter((page) => page.selectionReason === "score");
+      const reasons = new Map();
+      for (const entry of section.entries) {
+        if (selectedUrls.has(entry.url)) continue;
+        const reason = unselectedReason(section, entry);
+        reasons.set(reason, (reasons.get(reason) ?? 0) + 1);
+      }
+      const unselected = [...reasons].map(([reason, count]) => `${reason}: ${count}`).join(" / ") || "なし";
+      return `| ${section.sourceName.replaceAll("|", "／")} | ${formatPages(regionalPages)} | ${formatPages(scoredPages)} | ${unselected} |`;
+    }),
+    "",
     "## 地方4会場のページ確認",
     "",
     "以下の4会場について、リンク収集、ページ要約の選定、取得結果、モデル入力に含まれた抽出根拠を分けて記録します。",
@@ -1327,8 +1499,11 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     lines.push("", "#### ページごとの状態", "");
     for (const entry of section.entries) {
       const page = pages.find((item) => item.url === entry.url);
+      const selectionLabel = page?.selectionReason === "regional-reserve"
+        ? "地方優先枠"
+        : "通常スコア";
       const state = page
-        ? page.error ? "取得失敗: " + page.error : "取得成功・モデル入力済み"
+        ? page.error ? "取得失敗: " + page.error : "取得成功・モデル入力済み（" + selectionLabel + "）"
         : "未選定: " + unselectedReason(section, entry);
       lines.push("- " + entry.title + " — " + state);
       lines.push("  " + entry.url);
