@@ -26,9 +26,11 @@ The resulting candidate keeps the confirmed event details, uses Kanagawa, and le
 
 The extraction prompt now requires direct ticket application URLs in captured page summaries and requires ticket availability to be explicitly stated there. It forbids inferring sold-out or not-started status from old or future dates. A local check asserts that both rules reach the model.
 
-## Source coverage change
+## Source coverage change and link-selection check
 
-The existing H.I.P. watch target used an obsolete `hipjpn.co.jp` URL. A separate code PR replaces it with the current LIVE NATION H.I.P. schedule and allows broad discovery of a limited set of events, including unfamiliar international artists. The source-specific ranking helps its links fit within the scheduled page budget.
+The existing H.I.P. watch target used an obsolete `hipjpn.co.jp` URL. The first real link-collector run with the replacement source showed that its five-link limit selected navigation and KATSEYE links but omitted Disturbed. The source was raised to high priority, which allows eight links. A second real collector run selected the Disturbed event detail URL from the current LIVE NATION H.I.P. schedule.
+
+A separate code PR replaces the obsolete source, keeps broad discovery enabled for unfamiliar international artists, and gives H.I.P. pages a source-specific ranking in the page-budget selection. The link-collector check does not invoke the model.
 
 ## Evaluation
 
