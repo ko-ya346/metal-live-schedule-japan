@@ -13713,16 +13713,19 @@ export const candidateEvents: CandidateEvent[] = [
 
     {
         id: "disturbed-the-sickness-2027-yokohama",
-        artists: ["Disturbed"],
+        artists: [
+            "Disturbed",
+        ],
         tourName: "The Sickness & the Greatest Hits",
         date: "2027-05-19",
         endDate: null,
         prefecture: "神奈川県",
         venue: "ぴあアリーナMM",
-        genres: ["Heavy Metal"],
+        genres: [
+            "Heavy Metal",
+        ],
         isInternational: true,
         ticketUrl: "https://www.livenationhip.co.jp/all-events/disturbed-tickets-ae180",
-        ticketLinks: [],
         imageUrl: "https://networksites.livenationinternational.com/networksites/40oncafo/static_homepage_admat_1920x1080_disturbed-2027_national.jpg",
         organizerName: "LIVE NATION H.I.P.",
         organizerUrl: "https://www.livenationhip.co.jp/",
@@ -13732,9 +13735,9 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "LIVE NATION H.I.P. 公式公演",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "公式主催者ページで2027年5月19日・ぴあアリーナMMの1公演を確認。国内日程の追加公演は同ページに見当たらない。モデル出力のチケット「sold_out」は公式ページと不一致のため採用せず、チケット情報は未登録。公式ページでは11月9日からオフィシャル1次抽選先行を案内。",
         collectedAt: "2026-11-08",
-        reviewedAt: null,
+        reviewedAt: "2026-11-08",
     },
 ];
