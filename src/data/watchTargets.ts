@@ -63,6 +63,7 @@ export const priorityArtistKeywords = [
     "HELL FREEZES OVER",
     "Mardelas",
     "Tears Of Tragedy",
+    "ASTERISM",
 ] as const;
 
 export const discoveryArtistKeywords = [
@@ -247,6 +248,14 @@ export const priorityArtistSources: WatchSource[] = [
         region: "nationwide",
         priority: "high",
         notes: "東名阪を含む国内ツアーやイベント出演の全日程を確認する。",
+    },
+    {
+        name: "ASTERISM official news / live",
+        url: "https://asterism.asia/news/live.php",
+        type: "band_official",
+        region: "nationwide",
+        priority: "high",
+        notes: "国内ツアーや地方公演の公式告知を確認する。",
     },
     {
         name: "HIKAGE official",
