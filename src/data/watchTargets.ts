@@ -324,12 +324,13 @@ export const promoterTicketSources: WatchSource[] = [
         notes: "大型ロック/メタル系公演の確認に使う。",
     },
     {
-        name: "Hayashi International Promotions",
-        url: "https://www.hipjpn.co.jp/",
+        name: "LIVE NATION H.I.P. tour schedule",
+        url: "https://www.livenationhip.co.jp/",
         type: "promoter",
         region: "nationwide",
         priority: "high",
-        notes: "来日公演の確認に使う。",
+        notes: "公式の来日公演一覧。ジャンルを限定せず少数の公演リンクをopen-weightに渡し、未知の海外アーティストも判定してもらう。",
+        broadDiscovery: true,
     },
     {
         name: "Mount Alive schedule",

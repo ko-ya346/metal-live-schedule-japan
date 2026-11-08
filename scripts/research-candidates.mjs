@@ -73,6 +73,10 @@ const reportPath = args.get("report") ?? null;
 const shouldWrite = args.has("write");
 const promptOnly = args.has("prompt-only");
 const maxPagesPerSource = Number(args.get("max-pages") ?? "3");
+const pageLimitForSource = (sourceName) =>
+  normalizeForMatch(sourceName).includes("livenationhip")
+    ? Math.max(maxPagesPerSource, 5)
+    : maxPagesPerSource;
 const maxTotalPages = Number(args.get("max-total-pages") ?? "24");
 const promptMode = args.get("prompt-mode") === "full" ? "full" : "compact";
 const isCompactPrompt = promptMode === "compact";
@@ -519,6 +523,14 @@ function scoreResearchEntry(section, entry) {
     score += 6;
   }
 
+  if (normalizeForMatch(section.sourceName).includes("livenationhip")) {
+    score += 8;
+
+    if (entry.url.includes("/all-events/")) {
+      score += 14;
+    }
+  }
+
   if (
     priorityArtistKeywords.some((keyword) =>
       normalizedValue.includes(normalizeForMatch(keyword)),
@@ -879,7 +891,7 @@ async function buildPageSummaries(sections) {
 
     if (!regionalEntry || selections.length >= maxTotalPages) continue;
     const sourceCount = sourceCounts.get(section.sourceName) ?? 0;
-    if (sourceCount >= maxPagesPerSource) continue;
+    if (sourceCount >= pageLimitForSource(section.sourceName)) continue;
 
     seenUrls.add(regionalEntry.entry.url);
     sourceCounts.set(section.sourceName, sourceCount + 1);
@@ -889,7 +901,7 @@ async function buildPageSummaries(sections) {
   for (const item of entries) {
     if (selections.length >= maxTotalPages) break;
     const sourceCount = sourceCounts.get(item.section.sourceName) ?? 0;
-    if (sourceCount >= maxPagesPerSource || seenUrls.has(item.entry.url)) continue;
+    if (sourceCount >= pageLimitForSource(item.section.sourceName) || seenUrls.has(item.entry.url)) continue;
 
     seenUrls.add(item.entry.url);
     sourceCounts.set(item.section.sourceName, sourceCount + 1);
@@ -1331,6 +1343,8 @@ function buildPrompt(summaries, knownSummary) {
     "- Use ticketLinks: null when no ticket purchase URL is visible.",
     "- Do not invent prices. Only set ticketLinks[].price when an actual numeric ticket price is visible. Use null or omit it when unknown.",
     "- Set ticketLinks[].saleStartsAt only when the ticket sale start date is visible. Do not use the event date as the sale start date.",
+    "- Every ticketLinks[].url must be a direct ticket purchase/application URL explicitly shown in the captured page summaries. Do not use a venue event page as a ticket URL or repeat it for separate price tiers.",
+    "- Set saleStatus to unknown unless the captured page summaries explicitly state the current status for that ticket link. Never infer sold_out or not_started from expired or future dates.",
     "- Use imageUrl only for a relevant event, artist, tour, venue, or official OG image URL from the source page.",
     "- Keep reviewNotes in Japanese and include why a human should review it.",
     "",
@@ -1407,7 +1421,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     const score = scoreResearchEntry(section, entry);
     if (score <= 0) return "スコア対象外";
     const pages = sourcePages(section);
-    if (pages.length >= maxPagesPerSource) return "ソース別ページ上限";
+    if (pages.length >= pageLimitForSource(section.sourceName)) return "ソース別ページ上限";
     if (summaries.length >= maxTotalPages) return "全体ページ上限";
     return "重複URLまたは未選定";
   };

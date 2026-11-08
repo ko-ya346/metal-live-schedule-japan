@@ -105,6 +105,8 @@ try {
   assert.equal(receivedRequest.headers.authorization, undefined, "localhost does not require an API key");
   assert.equal(receivedRequest.body.model, "fixture-model");
   assert.equal(receivedRequest.body.stream, true);
+  assert.match(JSON.stringify(receivedRequest.body.messages), /direct ticket purchase\/application URL/, "the model receives ticket-link grounding rules");
+  assert.match(JSON.stringify(receivedRequest.body.messages), /explicitly state the current status/, "the model must ground ticket availability in captured pages");
   assert.deepEqual(receivedRequest.body.response_format, { type: "json_object" });
   const reportText = await readFile(report, "utf8");
   assert.match(reportText, /生成モデル: fixture-model/);

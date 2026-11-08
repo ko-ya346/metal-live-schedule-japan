@@ -36,12 +36,6 @@ const curatedSources = [
     maxLinks: 5,
   },
   {
-    name: "H.I.P.",
-    url: "https://www.hipjpn.co.jp/",
-    region: "nationwide",
-    maxLinks: 5,
-  },
-  {
     name: "SMASH",
     url: "https://smash-jpn.com/",
     region: "nationwide",
