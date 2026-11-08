@@ -28,9 +28,9 @@ The extraction prompt now requires direct ticket application URLs in captured pa
 
 ## Source coverage change and link-selection check
 
-The existing H.I.P. watch target used an obsolete `hipjpn.co.jp` URL. The first real link-collector run with the replacement source showed that its five-link limit selected navigation and KATSEYE links but omitted Disturbed. The source was raised to high priority, which allows eight links. A second real collector run selected the Disturbed event detail URL from the current LIVE NATION H.I.P. schedule.
+The existing H.I.P. watch target used an obsolete `hipjpn.co.jp` URL. The first real link-collector run with the replacement source showed that its five-link limit omitted Disturbed. Raising the source to high priority allowed eight links and exposed the event detail URL.
 
-A separate code PR replaces the obsolete source, keeps broad discovery enabled for unfamiliar international artists, and gives H.I.P. pages a source-specific ranking in the page-budget selection. The link-collector check does not invoke the model.
+The first 32-page `--prompt-only` selection still omitted Disturbed. Adding an event-detail score for LIVE NATION H.I.P. and allowing up to five pages from this source resulted in five selected H.I.P. pages, including Disturbed, under the same total 32-page limit. This selection check did not invoke a model. A separate code PR contains these source and page-budget changes, plus broad discovery for unfamiliar international artists.
 
 ## Evaluation
 
