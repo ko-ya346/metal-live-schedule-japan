@@ -10956,6 +10956,30 @@ const realEvents: Event[] = [
         publishedAt: "2026-10-27",
         updatedAt: "2026-10-27",
     },
+    {
+        id: "disturbed-the-sickness-2027-yokohama",
+        artists: [
+            "Disturbed",
+        ],
+        tourName: "The Sickness & the Greatest Hits",
+        date: "2027-05-19",
+        endDate: null,
+        prefecture: "神奈川県",
+        venue: "ぴあアリーナMM",
+        genres: [
+            "Heavy Metal",
+        ],
+        isInternational: true,
+        ticketUrl: "https://www.livenationhip.co.jp/all-events/disturbed-tickets-ae180",
+        imageUrl: "https://networksites.livenationinternational.com/networksites/40oncafo/static_homepage_admat_1920x1080_disturbed-2027_national.jpg",
+        organizerName: "LIVE NATION H.I.P.",
+        organizerUrl: "https://www.livenationhip.co.jp/",
+        officialUrl: "https://www.livenationhip.co.jp/all-events/disturbed-tickets-ae180",
+        status: "scheduled",
+        candidateCreatedAt: "2026-11-08",
+        publishedAt: "2026-11-08",
+        updatedAt: "2026-11-08",
+    },
 ];
 
 export const publishedEvents = realEvents;
