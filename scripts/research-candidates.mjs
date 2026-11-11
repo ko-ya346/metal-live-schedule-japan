@@ -497,6 +497,14 @@ const lowValueLinkPatterns = [
   /グッズ|goods/i,
 ];
 
+function isPriorityArtistEntry(section, entry) {
+  const normalizedValue = normalizeForMatch(`${section.sourceName} ${entry.title} ${entry.url}`);
+  return priorityArtistKeywords.some((keyword) => {
+    const normalizedKeyword = normalizeForMatch(keyword);
+    return normalizedKeyword && normalizedValue.includes(normalizedKeyword);
+  });
+}
+
 function scoreResearchEntry(section, entry) {
   const value = `${section.sourceName} ${entry.title} ${entry.url}`;
   const normalizedValue = normalizeForMatch(value);
@@ -626,7 +634,7 @@ function getContextWindow(text, index, windowSize) {
   return truncateText(snippet, windowSize);
 }
 
-function extractContextSnippets(text, keywords) {
+function extractContextSnippets(text, keywords, snippetLimit = maxSnippets) {
   const normalizedText = compactText(text);
   const lowerText = normalizedText.toLowerCase();
   const snippets = [];
@@ -637,7 +645,7 @@ function extractContextSnippets(text, keywords) {
   );
 
   for (const match of dateMatches) {
-    if (snippets.length >= maxSnippets) {
+    if (snippets.length >= snippetLimit) {
       break;
     }
 
@@ -651,7 +659,7 @@ function extractContextSnippets(text, keywords) {
   }
 
   for (const keyword of relevantKeywords) {
-    if (snippets.length >= maxSnippets) {
+    if (snippets.length >= snippetLimit) {
       break;
     }
 
@@ -712,11 +720,14 @@ function summarizeHtml(html, pageContext) {
     };
   }
 
-  const snippets = extractContextSnippets(bodyText, [
-    pageContext.sourceName,
-    pageContext.linkTitle,
-    ...eventContextKeywords,
-  ]);
+  const prioritySnippetLimit = Math.max(maxSnippets, Math.min(20, maxSnippets * 3));
+  const snippets = extractContextSnippets(
+    bodyText,
+    [pageContext.sourceName, pageContext.linkTitle, ...eventContextKeywords],
+    isPriorityArtistEntry(pageContext, { title: pageContext.linkTitle, url: pageContext.url })
+      ? prioritySnippetLimit
+      : maxSnippets,
+  );
 
   return {
     ...summary,
@@ -868,6 +879,7 @@ async function buildPageSummaries(sections) {
         left.entryIndex - right.entryIndex,
     );
   const selections = [];
+  const priorityArtistPageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
 
   for (const section of sections) {
     if (!section.sourceName.includes("国内広域確認")) continue;
@@ -898,6 +910,32 @@ async function buildPageSummaries(sections) {
     selections.push({ ...regionalEntry, selectionReason: "regional-reserve" });
   }
 
+  const priorityEntriesBySection = new Map();
+  for (const item of entries) {
+    if (!isPriorityArtistEntry(item.section, item.entry)) continue;
+    const items = priorityEntriesBySection.get(item.sectionIndex) ?? [];
+    items.push(item);
+    priorityEntriesBySection.set(item.sectionIndex, items);
+  }
+  const prioritySectionIndexes = [...priorityEntriesBySection.keys()].sort((a, b) => a - b);
+  if (prioritySectionIndexes.length && priorityArtistPageBudget > 0) {
+    const weekIndex = Math.floor(Date.parse(`${today}T00:00:00Z`) / 604800000);
+    const firstSection = weekIndex % prioritySectionIndexes.length;
+    for (let offset = 0, reserved = 0; offset < prioritySectionIndexes.length && reserved < priorityArtistPageBudget; offset += 1) {
+      if (selections.length >= maxTotalPages) break;
+      const sectionIndex = prioritySectionIndexes[(firstSection + offset) % prioritySectionIndexes.length];
+      const item = priorityEntriesBySection.get(sectionIndex).find((candidate) => {
+        const count = sourceCounts.get(candidate.section.sourceName) ?? 0;
+        return !seenUrls.has(candidate.entry.url) && count < pageLimitForSource(candidate.section.sourceName);
+      });
+      if (!item) continue;
+      seenUrls.add(item.entry.url);
+      sourceCounts.set(item.section.sourceName, (sourceCounts.get(item.section.sourceName) ?? 0) + 1);
+      selections.push({ ...item, selectionReason: "priority-artist-reserve" });
+      reserved += 1;
+    }
+  }
+
   for (const item of entries) {
     if (selections.length >= maxTotalPages) break;
     const sourceCount = sourceCounts.get(item.section.sourceName) ?? 0;
@@ -919,6 +957,7 @@ async function buildPageSummaries(sections) {
         ...summarizeHtml(html, {
           sourceName: section.sourceName,
           linkTitle: entry.title,
+          url: entry.url,
         }),
       });
     } catch (error) {
@@ -1333,7 +1372,8 @@ function buildPrompt(summaries, knownSummary) {
     "- Judge domestic scope from the official event description, organizer or venue context, co-performers, and known scene relationships. Do not assign a genre based on guesswork.",
     "- If the Japan date, venue, and performers are concrete and there is a plausible event-context signal but scope remains uncertain, keep it as a low-confidence review candidate. Start reviewNotes with 対象範囲要確認: and state the evidence and uncertainty.",
     "- Exclude generic music news without an event-specific Japan date, venue, and performers, or an event with no evidence connecting it to the site's heavy-live audience.",
-    "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible.",
+    "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible. Do not return only the lead or first date.",
+    "- For a multi-date schedule page, inspect every date/venue row visible in the supplied summary and create one candidate for each clearly confirmed Japan date, even when all dates share one page and tour name.",
     "- When a candidate looks like a tour or multi-date run, do not stop at the first date. Check the artist/promoter/ticket tour page for other Japan dates and add every clearly confirmed date.",
     "- For tour-like candidates, reviewNotes must say whether the full tour schedule was checked. Use wording like `公式ツアーページとチケットページで全日程確認済み` or `他日程の有無は未確認`.",
     "- Treat words like Japan Tour, Tour, nationwide tour, one-man tour, additional show, Tokyo/Nagoya/Osaka dates, and shared ticket reception pages as signals to check for other dates.",
@@ -1404,6 +1444,7 @@ function estimateTokens(text) {
 }
 
 function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt }) {
+  const priorityArtistPageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
   const pilotSourceNames = new Set([
     "仙台MACANA（国内広域確認）",
     "広島SECOND CRUTCH（国内広域確認）",
@@ -1440,6 +1481,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "- 生成モデル: " + model,
     "- プロンプト概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
     "- 追加候補数: " + candidates.length,
+    "- 優先アーティストページ枠: " + priorityArtistPageBudget + "ページ / 選定 " + summaries.filter((summary) => summary.selectionReason === "priority-artist-reserve").length + "ページ",
     "- 重複/不正で除外: " + skipped,
     "",
     "発見用ソースは候補探索の入口です。公演情報が具体的でも範囲が曖昧な候補は低確信度・要確認として表示します。",
@@ -1461,6 +1503,31 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
       else if (failedPages === pages.length) status = "要約ページ取得失敗";
       else if (candidateCount === 0) status = "取得後、候補なし";
       return "| " + section.sourceName.replaceAll("|", "／") + " | " + section.entries.length + " | " + (pages.length - failedPages) + " | " + failedPages + " | " + unselectedCount + " | " + candidateCount + " | " + status + " |";
+    }),
+    "",
+    "## 優先アーティスト公式ページの選定",
+    "",
+    "watch対象アーティストに一致するページは、週ごとに開始位置をずらし、1ソース1ページずつ優先枠で選びます。優先枠に入らなかったページも通常スコア枠で選ばれる場合があります。",
+    "",
+    "| ソース | 優先対象リンク | 優先枠 | 通常枠 | 未選定理由 |",
+    "|---|---:|---|---|---|",
+    ...sections.filter((section) => section.entries.some((entry) => isPriorityArtistEntry(section, entry))).map((section) => {
+      const pages = sourcePages(section);
+      const selectedUrls = new Set(pages.map((page) => page.url));
+      const reserved = pages.filter((page) => page.selectionReason === "priority-artist-reserve");
+      const scored = pages.filter((page) => page.selectionReason === "score");
+      const reasons = new Map();
+      for (const entry of section.entries) {
+        if (!isPriorityArtistEntry(section, entry) || selectedUrls.has(entry.url)) continue;
+        const reason = unselectedReason(section, entry);
+        reasons.set(reason, (reasons.get(reason) ?? 0) + 1);
+      }
+      const formatPages = (items) => items.length
+        ? items.map((page) => `${truncateText(page.linkTitle || page.title || "タイトルなし", 100)} — ${page.url}`).join("<br>")
+        : "なし";
+      const unselected = [...reasons].map(([reason, count]) => `${reason}: ${count}`).join(" / ") || "なし";
+      const count = section.entries.filter((entry) => isPriorityArtistEntry(section, entry)).length;
+      return `| ${section.sourceName.replaceAll("|", "／")} | ${count} | ${formatPages(reserved)} | ${formatPages(scored)} | ${unselected} |`;
     }),
     "",
     "## 地方ソースのページ選定",
