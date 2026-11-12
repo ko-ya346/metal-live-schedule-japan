@@ -503,15 +503,43 @@ const lowValueLinkPatterns = [
   /グッズ|goods/i,
 ];
 
+const nonEventLinkPatterns = [
+  /\/(?:products?|shop|store|goods|merch)(?:\/|[?#]|$)/i,
+  /\/(?:videos?|movies?|media|gallery|discography|profile|biography|members?)(?:\/|[?#]|$)/i,
+  /\b(?:discography|music videos?|movie list|video list|online store|official shop)\b/i,
+  /グッズ|オンラインストア|ディスコグラフィー|動画一覧|映像作品/,
+];
+const scheduleSignalPattern = /live|schedule|concert|tour|show|festival|ticket|公演|ライブ|日程|ツアー|チケット|受付|発売|\b20\d{2}\b|[0-9]{1,2}[/-][0-9]{1,2}/i;
+
 function isTrackedScheduleEntry(section, entry) {
-  const normalizedValue = normalizeForMatch(`${section.sourceName} ${entry.title} ${entry.url}`);
-  return scheduledEntityKeywords.some((keyword) => {
+  const sourceValue = normalizeForMatch(section.sourceName);
+  const pageValue = normalizeForMatch(`${entry.title} ${entry.url}`);
+  const rawPageValue = `${entry.title} ${entry.url}`;
+  if (nonEventLinkPatterns.some((pattern) => pattern.test(rawPageValue))) return false;
+
+  const matchesKeyword = (keywords, value) => keywords.some((keyword) => {
     const normalizedKeyword = normalizeForMatch(keyword);
-    return normalizedKeyword && normalizedValue.includes(normalizedKeyword);
-  }) || priorityArtistKeywords.some((keyword) => {
-    const normalizedKeyword = normalizeForMatch(keyword);
-    return normalizedKeyword && normalizedValue.includes(normalizedKeyword);
+    return normalizedKeyword && value.includes(normalizedKeyword);
   });
+  const sourceMatchesPriorityArtist = matchesKeyword(priorityArtistKeywords, sourceValue);
+  const pageMatchesPriorityArtist = matchesKeyword(priorityArtistKeywords, pageValue);
+  const trackedEntityMatch =
+    matchesKeyword(scheduledEntityKeywords, sourceValue) ||
+    matchesKeyword(scheduledEntityKeywords, pageValue) ||
+    sourceMatchesPriorityArtist ||
+    pageMatchesPriorityArtist;
+  if (!trackedEntityMatch || !scheduleSignalPattern.test(rawPageValue)) return false;
+
+  // An artist page often links unrelated acts' tickets. Keep those links out of
+  // that artist's reserve unless the ticket page itself names a tracked artist.
+  if (sourceMatchesPriorityArtist && !pageMatchesPriorityArtist) {
+    try {
+      const hostname = new URL(entry.url).hostname.replace(/^www\./i, "").toLowerCase();
+      if (scheduledTicketDomains.includes(hostname)) return false;
+    } catch {}
+  }
+
+  return true;
 }
 
 function scoreResearchEntry(section, entry) {
