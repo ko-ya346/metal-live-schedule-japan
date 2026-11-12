@@ -928,8 +928,8 @@ async function buildPageSummaries(sections) {
   }
   const trackedSectionIndexes = [...trackedEntriesBySection.keys()].sort((a, b) => a - b);
   if (trackedSectionIndexes.length && trackedSchedulePageBudget > 0) {
-    const weekIndex = Math.floor(Date.parse(`${today}T00:00:00Z`) / 604800000);
-    const firstSection = weekIndex % trackedSectionIndexes.length;
+    const collectionDayIndex = Math.floor(Date.parse(`${today}T00:00:00Z`) / 86400000);
+    const firstSection = collectionDayIndex % trackedSectionIndexes.length;
     for (let offset = 0, reserved = 0; offset < trackedSectionIndexes.length && reserved < trackedSchedulePageBudget; offset += 1) {
       if (selections.length >= maxTotalPages) break;
       const sectionIndex = trackedSectionIndexes[(firstSection + offset) % trackedSectionIndexes.length];
@@ -1461,6 +1461,8 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "鹿児島SR HALL（国内広域確認）",
   ]);
   const sourcePages = (section) => summaries.filter((summary) => summary.sourceName === section.sourceName);
+  const trackedReservedPages = summaries.filter((summary) => summary.selectionReason === "scheduled-entity-reserve");
+  const formatTrackedPage = (page) => `${truncateText(page.linkTitle || page.title || "タイトルなし", 100)} — ${page.url}`;
   const candidatesForSource = (section) => {
     const urls = new Set(sourcePages(section).map((summary) => summary.url));
     return candidates.filter((candidate) =>
@@ -1491,7 +1493,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "- プロンプト概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
     "- 追加候補数: " + candidates.length,
     "- 登録済み対象: アーティスト " + scheduledArtistNames.length + " / 会場 " + scheduledVenueNames.length + " / チケットサイト " + scheduledTicketDomains.length,
-    "- 登録済み対象ページ枠: " + trackedSchedulePageBudget + "ページ / 選定 " + summaries.filter((summary) => summary.selectionReason === "scheduled-entity-reserve").length + "ページ",
+    "- 登録済み対象ページ枠: " + trackedSchedulePageBudget + "ページ / 選定 " + trackedReservedPages.length + "ページ",
     "- 重複/不正で除外: " + skipped,
     "",
     "発見用ソースは候補探索の入口です。公演情報が具体的でも範囲が曖昧な候補は低確信度・要確認として表示します。",
@@ -1517,7 +1519,11 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "",
     "## 登録済みアーティスト・会場・チケットサイトの巡回",
     "",
-    "公開済みの今後の公演に登録されたアーティスト名・会場名・チケットURLドメイン、および手動watch対象に一致するページを対象にします。優先枠は週ごとに開始位置をずらし、1ソース1ページずつ選びます。全対象URLを毎回直接取得する方式ではなく、既存の公式/会場/プロモーター/チケット情報源を同じページ上限内で巡回します。新しい監視先の開拓はCodexが担当します。",
+    "公開済みの今後の公演に登録されたアーティスト名・会場名・チケットURLドメイン、および手動watch対象に一致するページを対象にします。優先枠は収集日ごとに開始位置をずらし、1ソース1ページずつ選びます。全対象URLを毎回直接取得する方式ではなく、既存の公式/会場/プロモーター/チケット情報源を同じページ上限内で巡回します。新しい監視先の開拓はCodexが担当します。",
+    "",
+    "### 今回、登録済み対象の優先枠でモデル入力したページ",
+    "",
+    ...(trackedReservedPages.length ? trackedReservedPages.map((page) => `- ${page.sourceName}: ${formatTrackedPage(page)}`) : ["- なし"]),
     "",
     "| ソース | 登録済み対象リンク | 優先枠 | 通常枠 | 未選定理由 |",
     "|---|---:|---|---|---|",
