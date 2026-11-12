@@ -8,6 +8,12 @@ import { candidateEvents } from "../src/data/candidate_events.ts";
 import { events } from "../src/data/events.ts";
 import { canFetchUrl } from "./lib/robots-policy.mjs";
 import {
+  scheduledArtistNames,
+  scheduledEntityKeywords,
+  scheduledTicketDomains,
+  scheduledVenueNames,
+} from "./lib/registered-schedule-targets.mjs";
+import {
   discoveryArtistKeywords,
   priorityArtistKeywords,
 } from "../src/data/watchTargets.ts";
@@ -497,9 +503,12 @@ const lowValueLinkPatterns = [
   /グッズ|goods/i,
 ];
 
-function isPriorityArtistEntry(section, entry) {
+function isTrackedScheduleEntry(section, entry) {
   const normalizedValue = normalizeForMatch(`${section.sourceName} ${entry.title} ${entry.url}`);
-  return priorityArtistKeywords.some((keyword) => {
+  return scheduledEntityKeywords.some((keyword) => {
+    const normalizedKeyword = normalizeForMatch(keyword);
+    return normalizedKeyword && normalizedValue.includes(normalizedKeyword);
+  }) || priorityArtistKeywords.some((keyword) => {
     const normalizedKeyword = normalizeForMatch(keyword);
     return normalizedKeyword && normalizedValue.includes(normalizedKeyword);
   });
@@ -720,12 +729,12 @@ function summarizeHtml(html, pageContext) {
     };
   }
 
-  const prioritySnippetLimit = Math.max(maxSnippets, Math.min(20, maxSnippets * 3));
+  const trackedScheduleSnippetLimit = Math.max(maxSnippets, Math.min(20, maxSnippets * 3));
   const snippets = extractContextSnippets(
     bodyText,
     [pageContext.sourceName, pageContext.linkTitle, ...eventContextKeywords],
-    isPriorityArtistEntry(pageContext, { title: pageContext.linkTitle, url: pageContext.url })
-      ? prioritySnippetLimit
+    isTrackedScheduleEntry(pageContext, { title: pageContext.linkTitle, url: pageContext.url })
+      ? trackedScheduleSnippetLimit
       : maxSnippets,
   );
 
@@ -879,7 +888,7 @@ async function buildPageSummaries(sections) {
         left.entryIndex - right.entryIndex,
     );
   const selections = [];
-  const priorityArtistPageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
+  const trackedSchedulePageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
 
   for (const section of sections) {
     if (!section.sourceName.includes("国内広域確認")) continue;
@@ -910,28 +919,28 @@ async function buildPageSummaries(sections) {
     selections.push({ ...regionalEntry, selectionReason: "regional-reserve" });
   }
 
-  const priorityEntriesBySection = new Map();
+  const trackedEntriesBySection = new Map();
   for (const item of entries) {
-    if (!isPriorityArtistEntry(item.section, item.entry)) continue;
-    const items = priorityEntriesBySection.get(item.sectionIndex) ?? [];
+    if (!isTrackedScheduleEntry(item.section, item.entry)) continue;
+    const items = trackedEntriesBySection.get(item.sectionIndex) ?? [];
     items.push(item);
-    priorityEntriesBySection.set(item.sectionIndex, items);
+    trackedEntriesBySection.set(item.sectionIndex, items);
   }
-  const prioritySectionIndexes = [...priorityEntriesBySection.keys()].sort((a, b) => a - b);
-  if (prioritySectionIndexes.length && priorityArtistPageBudget > 0) {
+  const trackedSectionIndexes = [...trackedEntriesBySection.keys()].sort((a, b) => a - b);
+  if (trackedSectionIndexes.length && trackedSchedulePageBudget > 0) {
     const weekIndex = Math.floor(Date.parse(`${today}T00:00:00Z`) / 604800000);
-    const firstSection = weekIndex % prioritySectionIndexes.length;
-    for (let offset = 0, reserved = 0; offset < prioritySectionIndexes.length && reserved < priorityArtistPageBudget; offset += 1) {
+    const firstSection = weekIndex % trackedSectionIndexes.length;
+    for (let offset = 0, reserved = 0; offset < trackedSectionIndexes.length && reserved < trackedSchedulePageBudget; offset += 1) {
       if (selections.length >= maxTotalPages) break;
-      const sectionIndex = prioritySectionIndexes[(firstSection + offset) % prioritySectionIndexes.length];
-      const item = priorityEntriesBySection.get(sectionIndex).find((candidate) => {
+      const sectionIndex = trackedSectionIndexes[(firstSection + offset) % trackedSectionIndexes.length];
+      const item = trackedEntriesBySection.get(sectionIndex).find((candidate) => {
         const count = sourceCounts.get(candidate.section.sourceName) ?? 0;
         return !seenUrls.has(candidate.entry.url) && count < pageLimitForSource(candidate.section.sourceName);
       });
       if (!item) continue;
       seenUrls.add(item.entry.url);
       sourceCounts.set(item.section.sourceName, (sourceCounts.get(item.section.sourceName) ?? 0) + 1);
-      selections.push({ ...item, selectionReason: "priority-artist-reserve" });
+      selections.push({ ...item, selectionReason: "scheduled-entity-reserve" });
       reserved += 1;
     }
   }
@@ -1444,7 +1453,7 @@ function estimateTokens(text) {
 }
 
 function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt }) {
-  const priorityArtistPageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
+  const trackedSchedulePageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
   const pilotSourceNames = new Set([
     "仙台MACANA（国内広域確認）",
     "広島SECOND CRUTCH（国内広域確認）",
@@ -1481,7 +1490,8 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "- 生成モデル: " + model,
     "- プロンプト概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
     "- 追加候補数: " + candidates.length,
-    "- 優先アーティストページ枠: " + priorityArtistPageBudget + "ページ / 選定 " + summaries.filter((summary) => summary.selectionReason === "priority-artist-reserve").length + "ページ",
+    "- 登録済み対象: アーティスト " + scheduledArtistNames.length + " / 会場 " + scheduledVenueNames.length + " / チケットサイト " + scheduledTicketDomains.length,
+    "- 登録済み対象ページ枠: " + trackedSchedulePageBudget + "ページ / 選定 " + summaries.filter((summary) => summary.selectionReason === "scheduled-entity-reserve").length + "ページ",
     "- 重複/不正で除外: " + skipped,
     "",
     "発見用ソースは候補探索の入口です。公演情報が具体的でも範囲が曖昧な候補は低確信度・要確認として表示します。",
@@ -1505,20 +1515,20 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
       return "| " + section.sourceName.replaceAll("|", "／") + " | " + section.entries.length + " | " + (pages.length - failedPages) + " | " + failedPages + " | " + unselectedCount + " | " + candidateCount + " | " + status + " |";
     }),
     "",
-    "## 優先アーティスト公式ページの選定",
+    "## 登録済みアーティスト・会場・チケットサイトの巡回",
     "",
-    "watch対象アーティストに一致するページは、週ごとに開始位置をずらし、1ソース1ページずつ優先枠で選びます。優先枠に入らなかったページも通常スコア枠で選ばれる場合があります。",
+    "公開済みの今後の公演に登録されたアーティスト名・会場名・チケットURLドメイン、および手動watch対象に一致するページを対象にします。優先枠は週ごとに開始位置をずらし、1ソース1ページずつ選びます。全対象URLを毎回直接取得する方式ではなく、既存の公式/会場/プロモーター/チケット情報源を同じページ上限内で巡回します。新しい監視先の開拓はCodexが担当します。",
     "",
-    "| ソース | 優先対象リンク | 優先枠 | 通常枠 | 未選定理由 |",
+    "| ソース | 登録済み対象リンク | 優先枠 | 通常枠 | 未選定理由 |",
     "|---|---:|---|---|---|",
-    ...sections.filter((section) => section.entries.some((entry) => isPriorityArtistEntry(section, entry))).map((section) => {
+    ...sections.filter((section) => section.entries.some((entry) => isTrackedScheduleEntry(section, entry))).map((section) => {
       const pages = sourcePages(section);
       const selectedUrls = new Set(pages.map((page) => page.url));
-      const reserved = pages.filter((page) => page.selectionReason === "priority-artist-reserve");
+      const reserved = pages.filter((page) => page.selectionReason === "scheduled-entity-reserve");
       const scored = pages.filter((page) => page.selectionReason === "score");
       const reasons = new Map();
       for (const entry of section.entries) {
-        if (!isPriorityArtistEntry(section, entry) || selectedUrls.has(entry.url)) continue;
+        if (!isTrackedScheduleEntry(section, entry) || selectedUrls.has(entry.url)) continue;
         const reason = unselectedReason(section, entry);
         reasons.set(reason, (reasons.get(reason) ?? 0) + 1);
       }
@@ -1526,7 +1536,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
         ? items.map((page) => `${truncateText(page.linkTitle || page.title || "タイトルなし", 100)} — ${page.url}`).join("<br>")
         : "なし";
       const unselected = [...reasons].map(([reason, count]) => `${reason}: ${count}`).join(" / ") || "なし";
-      const count = section.entries.filter((entry) => isPriorityArtistEntry(section, entry)).length;
+      const count = section.entries.filter((entry) => isTrackedScheduleEntry(section, entry)).length;
       return `| ${section.sourceName.replaceAll("|", "／")} | ${count} | ${formatPages(reserved)} | ${formatPages(scored)} | ${unselected} |`;
     }),
     "",
