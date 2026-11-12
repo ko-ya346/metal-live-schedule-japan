@@ -3,6 +3,12 @@ import { crawlTargets } from "../src/data/crawlTargets.ts";
 import { events } from "../src/data/events.ts";
 import { canFetchUrl } from "./lib/robots-policy.mjs";
 import {
+  scheduledArtistNames,
+  scheduledEntityKeywords,
+  scheduledTicketDomains,
+  scheduledVenueNames,
+} from "./lib/registered-schedule-targets.mjs";
+import {
   discoveryArtistKeywords,
   manualSnsSources,
   priorityArtistSources,
@@ -167,6 +173,7 @@ const includeKeywords = [
   "Black Sun Rising",
   "Pagan Metal",
   "PUNK LIVES",
+  ...scheduledEntityKeywords,
 ];
 
 const excludePatterns = [
@@ -422,6 +429,7 @@ function renderMarkdown(results) {
     `# 新着ライブ調査メモ (${today})`,
     "",
     "このIssueのリンクは自動収集された調査材料です。候補イベントとして正しいとは限りません。",
+    `登録済みの今後の公演から ${scheduledArtistNames.length} 組のアーティスト、${scheduledVenueNames.length} 会場、${scheduledTicketDomains.length} チケットサイトの名称・ドメインを監視語に使っています。対象は既存の公式/会場/プロモーター/チケット情報源で確認し、新しい監視先の追加・開拓はCodexが行います。`,
     "",
     "## Codexへの依頼",
     "",
