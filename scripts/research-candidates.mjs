@@ -515,7 +515,11 @@ function isTrackedScheduleEntry(section, entry) {
   const sourceValue = normalizeForMatch(section.sourceName);
   const pageValue = normalizeForMatch(`${entry.title} ${entry.url}`);
   const rawPageValue = `${entry.title} ${entry.url}`;
-  if (nonEventLinkPatterns.some((pattern) => pattern.test(rawPageValue))) return false;
+  if (
+    lowValueLinkPatterns.some((pattern) => pattern.test(entry.title.trim())) ||
+    /^(?:new|other|archive|next|previous|詳細|一覧)$/i.test(entry.title.trim()) ||
+    nonEventLinkPatterns.some((pattern) => pattern.test(rawPageValue))
+  ) return false;
 
   const matchesKeyword = (keywords, value) => keywords.some((keyword) => {
     const normalizedKeyword = normalizeForMatch(keyword);
@@ -961,10 +965,15 @@ async function buildPageSummaries(sections) {
     for (let offset = 0, reserved = 0; offset < trackedSectionIndexes.length && reserved < trackedSchedulePageBudget; offset += 1) {
       if (selections.length >= maxTotalPages) break;
       const sectionIndex = trackedSectionIndexes[(firstSection + offset) % trackedSectionIndexes.length];
-      const item = trackedEntriesBySection.get(sectionIndex).find((candidate) => {
-        const count = sourceCounts.get(candidate.section.sourceName) ?? 0;
-        return !seenUrls.has(candidate.entry.url) && count < pageLimitForSource(candidate.section.sourceName);
-      });
+      const item = trackedEntriesBySection.get(sectionIndex)
+        .filter((candidate) => {
+          const count = sourceCounts.get(candidate.section.sourceName) ?? 0;
+          return !seenUrls.has(candidate.entry.url) && count < pageLimitForSource(candidate.section.sourceName);
+        })
+        .sort((left, right) =>
+          scoreResearchEntry(right.section, right.entry) - scoreResearchEntry(left.section, left.entry) ||
+          left.entryIndex - right.entryIndex,
+        )[0];
       if (!item) continue;
       seenUrls.add(item.entry.url);
       sourceCounts.set(item.section.sourceName, (sourceCounts.get(item.section.sourceName) ?? 0) + 1);
