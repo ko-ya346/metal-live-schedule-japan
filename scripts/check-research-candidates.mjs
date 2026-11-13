@@ -9,10 +9,11 @@ import { promisify } from "node:util";
 const run = promisify(execFile);
 const temp = await mkdtemp(path.join(tmpdir(), "research-candidates-check-"));
 let receivedRequest = null;
+let receivedRequestCount = 0;
 let timedOutConnectionClosed = false;
 
 const server = createServer(async (request, response) => {
-  if (request.url === "/official-event") {
+  if (request.url.startsWith("/official-event")) {
     response.setHeader("Content-Type", "text/html; charset=utf-8");
     response.end("<title>TEST METAL JAPAN TOUR 2099</title><p>2099-01-02 東京 TEST HALL</p>");
     return;
@@ -22,6 +23,7 @@ const server = createServer(async (request, response) => {
     let body = "";
     for await (const chunk of request) body += chunk;
     receivedRequest = { headers: request.headers, body: JSON.parse(body) };
+    receivedRequestCount += 1;
     if (receivedRequest.body.model === "timeout-model") {
       response.writeHead(200, { "Content-Type": "text/event-stream" });
       response.flushHeaders();
@@ -107,10 +109,49 @@ try {
   assert.equal(receivedRequest.body.stream, true);
   assert.match(JSON.stringify(receivedRequest.body.messages), /direct ticket purchase\/application URL/, "the model receives ticket-link grounding rules");
   assert.match(JSON.stringify(receivedRequest.body.messages), /explicitly state the current status/, "the model must ground ticket availability in captured pages");
+  assert.match(JSON.stringify(receivedRequest.body.messages), /Do not infer it from a venue name/, "the model must not guess a prefecture from the venue name");
   assert.deepEqual(receivedRequest.body.response_format, { type: "json_object" });
   const reportText = await readFile(report, "utf8");
   assert.match(reportText, /生成モデル: fixture-model/);
   assert.match(reportText, /test-metal-2099-tokyo/);
+
+  const batchInput = path.join(temp, "batch-research-links.md");
+  await writeFile(
+    batchInput,
+    Array.from({ length: 16 }, (_, index) =>
+      "#### Official promoter " + (index + 1) + "\n\n- TEST METAL JAPAN TOUR 2099\nhttp://127.0.0.1:" +
+        port + "/official-event-" + index,
+    ).join("\n") + "\n",
+  );
+  receivedRequest = null;
+  receivedRequestCount = 0;
+  await run(
+    process.execPath,
+    [
+      "--experimental-strip-types",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "scripts/research-candidates.mjs",
+      "--input=" + batchInput,
+      "--report=" + report,
+      "--prompt-token-budget=2500",
+    ],
+    {
+      cwd: new URL("..", import.meta.url),
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "",
+        CANDIDATE_LLM_API_KEY: "",
+        CANDIDATE_LLM_BASE_URL: "http://127.0.0.1:" + port + "/v1",
+        CANDIDATE_LLM_MODEL: "fixture-model",
+      },
+    },
+  );
+  assert.ok(receivedRequestCount > 1, "oversized prompts are split into separate model requests");
+  const batchReport = await readFile(report, "utf8");
+  assert.match(batchReport, /モデル入力バッチ数: [2-4]/);
+  const maxBatchTokens = Number(batchReport.match(/1バッチ最大プロンプト概算: ([0-9,]+) tokens/)?.[1]?.replaceAll(",", ""));
+  assert.ok(maxBatchTokens <= 2500, "each prompt stays within the configured token budget");
+  assert.match(batchReport, /test-metal-2099-tokyo/);
 
   receivedRequest = null;
   await run(

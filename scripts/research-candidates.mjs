@@ -90,6 +90,7 @@ const bodyCharLimit = Number(args.get("body-chars") ?? (isCompactPrompt ? "450" 
 const maxSnippets = Number(args.get("max-snippets") ?? "6");
 const snippetCharLimit = Number(args.get("snippet-chars") ?? "180");
 const knownSummaryLimit = Number(args.get("known-limit") ?? "16");
+const promptTokenBudget = Number(args.get("prompt-token-budget") ?? "4000");
 const fetchTimeoutMs = Number(args.get("fetch-timeout-ms") ?? "25000");
 const fetchRetryCount = Number(args.get("fetch-retries") ?? "3");
 const retryBaseDelayMs = Number(args.get("fetch-retry-delay-ms") ?? "1500");
@@ -1425,6 +1426,7 @@ function buildPrompt(summaries, knownSummary) {
     "- Treat words like Japan Tour, Tour, nationwide tour, one-man tour, additional show, Tokyo/Nagoya/Osaka dates, and shared ticket reception pages as signals to check for other dates.",
     "- Set isInternational to true when the main purpose is a visiting international artist's Japan show. Domestic-only events should be false.",
     "- If date, prefecture, or venue is missing but the announcement is important, keep the missing field null and explain it in reviewNotes.",
+    "- Set prefecture only when it is explicit in the supplied page text or captured venue details. Do not infer it from a venue name; otherwise set it to null.",
     "- When visible, collect event end date, event image URL, organizer/promoter name and URL, ticket price, ticket sale start date, ticket sale end date, and ticket availability.",
     "- Use ticketLinks: null when no ticket purchase URL is visible.",
     "- Do not invent prices. Only set ticketLinks[].price when an actual numeric ticket price is visible. Use null or omit it when unknown.",
@@ -1489,7 +1491,46 @@ function estimateTokens(text) {
   return Math.ceil(text.length / 4);
 }
 
-function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt }) {
+function fitSummaryToPromptBudget(summary, knownSummary, tokenBudget) {
+  if (estimateTokens(buildPrompt([summary], knownSummary)) <= tokenBudget) return summary;
+  const textKey = typeof summary.text === "string" ? "text" : typeof summary.bodyText === "string" ? "bodyText" : null;
+  if (!textKey) return summary;
+  const originalText = summary[textKey];
+  let low = 0;
+  let high = originalText.length;
+  let best = { ...summary, [textKey]: "" };
+  while (low <= high) {
+    const middle = Math.floor((low + high) / 2);
+    const candidate = { ...summary, [textKey]: originalText.slice(0, middle) };
+    if (estimateTokens(buildPrompt([candidate], knownSummary)) <= tokenBudget) {
+      best = candidate;
+      low = middle + 1;
+    } else {
+      high = middle - 1;
+    }
+  }
+  return best;
+}
+
+function buildPromptBatches(summaries, knownSummary, tokenBudget) {
+  if (!Number.isFinite(tokenBudget) || tokenBudget <= 0) throw new Error("prompt-token-budget must be a positive finite number");
+  const batches = [];
+  let currentBatch = [];
+  for (const originalSummary of summaries) {
+    const summary = fitSummaryToPromptBudget(originalSummary, knownSummary, tokenBudget);
+    const singlePromptTokens = estimateTokens(buildPrompt([summary], knownSummary));
+    if (singlePromptTokens > tokenBudget) throw new Error("A page summary exceeds prompt-token-budget even after trimming its body: " + summary.url);
+    const nextBatch = [...currentBatch, summary];
+    if (currentBatch.length > 0 && estimateTokens(buildPrompt(nextBatch, knownSummary)) > tokenBudget) {
+      batches.push(currentBatch);
+      currentBatch = [summary];
+    } else currentBatch = nextBatch;
+  }
+  if (currentBatch.length > 0 || batches.length === 0) batches.push(currentBatch);
+  return batches;
+}
+
+function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt, promptBatches, promptBatchTokenCounts }) {
   const trackedSchedulePageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
   const pilotSourceNames = new Set([
     "仙台MACANA（国内広域確認）",
@@ -1527,7 +1568,10 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "- リンク収集失敗ソース数: " + sections.filter((section) => section.error).length,
     "- プロンプトモード: " + promptMode,
     "- 生成モデル: " + model,
-    "- プロンプト概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
+    "- モデル入力バッチ数: " + promptBatches.length,
+    "- バッチごとのページ数: " + promptBatches.map((batch, index) => (index + 1) + "回目 " + batch.length + "ページ").join(" / "),
+    "- 1バッチ最大プロンプト概算: " + Math.max(...promptBatchTokenCounts).toLocaleString() + " tokens（予算 " + promptTokenBudget.toLocaleString() + "）",
+    "- プロンプト合計概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
     "- 追加候補数: " + candidates.length,
     "- 登録済み対象: アーティスト " + scheduledArtistNames.length + " / 会場 " + scheduledVenueNames.length + " / チケットサイト " + scheduledTicketDomains.length,
     "- 登録済み対象ページ枠: " + trackedSchedulePageBudget + "ページ / 選定 " + trackedReservedPages.length + "ページ",
@@ -1727,11 +1771,35 @@ async function main() {
   console.error(`[candidate-collection] stage=page_summary status=complete pages=${summaries.length}`);
   const knownIds = buildKnownIdSet();
   const knownSummary = getKnownSummary();
-  const prompt = buildPrompt(summaries, knownSummary);
-  const parsed = await callCandidateLlm(prompt);
-  const rawCandidates = Array.isArray(parsed.candidates) ? parsed.candidates : [];
+  const promptBatches = buildPromptBatches(summaries, knownSummary, promptTokenBudget);
+  const prompts = [];
+  const promptBatchTokenCounts = [];
+  const rawCandidates = [];
+  const skippedReasons = [];
+
+  for (let index = 0; index < promptBatches.length; index += 1) {
+    const batch = promptBatches[index];
+    const batchPrompt = buildPrompt(batch, knownSummary);
+    prompts.push(batchPrompt);
+    promptBatchTokenCounts.push(estimateTokens(batchPrompt));
+    console.error(
+      "[candidate-collection] stage=llm_batch status=start index=" +
+        (index + 1) + "/" + promptBatches.length +
+        " pages=" + batch.length +
+        " estimated_tokens=" + estimateTokens(batchPrompt),
+    );
+    const parsedBatch = await callCandidateLlm(batchPrompt);
+    if (Array.isArray(parsedBatch.candidates)) rawCandidates.push(...parsedBatch.candidates);
+    if (parsedBatch.skippedReason) {
+      skippedReasons.push(parsedBatch.skippedReason);
+      break;
+    }
+  }
+
+  const prompt = prompts.join("\n\n--- candidate batch ---\n\n");
+  const skippedReason = [...new Set(skippedReasons)].join("; ") || null;
   const candidates = [];
-  let skipped = parsed.skippedReason ? 1 : 0;
+  let skipped = skippedReasons.length ? 1 : 0;
   const knownEvents = buildKnownEvents();
 
   for (const rawCandidate of rawCandidates) {
@@ -1761,8 +1829,10 @@ async function main() {
       summaries,
       candidates,
       skipped,
-      skippedReason: parsed.skippedReason,
+      skippedReason,
       prompt,
+      promptBatches,
+      promptBatchTokenCounts,
     }),
   );
 }
