@@ -1350,13 +1350,14 @@ async function callCandidateLlm(prompt) {
       body: JSON.stringify({
         model,
         temperature: 0.1,
+        max_tokens: 2048,
         stream: true,
         response_format: { type: "json_object" },
         messages: [
           {
             role: "system",
             content:
-              "You extract Japan metal and heavy music live event candidates. Return JSON only. Never invent facts.",
+              "You extract Japan metal and heavy music live event candidates. /no_think Return JSON only. Never invent facts.",
           },
           {
             role: "user",
