@@ -18,13 +18,25 @@ let eventsBeforeTests = null;
 const server = createServer(async (request, response) => {
   if (request.url.startsWith("/official-event")) {
     response.setHeader("Content-Type", "text/html; charset=utf-8");
-    response.end("<title>TEST METAL JAPAN TOUR 2099</title><p>2099-01-02 東京 TEST HALL</p>");
+    response.end("<title>MIZU NO YUME / TEST METAL JAPAN TOUR 2099</title><p>2099-01-02 東京 TEST HALL</p>");
     return;
   }
 
   if (request.url === "/known-band-event") {
     response.setHeader("Content-Type", "text/html; charset=utf-8");
     response.end("<title>SEX MACHINEGUNS 愛知公演</title><h1>SEX MACHINEGUNS</h1><p>2099-01-02 愛知県 TEST HALL</p>");
+    return;
+  }
+
+  if (request.url === "/non-heavy-event") {
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    response.end("<title>wave to earth - the pieces tour</title><p>Korean indie band wave to earth 2026-11-27 東京都 Zepp DiverCity(TOKYO)</p>");
+    return;
+  }
+
+  if (request.url === "/corrupt-event") {
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    response.end("<title>�{�{�_�� live</title><p>�{�{�_�� 2027-01-05 �N���R����z�[��</p>");
     return;
   }
 
@@ -45,7 +57,14 @@ const server = createServer(async (request, response) => {
     }
 
     const isKnownBandCase = receivedRequest.body.model === "auto-adopt-model" || receivedRequest.body.model === "mismatch-model";
-    const sourceUrl = `http://127.0.0.1:${server.address().port}/${isKnownBandCase ? "known-band-event" : "official-event"}`;
+    const sourcePath = isKnownBandCase ? "known-band-event"
+      : receivedRequest.body.model === "non-heavy-model" ? "non-heavy-event"
+        : receivedRequest.body.model === "corrupt-model" ? "corrupt-event" : "official-event";
+    const promptSourceUrl = receivedRequest.body.messages[1].content.match(
+      /http:\/\/127\.0\.0\.1:\d+\/(?:official-event(?:-\d+)?|non-heavy-event|corrupt-event)/,
+    )?.[0];
+    const sourceUrl = `http://127.0.0.1:${server.address().port}/${isKnownBandCase ? sourcePath : "official-event"}`;
+    const groundedSourceUrl = isKnownBandCase ? sourceUrl : promptSourceUrl ?? sourceUrl;
     const candidate = receivedRequest.body.model === "scope-model"
       ? {
           id: "test-ambiguous-domestic-2099",
@@ -54,13 +73,45 @@ const server = createServer(async (request, response) => {
           date: "2099-01-02",
           prefecture: "東京都",
           venue: "TEST HALL",
-          genres: ["Alternative Rock"],
+          genres: [],
           isInternational: false,
-          sourceUrl,
+          sourceUrl: groundedSourceUrl,
           sourceType: "manual",
           sourceName: "Community event listing",
           confidence: "medium",
           reviewNotes: "会場主催イベントで日付・出演者を確認。",
+        }
+      : receivedRequest.body.model === "non-heavy-model"
+      ? {
+          id: "wave-to-earth-non-heavy-2099",
+          artists: ["wave to earth"],
+          tourName: "the pieces tour",
+          date: "2099-01-02",
+          prefecture: "東京都",
+          venue: "TEST HALL",
+          genres: ["Heavy Music"],
+          isInternational: true,
+          sourceUrl: groundedSourceUrl,
+          sourceType: "promoter",
+          sourceName: "Official promoter",
+          confidence: "high",
+          reviewNotes: "heavy music",
+        }
+      : receivedRequest.body.model === "corrupt-model"
+      ? {
+          id: "corrupt-band-2099",
+          artists: ["�{�{�_��"],
+          tourName: "�N���R����z�[�� tour",
+          date: "2099-01-02",
+          prefecture: "愛知県",
+          venue: "�N���R����z�[��",
+          genres: [],
+          isInternational: false,
+          sourceUrl: groundedSourceUrl,
+          sourceType: "promoter",
+          sourceName: "Official promoter",
+          confidence: "high",
+          reviewNotes: "verify",
         }
       : isKnownBandCase
       ? {
@@ -74,7 +125,7 @@ const server = createServer(async (request, response) => {
           isInternational: false,
           ticketUrl: "https://unverified.example/ticket",
           ticketLinks: [{ provider: "other", url: "https://unverified.example/ticket" }],
-          sourceUrl,
+          sourceUrl: groundedSourceUrl,
           sourceType: "ticket",
           sourceName: "Official ticket page",
           confidence: "high",
@@ -89,7 +140,7 @@ const server = createServer(async (request, response) => {
           venue: "TEST HALL",
           genres: ["Heavy Metal"],
           isInternational: true,
-          sourceUrl,
+          sourceUrl: groundedSourceUrl,
           sourceType: "promoter",
           sourceName: "Official promoter",
           confidence: "high",
@@ -190,7 +241,7 @@ try {
   receivedRequest = null;
   await run(
     process.execPath,
-    ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/research-candidates.mjs", "--input=" + input, "--report=" + report],
+    ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/research-candidates.mjs", "--input=" + input, "--report=" + report, "--write"],
     {
       cwd: new URL("..", import.meta.url),
       env: {
@@ -206,6 +257,35 @@ try {
   assert.match(scopeReport, /test-ambiguous-domestic-2099/, "an ambiguous domestic event with concrete facts remains reviewable");
   assert.match(scopeReport, /low \/ Community event listing/, "scope uncertainty downgrades confidence");
   assert.match(scopeReport, /対象範囲要確認/, "the report calls out scope review");
+  const scopeCandidateFile = await readFile(candidateFile, "utf8");
+  const scopeCandidateBlock = scopeCandidateFile.split('id: "test-ambiguous-domestic-2099"')[1]?.split("\n    },")[0] ?? "";
+  assert.match(scopeCandidateBlock, /genres: \[\s*"ジャンル未確認"/, "an unknown genre is not fabricated as Heavy Metal");
+  await writeFile(candidateFile, candidatesBeforeTimeout);
+
+  const scopeRejectionInput = path.join(temp, "scope-rejection-links.md");
+  for (const [fixtureModel, expectedReason] of [
+    ["non-heavy-model", /ポップ／インディー等の明示/],
+    ["corrupt-model", /文字化けにより出演者・会場を確認できない/],
+  ]) {
+    await writeFile(scopeRejectionInput, `#### Official promoter\n\n- test page\nhttp://127.0.0.1:${port}/${fixtureModel === "non-heavy-model" ? "non-heavy-event" : "corrupt-event"}\n`);
+    await run(
+      process.execPath,
+      ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/research-candidates.mjs", "--input=" + scopeRejectionInput, "--report=" + report],
+      {
+        cwd: new URL("..", import.meta.url),
+        env: {
+          ...process.env,
+          OPENAI_API_KEY: "",
+          CANDIDATE_LLM_API_KEY: "",
+          CANDIDATE_LLM_BASE_URL: "http://127.0.0.1:" + port + "/v1",
+          CANDIDATE_LLM_MODEL: fixtureModel,
+        },
+      },
+    );
+    const rejectionReport = await readFile(report, "utf8");
+    assert.match(rejectionReport, /追加候補数: 0/, fixtureModel + " is rejected");
+    assert.match(rejectionReport, expectedReason, fixtureModel + " rejection reason is reported");
+  }
 
   receivedRequest = null;
   await assert.rejects(
@@ -270,9 +350,9 @@ try {
     },
   );
   const candidateFileAfterPartial = await readFile(candidateFile, "utf8");
+  const partialReportText = await readFile(partialReport, "utf8");
   assert.notEqual(candidateFileAfterPartial, candidatesBeforeTimeout, "completed batches survive a later timeout");
   assert.match(candidateFileAfterPartial, /test-metal-2099-tokyo/);
-  const partialReportText = await readFile(partialReport, "utf8");
   assert.match(partialReportText, /バッチ実行・完了数: 2 \/ 1/);
   assert.match(partialReportText, /失敗バッチ: 2 \/ [2-9][0-9]*/);
   assert.match(partialReportText, /LLM batch 2 failed/);
