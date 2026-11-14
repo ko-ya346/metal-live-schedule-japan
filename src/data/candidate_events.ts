@@ -14123,9 +14123,9 @@ export const candidateEvents: CandidateEvent[] = [
         sourceName: "イープラス",
         confidence: "high",
         eventStatus: "scheduled",
-        reviewStatus: "review_needed",
+        reviewStatus: "published",
         reviewNotes: "e+の公演ページで2027-02-13、Electric Lady Land（愛知県名古屋市）、一般発売2026-11-22を確認。会場名から都道府県は推測せず、e+掲載情報を根拠に設定。公式サイトのライブ告知も確認。",
         collectedAt: "2026-11-14",
-        reviewedAt: null,
+        reviewedAt: "2026-11-14",
     },
 ];

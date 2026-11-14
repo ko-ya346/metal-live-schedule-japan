@@ -11268,6 +11268,37 @@ const realEvents: Event[] = [
         publishedAt: "2026-11-11",
         updatedAt: "2026-11-11",
     },
+    {
+        id: "sex-machineguns-heavy-metal-commander-2027-nagoya",
+        artists: ["SEX MACHINEGUNS"],
+        tourName: "HEAVY METAL COMMANDER 2027",
+        date: "2027-02-13",
+        prefecture: "愛知県",
+        venue: "Electric Lady Land",
+        genres: ["Heavy Metal"],
+        isInternational: false,
+        ticketUrl: "https://eplus.jp/sf/detail/4619500001-P0030001P021001",
+        ticketLinks: [
+            {
+                provider: "eplus",
+                url: "https://eplus.jp/sf/detail/4619500001-P0030001P021001",
+                affiliateUrl: null,
+                price: null,
+                saleStartsAt: "2026-11-22",
+                saleStatus: "not_started",
+                saleEndsAt: "2027-02-12",
+                priority: 1,
+            },
+        ],
+        imageUrl: null,
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: "https://sexmachineguns.smg-fire.com/?page_id=342",
+        status: "scheduled",
+        candidateCreatedAt: "2026-11-14",
+        publishedAt: "2026-11-14",
+        updatedAt: "2026-11-14",
+    },
 ];
 
 export const publishedEvents = realEvents;
