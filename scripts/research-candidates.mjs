@@ -7,6 +7,7 @@ import { promisify } from "node:util";
 import { candidateEvents } from "../src/data/candidate_events.ts";
 import { publishedEvents } from "../src/data/events.ts";
 import { canFetchUrl } from "./lib/robots-policy.mjs";
+import { hasOfficialBandMetalEvidence } from "./lib/candidate-scope-evidence.mjs";
 import {
   scheduledArtistNames,
   scheduledEntityKeywords,
@@ -386,7 +387,7 @@ function getCandidateScopeFailureReason(candidate, summaries, knownScopeArtistNa
   if (hasExplicitNonHeavyEvidence && !hasExplicitHeavyEvidence) {
     return "公式ページにポップ／インディー等の明示があり、ヘヴィ系の根拠がない";
   }
-  if (!hasExplicitHeavyEvidence) {
+  if (!hasExplicitHeavyEvidence && !hasOfficialBandMetalEvidence(candidate, summaries, source, heavySignalKeywords)) {
     return "既知の対象アーティストも、ページ本文のメタル／ヘヴィ系根拠も確認できない";
   }
   return null;
@@ -491,6 +492,8 @@ function normalizeForMatch(value) {
 const heavySignalKeywords = [
   "metal",
   "heavy",
+  "nwobhm",
+  "new wave of british heavy metal",
   "hard rock",
   "hardcore",
   "metalcore",
@@ -1501,6 +1504,7 @@ async function callCandidateLlm(prompt) {
       body: JSON.stringify({
         model,
         temperature: 0.1,
+        ...(isLoopbackUrl(llmBaseUrl) ? { reasoning_effort: "none" } : {}),
         max_tokens: 2048,
         stream: true,
         response_format: { type: "json_object" },
