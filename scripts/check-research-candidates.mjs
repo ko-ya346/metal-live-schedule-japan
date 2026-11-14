@@ -12,11 +12,19 @@ let receivedRequest = null;
 let receivedRequestCount = 0;
 let partialTimeoutRequestCount = 0;
 let timedOutConnectionClosed = false;
+let candidatesBeforeTimeout = null;
+let eventsBeforeTests = null;
 
 const server = createServer(async (request, response) => {
   if (request.url.startsWith("/official-event")) {
     response.setHeader("Content-Type", "text/html; charset=utf-8");
     response.end("<title>TEST METAL JAPAN TOUR 2099</title><p>2099-01-02 東京 TEST HALL</p>");
+    return;
+  }
+
+  if (request.url === "/known-band-event") {
+    response.setHeader("Content-Type", "text/html; charset=utf-8");
+    response.end("<title>SEX MACHINEGUNS 愛知公演</title><h1>SEX MACHINEGUNS</h1><p>2099-01-02 愛知県 TEST HALL</p>");
     return;
   }
 
@@ -36,7 +44,8 @@ const server = createServer(async (request, response) => {
       return;
     }
 
-    const sourceUrl = `http://127.0.0.1:${server.address().port}/official-event`;
+    const isKnownBandCase = receivedRequest.body.model === "auto-adopt-model" || receivedRequest.body.model === "mismatch-model";
+    const sourceUrl = `http://127.0.0.1:${server.address().port}/${isKnownBandCase ? "known-band-event" : "official-event"}`;
     const candidate = receivedRequest.body.model === "scope-model"
       ? {
           id: "test-ambiguous-domestic-2099",
@@ -52,6 +61,24 @@ const server = createServer(async (request, response) => {
           sourceName: "Community event listing",
           confidence: "medium",
           reviewNotes: "会場主催イベントで日付・出演者を確認。",
+        }
+      : isKnownBandCase
+      ? {
+          id: "sex-machineguns-2099-aichi-test",
+          artists: ["SEX MACHINEGUNS", "UNVERIFIED BAND"],
+          tourName: "HEAVY METAL COMMANDER 2099",
+          date: "2099-01-02",
+          prefecture: "愛知県",
+          venue: receivedRequest.body.model === "mismatch-model" ? "Zepp Nagoya" : "TEST HALL",
+          genres: ["Heavy Metal"],
+          isInternational: false,
+          ticketUrl: "https://unverified.example/ticket",
+          ticketLinks: [{ provider: "other", url: "https://unverified.example/ticket" }],
+          sourceUrl,
+          sourceType: "ticket",
+          sourceName: "Official ticket page",
+          confidence: "high",
+          reviewNotes: "source verified",
         }
       : {
           id: "test-metal-2099-tokyo",
@@ -86,7 +113,9 @@ try {
   const stopScript = path.join(temp, "ollama-fixture");
   const stopLog = path.join(temp, "ollama-stop.log");
   const candidateFile = new URL("../src/data/candidate_events.ts", import.meta.url);
-  const candidatesBeforeTimeout = await readFile(candidateFile, "utf8");
+  candidatesBeforeTimeout = await readFile(candidateFile, "utf8");
+  const eventsFile = new URL("../src/data/events.ts", import.meta.url);
+  eventsBeforeTests = await readFile(eventsFile, "utf8");
   await writeFile(input, `#### Official promoter\n\n- TEST METAL JAPAN TOUR 2099 live\nhttp://127.0.0.1:${port}/official-event\n`);
   await writeFile(stopScript, '#!/bin/sh\nprintf "%s\\n" "$@" > "$OLLAMA_STOP_LOG"\n');
   await chmod(stopScript, 0o755);
@@ -248,8 +277,45 @@ try {
   assert.match(partialReportText, /失敗バッチ: 2 \/ [2-9][0-9]*/);
   assert.match(partialReportText, /LLM batch 2 failed/);
   await writeFile(candidateFile, candidatesBeforeTimeout);
+
+  const knownInput = path.join(temp, "known-band-links.md");
+  await writeFile(knownInput, `#### Official ticket page\n\n- SEX MACHINEGUNS HEAVY METAL COMMANDER 2099\nhttp://127.0.0.1:${port}/known-band-event\n`);
+  for (const [fixtureModel, expectedStatus] of [["auto-adopt-model", "published"], ["mismatch-model", "review_needed"]]) {
+    await run(
+      process.execPath,
+      ["--experimental-strip-types", "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON", "scripts/research-candidates.mjs", "--input=" + knownInput, "--report=" + report, "--write"],
+      {
+        cwd: new URL("..", import.meta.url),
+        env: {
+          ...process.env,
+          OPENAI_API_KEY: "",
+          CANDIDATE_LLM_API_KEY: "",
+          CANDIDATE_LLM_BASE_URL: "http://127.0.0.1:" + port + "/v1",
+          CANDIDATE_LLM_MODEL: fixtureModel,
+        },
+      },
+    );
+    const writtenCandidates = await readFile(candidateFile, "utf8");
+    const candidateBlock = writtenCandidates.split('id: "sex-machineguns-2099-aichi-test"')[1]?.split("\n    },")[0] ?? "";
+    assert.match(candidateBlock, new RegExp(`reviewStatus: "${expectedStatus}"`));
+    const writtenEvents = await readFile(eventsFile, "utf8");
+    if (expectedStatus === "published") {
+      assert.match(writtenEvents, /id: "sex-machineguns-2099-aichi-test"/);
+      const publishedEventBlock = writtenEvents.split('id: "sex-machineguns-2099-aichi-test"')[1]?.split("\n    },")[0] ?? "";
+      assert.doesNotMatch(publishedEventBlock, /UNVERIFIED BAND|unverified\.example/);
+      assert.match(publishedEventBlock, new RegExp(`ticketUrl: "http://127\\.0\\.0\\.1:${port}/known-band-event"`));
+      assert.match(await readFile(report, "utf8"), /自動採用（既知の国内アーティスト・一次ソースで4項目確認）: 1/);
+    } else {
+      assert.equal(writtenEvents, eventsBeforeTests, "mismatched primary-source evidence must not enter published events");
+      assert.match(await readFile(report, "utf8"), /人間確認待ち: 1/);
+    }
+    await writeFile(candidateFile, candidatesBeforeTimeout);
+    await writeFile(eventsFile, eventsBeforeTests);
+  }
   console.log("Research candidate local LLM check passed.");
 } finally {
+  if (candidatesBeforeTimeout !== null) await writeFile(new URL("../src/data/candidate_events.ts", import.meta.url), candidatesBeforeTimeout);
+  if (eventsBeforeTests !== null) await writeFile(new URL("../src/data/events.ts", import.meta.url), eventsBeforeTests);
   await new Promise((resolve) => server.close(resolve));
   await rm(temp, { recursive: true, force: true });
 }
