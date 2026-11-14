@@ -5,7 +5,7 @@ import { request as httpsRequest } from "node:https";
 import { readFile, writeFile } from "node:fs/promises";
 import { promisify } from "node:util";
 import { candidateEvents } from "../src/data/candidate_events.ts";
-import { events } from "../src/data/events.ts";
+import { publishedEvents } from "../src/data/events.ts";
 import { canFetchUrl } from "./lib/robots-policy.mjs";
 import {
   scheduledArtistNames,
@@ -288,6 +288,104 @@ function formatCandidateObject(candidate) {
   ])},`;
 }
 
+function hasExplicitDateEvidence(text, date) {
+  if (!date) return false;
+  const [year, month, day] = date.split("-");
+  const normalized = normalizeForMatch(text);
+  return [
+    `${year}-${month}-${day}`,
+    `${year}/${month}/${day}`,
+    `${year}年${Number(month)}月${Number(day)}日`,
+  ].some((value) => normalized.includes(normalizeForMatch(value)));
+}
+
+function getAutoAdoptionEvidence(candidate, summaries, knownArtistNames) {
+  if (
+    candidate.eventStatus !== "scheduled" ||
+    candidate.isInternational ||
+    !candidate.date ||
+    candidate.date < today ||
+    !candidate.prefecture ||
+    !candidate.venue ||
+    !["band_official", "venue", "promoter", "ticket"].includes(candidate.sourceType)
+  ) return null;
+
+  const matchedKnownArtist = candidate.artists.find((artist) =>
+    knownArtistNames.has(normalizeForMatch(artist)),
+  );
+  if (!matchedKnownArtist) return null;
+
+  const source = summaries.find((summary) =>
+    !summary.error && normalizeUrl(summary.url) === normalizeUrl(candidate.sourceUrl),
+  );
+  if (!source) return null;
+
+  const sourceText = normalizeForMatch([
+    source.title,
+    source.description,
+    ...(source.headings ?? []),
+    source.text,
+    source.bodyText,
+  ].filter(Boolean).join(" "));
+  const requiredFieldsMatch = sourceText.includes(normalizeForMatch(matchedKnownArtist)) &&
+    hasExplicitDateEvidence(sourceText, candidate.date) &&
+    sourceText.includes(normalizeForMatch(candidate.prefecture)) &&
+    sourceText.includes(normalizeForMatch(candidate.venue));
+  if (!requiredFieldsMatch) return null;
+
+  const verifiedArtists = candidate.artists.filter((artist) =>
+    sourceText.includes(normalizeForMatch(artist)),
+  );
+  return { sourceType: candidate.sourceType, sourceUrl: candidate.sourceUrl, sourceText, verifiedArtists };
+}
+
+function toPublishedEvent(candidate, evidence, knownArtistGenres) {
+  const tourName = candidate.tourName &&
+    evidence.sourceText.includes(normalizeForMatch(candidate.tourName))
+    ? candidate.tourName
+    : candidate.artists[0];
+  const genres = [...new Set(candidate.artists.flatMap((artist) =>
+    knownArtistGenres.get(normalizeForMatch(artist)) ?? [],
+  ))];
+  return {
+    id: candidate.id,
+    artists: evidence.verifiedArtists,
+    tourName,
+    date: candidate.date,
+    ...(candidate.endDate ? { endDate: candidate.endDate } : {}),
+    prefecture: candidate.prefecture,
+    venue: candidate.venue,
+    genres: genres.length > 0 ? genres : ["Heavy Metal"],
+    isInternational: false,
+    ticketUrl: evidence.sourceType === "ticket" ? evidence.sourceUrl : null,
+    imageUrl: null,
+    officialUrl: evidence.sourceType === "ticket" ? null : evidence.sourceUrl,
+    status: "scheduled",
+    candidateCreatedAt: candidate.collectedAt,
+    publishedAt: today,
+    updatedAt: today,
+  };
+}
+
+async function appendPublishedEvents(newEvents) {
+  if (!shouldWrite || newEvents.length === 0) return;
+
+  const eventFilePath = new URL("../src/data/events.ts", import.meta.url);
+  const fileContent = await readFile(eventFilePath, "utf8");
+  const marker = "\n];\n\nexport const publishedEvents = realEvents;";
+  const insertIndex = fileContent.lastIndexOf(marker);
+  if (insertIndex === -1) throw new Error("real events array end not found");
+
+  const keys = [
+    "id", "artists", "tourName", "date", "endDate", "prefecture", "venue",
+    "genres", "isInternational", "ticketUrl", "ticketLinks", "imageUrl",
+    "organizerName", "organizerUrl", "officialUrl", "status",
+    "candidateCreatedAt", "publishedAt", "updatedAt",
+  ];
+  const insertion = newEvents.map((event) => `\n${formatObject(event, keys)},`).join("");
+  await writeFile(eventFilePath, `${fileContent.slice(0, insertIndex)}${insertion}${fileContent.slice(insertIndex)}`);
+}
+
 function parseResearchSections(markdown) {
   const sections = [];
   const sectionPattern =
@@ -325,7 +423,7 @@ function parseResearchSections(markdown) {
 
 function buildKnownIdSet() {
   return new Set([
-    ...events.map((event) => event.id),
+    ...publishedEvents.map((event) => event.id),
     ...candidateEvents.map((candidate) => candidate.id),
   ]);
 }
@@ -395,7 +493,7 @@ function inferSourceType(sourceType, sourceUrl) {
 }
 
 function buildKnownEvents() {
-  return [...events, ...candidateEvents].map((event) => ({
+  return [...publishedEvents, ...candidateEvents].map((event) => ({
     id: event.id,
     date: event.date ?? null,
     prefecture: normalizeForMatch(event.prefecture),
@@ -454,7 +552,7 @@ function isKnownEvent(candidate, knownEvents) {
 }
 
 function getKnownSummary() {
-  const published = events.slice(-80).map((event) =>
+  const published = publishedEvents.slice(-80).map((event) =>
     [
       event.id,
       event.date,
@@ -1531,7 +1629,7 @@ function buildPromptBatches(summaries, knownSummary, tokenBudget) {
   return batches;
 }
 
-function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt, promptBatches, promptBatchTokenCounts, completedLlmBatchCount, failedLlmBatchIndex }) {
+function buildReport({ sections, summaries, candidates, autoAdoptedCount, skipped, skippedReason, prompt, promptBatches, promptBatchTokenCounts, completedLlmBatchCount, failedLlmBatchIndex }) {
   const trackedSchedulePageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
   const pilotSourceNames = new Set([
     "仙台MACANA（国内広域確認）",
@@ -1559,7 +1657,7 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
   const lines = [
     "# 候補自動生成レポート (" + today + ")",
     "",
-    "このレポートは自動生成です。公開イベントには直接反映していません。",
+    "候補データと公開イベントデータへの変更を含む提案です。公開サイトへの反映は人間がPRをマージした後です。",
     "",
     "- 対象ソース数: " + sections.length,
     "- 取得リンク数: " + sections.reduce((total, section) => total + section.entries.length, 0),
@@ -1576,6 +1674,8 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "- 1バッチ最大プロンプト概算: " + Math.max(...promptBatchTokenCounts).toLocaleString() + " tokens（予算 " + promptTokenBudget.toLocaleString() + "）",
     "- プロンプト合計概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
     "- 追加候補数: " + candidates.length,
+    "- 自動採用（既知の国内アーティスト・一次ソースで4項目確認）: " + autoAdoptedCount,
+    "- 人間確認待ち: " + (candidates.length - autoAdoptedCount),
     "- 登録済み対象: アーティスト " + scheduledArtistNames.length + " / 会場 " + scheduledVenueNames.length + " / チケットサイト " + scheduledTicketDomains.length,
     "- 登録済み対象ページ枠: " + trackedSchedulePageBudget + "ページ / 選定 " + trackedReservedPages.length + "ページ",
     "- 重複/不正で除外: " + skipped,
@@ -1720,11 +1820,26 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     lines.push("- 候補生成スキップ理由: " + skippedReason, "");
   }
 
-  lines.push("## /admin/candidates で確認してください", "");
+  lines.push("## 今回の候補と確認先", "");
   if (candidates.length === 0) {
     lines.push("- 新規候補なし");
   } else {
-    for (const candidate of candidates) {
+    const autoAdopted = candidates.filter((candidate) => candidate.reviewStatus === "published");
+    const humanReview = candidates.filter((candidate) => candidate.reviewStatus !== "published");
+    if (autoAdopted.length > 0) {
+      lines.push("### 自動採用提案（公開サイトへの反映はPRマージ後）", "");
+      for (const candidate of autoAdopted) {
+        lines.push("- [自動採用提案] " + candidate.id);
+        lines.push("  - " + candidate.artists.join(" / "));
+        lines.push("  - " + (candidate.date ?? "日付未定") + " / " + ([candidate.prefecture, candidate.venue].filter(Boolean).join(" / ") || "会場未定"));
+        lines.push("  - 根拠: " + candidate.sourceName + " — " + candidate.sourceUrl);
+      }
+      lines.push("");
+    }
+    if (humanReview.length > 0) {
+      lines.push("### 人間確認待ち（/admin/candidates）", "");
+    }
+    for (const candidate of humanReview) {
       lines.push("- " + candidate.id);
       lines.push("  - " + candidate.artists.join(" / "));
       lines.push("  - " + (candidate.date ?? "日付未定") + " / " + ([candidate.prefecture, candidate.venue].filter(Boolean).join(" / ") || "会場未定"));
@@ -1774,6 +1889,25 @@ async function main() {
   console.error(`[candidate-collection] stage=page_summary status=complete pages=${summaries.length}`);
   const knownIds = buildKnownIdSet();
   const knownSummary = getKnownSummary();
+  const knownArtistNames = new Set(
+    publishedEvents
+      .filter((event) => event.status === "scheduled" && !event.isInternational)
+      .flatMap((event) => event.artists)
+      .map(normalizeForMatch),
+  );
+  const knownArtistGenres = new Map();
+  for (const event of publishedEvents) {
+    if (event.status !== "scheduled" || event.isInternational) continue;
+    for (const artist of event.artists) {
+      const key = normalizeForMatch(artist);
+      const genres = knownArtistGenres.get(key) ?? new Set();
+      for (const genre of event.genres) genres.add(genre);
+      knownArtistGenres.set(key, genres);
+    }
+  }
+  for (const [artist, genres] of knownArtistGenres) {
+    knownArtistGenres.set(artist, [...genres]);
+  }
   const promptBatches = buildPromptBatches(summaries, knownSummary, promptTokenBudget);
   const prompts = [];
   const promptBatchTokenCounts = [];
@@ -1817,6 +1951,7 @@ async function main() {
   const prompt = prompts.join("\n\n--- candidate batch ---\n\n");
   const skippedReason = [...new Set(skippedReasons)].join("; ") || null;
   const candidates = [];
+  const autoAdoptedEvents = [];
   let skipped = skippedReasons.length ? 1 : 0;
   const knownEvents = buildKnownEvents();
 
@@ -1826,6 +1961,17 @@ async function main() {
     if (!candidate) {
       skipped += 1;
       continue;
+    }
+
+    const autoAdoptionEvidence = getAutoAdoptionEvidence(candidate, summaries, knownArtistNames);
+    if (autoAdoptionEvidence) {
+      candidate.artists = autoAdoptionEvidence.verifiedArtists;
+      candidate.reviewStatus = "published";
+      candidate.reviewedAt = today;
+      candidate.reviewNotes =
+        "自動採用: 公開済みの国内アーティストで、信頼できるソース本文に出演者・日付・会場・都道府県を確認。公開は候補PRの人間マージ後。 " +
+        candidate.reviewNotes;
+      autoAdoptedEvents.push(toPublishedEvent(candidate, autoAdoptionEvidence, knownArtistGenres));
     }
 
     knownIds.add(candidate.id);
@@ -1840,12 +1986,14 @@ async function main() {
   }
 
   await appendCandidates(candidates);
+  await appendPublishedEvents(autoAdoptedEvents);
   console.error(`[candidate-collection] stage=write_candidates status=complete count=${candidates.length}`);
   await writeReport(
     buildReport({
       sections,
       summaries,
       candidates,
+      autoAdoptedCount: autoAdoptedEvents.length,
       skipped,
       skippedReason,
       prompt,
