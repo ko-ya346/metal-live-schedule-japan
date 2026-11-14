@@ -10,6 +10,7 @@ const run = promisify(execFile);
 const temp = await mkdtemp(path.join(tmpdir(), "research-candidates-check-"));
 let receivedRequest = null;
 let receivedRequestCount = 0;
+let partialTimeoutRequestCount = 0;
 let timedOutConnectionClosed = false;
 
 const server = createServer(async (request, response) => {
@@ -24,7 +25,9 @@ const server = createServer(async (request, response) => {
     for await (const chunk of request) body += chunk;
     receivedRequest = { headers: request.headers, body: JSON.parse(body) };
     receivedRequestCount += 1;
-    if (receivedRequest.body.model === "timeout-model") {
+    const shouldTimeout = receivedRequest.body.model === "timeout-model" ||
+      (receivedRequest.body.model === "partial-timeout-model" && ++partialTimeoutRequestCount === 2);
+    if (shouldTimeout) {
       response.writeHead(200, { "Content-Type": "text/event-stream" });
       response.flushHeaders();
       response.on("close", () => {
@@ -207,6 +210,44 @@ try {
     candidatesBeforeTimeout,
     "a timed-out run does not write partial candidates",
   );
+
+  receivedRequest = null;
+  receivedRequestCount = 0;
+  partialTimeoutRequestCount = 0;
+  const partialReport = path.join(temp, "partial-candidate-report.md");
+  await run(
+    process.execPath,
+    [
+      "--experimental-strip-types",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "scripts/research-candidates.mjs",
+      "--input=" + batchInput,
+      "--report=" + partialReport,
+      "--write",
+      "--prompt-token-budget=2500",
+    ],
+    {
+      cwd: new URL("..", import.meta.url),
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "",
+        CANDIDATE_LLM_API_KEY: "",
+        CANDIDATE_LLM_BASE_URL: "http://127.0.0.1:" + port + "/v1",
+        CANDIDATE_LLM_MODEL: "partial-timeout-model",
+        CANDIDATE_LLM_TIMEOUT_MS: "100",
+        OLLAMA_CLI_PATH: stopScript,
+        OLLAMA_STOP_LOG: stopLog,
+      },
+    },
+  );
+  const candidateFileAfterPartial = await readFile(candidateFile, "utf8");
+  assert.notEqual(candidateFileAfterPartial, candidatesBeforeTimeout, "completed batches survive a later timeout");
+  assert.match(candidateFileAfterPartial, /test-metal-2099-tokyo/);
+  const partialReportText = await readFile(partialReport, "utf8");
+  assert.match(partialReportText, /バッチ実行・完了数: 2 \/ 1/);
+  assert.match(partialReportText, /失敗バッチ: 2 \/ [2-9][0-9]*/);
+  assert.match(partialReportText, /LLM batch 2 failed/);
+  await writeFile(candidateFile, candidatesBeforeTimeout);
   console.log("Research candidate local LLM check passed.");
 } finally {
   await new Promise((resolve) => server.close(resolve));

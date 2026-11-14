@@ -1531,7 +1531,7 @@ function buildPromptBatches(summaries, knownSummary, tokenBudget) {
   return batches;
 }
 
-function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt, promptBatches, promptBatchTokenCounts }) {
+function buildReport({ sections, summaries, candidates, skipped, skippedReason, prompt, promptBatches, promptBatchTokenCounts, completedLlmBatchCount, failedLlmBatchIndex }) {
   const trackedSchedulePageBudget = Math.min(8, Math.ceil(maxTotalPages / 4));
   const pilotSourceNames = new Set([
     "仙台MACANA（国内広域確認）",
@@ -1570,6 +1570,8 @@ function buildReport({ sections, summaries, candidates, skipped, skippedReason, 
     "- プロンプトモード: " + promptMode,
     "- 生成モデル: " + model,
     "- モデル入力バッチ数: " + promptBatches.length,
+    "- バッチ実行・完了数: " + promptBatchTokenCounts.length + " / " + completedLlmBatchCount,
+    "- 失敗バッチ: " + (failedLlmBatchIndex ? failedLlmBatchIndex + " / " + promptBatches.length : "なし"),
     "- バッチごとのページ数: " + promptBatches.map((batch, index) => (index + 1) + "回目 " + batch.length + "ページ").join(" / "),
     "- 1バッチ最大プロンプト概算: " + Math.max(...promptBatchTokenCounts).toLocaleString() + " tokens（予算 " + promptTokenBudget.toLocaleString() + "）",
     "- プロンプト合計概算: " + prompt.length.toLocaleString() + " chars / 約" + estimateTokens(prompt).toLocaleString() + " tokens",
@@ -1777,6 +1779,8 @@ async function main() {
   const promptBatchTokenCounts = [];
   const rawCandidates = [];
   const skippedReasons = [];
+  let completedLlmBatchCount = 0;
+  let failedLlmBatchIndex = null;
 
   for (let index = 0; index < promptBatches.length; index += 1) {
     const batch = promptBatches[index];
@@ -1789,7 +1793,20 @@ async function main() {
         " pages=" + batch.length +
         " estimated_tokens=" + estimateTokens(batchPrompt),
     );
-    const parsedBatch = await callCandidateLlm(batchPrompt);
+    let parsedBatch;
+    try {
+      parsedBatch = await callCandidateLlm(batchPrompt);
+      completedLlmBatchCount += 1;
+    } catch (error) {
+      failedLlmBatchIndex = index + 1;
+      const reason = error instanceof Error ? error.message : String(error);
+      skippedReasons.push("LLM batch " + failedLlmBatchIndex + " failed: " + reason);
+      console.error(
+        "[candidate-collection] stage=llm_batch status=failed index=" +
+          failedLlmBatchIndex + "/" + promptBatches.length + " reason=" + reason,
+      );
+      break;
+    }
     if (Array.isArray(parsedBatch.candidates)) rawCandidates.push(...parsedBatch.candidates);
     if (parsedBatch.skippedReason) {
       skippedReasons.push(parsedBatch.skippedReason);
@@ -1834,8 +1851,13 @@ async function main() {
       prompt,
       promptBatches,
       promptBatchTokenCounts,
+      completedLlmBatchCount,
+      failedLlmBatchIndex,
     }),
   );
+  if (failedLlmBatchIndex && completedLlmBatchCount === 0) {
+    process.exitCode = 1;
+  }
 }
 
 await main();
