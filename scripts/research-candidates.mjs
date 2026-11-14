@@ -339,6 +339,59 @@ function getAutoAdoptionEvidence(candidate, summaries, knownArtistNames) {
   return { sourceType: candidate.sourceType, sourceUrl: candidate.sourceUrl, sourceText, verifiedArtists };
 }
 
+function getCandidateScopeFailureReason(candidate, summaries, knownScopeArtistNames) {
+  const source = summaries.find((summary) =>
+    !summary.error && normalizeUrl(summary.url) === normalizeUrl(candidate.sourceUrl),
+  );
+  if (!source) return "候補の根拠ページを取得できない";
+
+  const candidateFields = [
+    ...candidate.artists,
+    candidate.tourName,
+    candidate.prefecture,
+    candidate.venue,
+  ].filter(Boolean);
+  if (candidateFields.some((value) => String(value).includes("\uFFFD"))) {
+    return "根拠ページの文字化けにより出演者・会場を確認できない";
+  }
+
+  const sourceText = [source.title, source.description, ...(source.headings ?? []), source.text, source.bodyText]
+    .filter(Boolean)
+    .join(" ");
+  const lowerSourceText = sourceText.toLowerCase();
+  const candidateNames = [...candidate.artists, candidate.tourName].filter(Boolean);
+  const eventContexts = candidateNames.flatMap((name) => {
+    const needle = String(name).toLowerCase();
+    const position = lowerSourceText.indexOf(needle);
+    return position < 0
+      ? []
+      : [lowerSourceText.slice(Math.max(0, position - 180), position + needle.length + 180)];
+  });
+  if (eventContexts.length === 0) {
+    return "根拠ページ本文に候補の出演者名・公演名が見つからない";
+  }
+
+  if (candidate.artists.some((artist) => knownScopeArtistNames.has(normalizeForMatch(artist)))) {
+    return null;
+  }
+
+  const eventContextText = eventContexts.join(" ");
+  const hasExplicitHeavyEvidence = heavySignalKeywords.some((keyword) =>
+    eventContextText.includes(keyword.toLowerCase()),
+  );
+  const hasExplicitNonHeavyEvidence =
+    /\b(?:indie|independent|pop(?:-rock)?|idol|singer[- ]songwriter|alternative rock)\b/i.test(eventContextText) ||
+    /インディー|ポップ(?:ロック|ス)?|アイドル|シンガーソングライター/.test(eventContextText);
+
+  if (hasExplicitNonHeavyEvidence && !hasExplicitHeavyEvidence) {
+    return "公式ページにポップ／インディー等の明示があり、ヘヴィ系の根拠がない";
+  }
+  if (!hasExplicitHeavyEvidence) {
+    return "既知の対象アーティストも、ページ本文のメタル／ヘヴィ系根拠も確認できない";
+  }
+  return null;
+}
+
 function toPublishedEvent(candidate, evidence, knownArtistGenres) {
   const tourName = candidate.tourName &&
     evidence.sourceText.includes(normalizeForMatch(candidate.tourName))
@@ -1229,7 +1282,7 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
     genres:
       Array.isArray(candidate.genres) && candidate.genres.length > 0
         ? candidate.genres.map((genre) => String(genre).trim()).filter(Boolean)
-        : ["Heavy Metal"],
+        : ["ジャンル未確認"],
     isInternational: candidate.isInternational === true,
     ticketUrl: candidate.ticketUrl ? normalizeUrl(String(candidate.ticketUrl)) : null,
     ticketLinks: Array.isArray(candidate.ticketLinks)
@@ -1514,9 +1567,12 @@ function buildPrompt(summaries, knownSummary) {
     "- News or discovery pages may be used only as low/medium confidence candidates and reviewNotes must say official confirmation is needed.",
     "- SNS-only items must be official and low confidence.",
     "- Do not use fan speculation.",
-    "- Do not exclude a domestic live event only because the artist has no single clear genre label or is not on the watch list.",
-    "- Judge domestic scope from the official event description, organizer or venue context, co-performers, and known scene relationships. Do not assign a genre based on guesswork.",
-    "- If the Japan date, venue, and performers are concrete and there is a plausible event-context signal but scope remains uncertain, keep it as a low-confidence review candidate. Start reviewNotes with 対象範囲要確認: and state the evidence and uncertainty.",
+    "- Do not exclude a domestic live event only because the artist has no single clear genre label or is not on the watch list, but require concrete page evidence connecting it to metal/heavy music or an already known target artist.",
+    "- An event's date, venue, and promoter alone do not establish metal/heavy scope. A known heavy co-performer, explicit genre description, or specific heavy-scene event context can establish the connection.",
+    "- If the official source explicitly describes the performer as indie/pop/idol or similar, exclude it unless the same event page also gives clear metal/heavy evidence or includes a known target artist.",
+    "- If concrete event details exist but no reliable heavy-scope connection can be found, skip the candidate. Do not invent a generic label such as Heavy Music or Heavy Metal to make it fit.",
+    "- When scope has some positive evidence but remains uncertain, keep a low-confidence review candidate and start reviewNotes with 対象範囲要確認:; state the positive evidence and the uncertainty.",
+    "- If names or event details are corrupted/garbled in the source text, do not guess them; skip the candidate.",
     "- Exclude generic music news without an event-specific Japan date, venue, and performers, or an event with no evidence connecting it to the site's heavy-live audience.",
     "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible. Do not return only the lead or first date.",
     "- For a multi-date schedule page, inspect every date/venue row visible in the supplied summary and create one candidate for each clearly confirmed Japan date, even when all dates share one page and tour name.",
@@ -1895,6 +1951,11 @@ async function main() {
       .flatMap((event) => event.artists)
       .map(normalizeForMatch),
   );
+  const knownScopeArtistNames = new Set([
+    ...knownArtistNames,
+    ...priorityArtistKeywords.map(normalizeForMatch),
+    ...discoveryArtistKeywords.map(normalizeForMatch),
+  ]);
   const knownArtistGenres = new Map();
   for (const event of publishedEvents) {
     if (event.status !== "scheduled" || event.isInternational) continue;
@@ -1949,9 +2010,9 @@ async function main() {
   }
 
   const prompt = prompts.join("\n\n--- candidate batch ---\n\n");
-  const skippedReason = [...new Set(skippedReasons)].join("; ") || null;
   const candidates = [];
   const autoAdoptedEvents = [];
+  const candidateRejectionReasons = [];
   let skipped = skippedReasons.length ? 1 : 0;
   const knownEvents = buildKnownEvents();
 
@@ -1960,6 +2021,17 @@ async function main() {
 
     if (!candidate) {
       skipped += 1;
+      continue;
+    }
+
+    const scopeFailureReason = getCandidateScopeFailureReason(
+      candidate,
+      summaries,
+      knownScopeArtistNames,
+    );
+    if (scopeFailureReason) {
+      skipped += 1;
+      candidateRejectionReasons.push(candidate.id + ": " + scopeFailureReason);
       continue;
     }
 
@@ -1984,6 +2056,8 @@ async function main() {
     });
     candidates.push(candidate);
   }
+
+  const skippedReason = [...new Set([...skippedReasons, ...candidateRejectionReasons])].join("; ") || null;
 
   await appendCandidates(candidates);
   await appendPublishedEvents(autoAdoptedEvents);
