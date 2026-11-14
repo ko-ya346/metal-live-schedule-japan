@@ -5,6 +5,7 @@ import { createServer } from "node:http";
 import { tmpdir } from "node:os";
 import path from "node:path";
 import { promisify } from "node:util";
+import { hasOfficialBandMetalEvidence } from "./lib/candidate-scope-evidence.mjs";
 
 const run = promisify(execFile);
 const temp = await mkdtemp(path.join(tmpdir(), "research-candidates-check-"));
@@ -190,6 +191,7 @@ try {
   assert.equal(receivedRequest.headers.authorization, undefined, "localhost does not require an API key");
   assert.equal(receivedRequest.body.model, "fixture-model");
   assert.equal(receivedRequest.body.stream, true);
+  assert.equal(receivedRequest.body.reasoning_effort, "none");
   assert.equal(receivedRequest.body.max_tokens, 2048);
   assert.match(receivedRequest.body.messages[0].content, /\/no_think/);
   assert.match(JSON.stringify(receivedRequest.body.messages), /direct ticket purchase\/application URL/, "the model receives ticket-link grounding rules");
@@ -286,6 +288,20 @@ try {
     assert.match(rejectionReport, /追加候補数: 0/, fixtureModel + " is rejected");
     assert.match(rejectionReport, expectedReason, fixtureModel + " rejection reason is reported");
   }
+
+  const satanCandidate = { artists: ["SATAN"] };
+  const ticketSummary = { url: "https://chrosh.theshop.jp/items/133738182" };
+  const satanBandcampSummary = {
+    url: "https://satanuk.bandcamp.com/album/suspended-sentence",
+    title: "SATAN - Suspended Sentence",
+    headings: ["SATAN"],
+    description: "NWOBHM titans",
+  };
+  const metalKeywords = ["metal", "heavy", "nwobhm", "new wave of british heavy metal"];
+  assert.equal(hasOfficialBandMetalEvidence(satanCandidate, [ticketSummary, satanBandcampSummary], ticketSummary, metalKeywords), true, "matching official Bandcamp genre evidence supports an official ticket event");
+  assert.equal(hasOfficialBandMetalEvidence({ artists: ["OTHER BAND"] }, [ticketSummary, satanBandcampSummary], ticketSummary, metalKeywords), false, "a different Bandcamp artist cannot establish scope");
+  assert.equal(hasOfficialBandMetalEvidence(satanCandidate, [ticketSummary, { ...satanBandcampSummary, url: "https://example.com/satan" }], ticketSummary, metalKeywords), false, "an unrelated host cannot establish official band evidence");
+  assert.equal(hasOfficialBandMetalEvidence(satanCandidate, [ticketSummary, { ...satanBandcampSummary, description: "Alternative pop" }], ticketSummary, metalKeywords), false, "a Bandcamp page without heavy-music evidence cannot establish scope");
 
   receivedRequest = null;
   await assert.rejects(
