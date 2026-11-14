@@ -56,7 +56,7 @@ CANDIDATE_LLM_BASE_URL="$base_url" CANDIDATE_LLM_MODEL="$model" \
   --write \
   --max-total-pages=32
 
-if git diff --quiet -- src/data/candidate_events.ts; then
+if git diff --quiet -- src/data/candidate_events.ts src/data/events.ts; then
   echo "No new candidate events."
   exit 0
 fi
@@ -67,14 +67,14 @@ npm run build
 
 git config user.name "metals-calendar-openweight"
 git config user.email "metals-calendar-openweight@users.noreply.github.com"
-git add src/data/candidate_events.ts
+git add src/data/candidate_events.ts src/data/events.ts
 git commit -m "data: add open-weight candidate events"
 git push -u origin "$branch"
 
 {
   echo "## What"
   echo
-  echo "Ubuntuのopen-weightモデルが定期収集した候補イベントです。公開イベントにはまだ反映していません。"
+  echo "Ubuntuのopen-weightモデルが定期収集した候補と、自動採用条件を満たした公開イベントの提案です。公開サイトへの反映はこのPRを人間がマージした後です。"
   echo
   echo "## Open-weight output"
   echo
@@ -82,7 +82,11 @@ git push -u origin "$branch"
   echo
   echo "## Human review"
   echo
-  echo "Ubuntuの \`/admin/candidates?queue=new&status=review_needed\` で、採用・修正・対象外を判断してください。確認結果はこのPRへ自動保存されます。"
+  echo "### 人間が確認する内容"
+  echo
+  echo "- `review_needed` の候補: Ubuntuの `/admin/candidates?queue=new&status=review_needed` で採用・修正・対象外を判断してください。確認結果はこのPRへ自動保存されます。"
+  echo "- 自動採用提案: Open-weight outputの採用件数と `src/data/events.ts` の差分を確認してください。根拠不足や誤りがあれば、PR上で修正してからマージしてください。"
+  echo "- マージ後に公開サイトへ反映されます。"
   echo
   echo "## Validation"
   echo
