@@ -187,6 +187,7 @@ const excludePatterns = [
   /mailto:/i,
   /tel:/i,
   /\/contact/i,
+  /\/inquiry/i,
   /\/privacy/i,
   /\/goods/i,
   /\/faq/i,
@@ -202,7 +203,6 @@ const excludePatterns = [
   /\/sf\/word\//i,
   /\/newrelease/i,
   /\/tag\//i,
-  /\/category\//i,
   /hb\.afl\.rakuten\.co\.jp/i,
   /backnumber/i,
   /\/schedule\/cancel\/?$/i,
@@ -313,6 +313,7 @@ function getMatchedKeywords(title, url) {
 }
 
 function isExcluded(title, url) {
+  if (/\/(?:categories?|cart|law)(?:\/|$)/i.test(url) || /\/items\/all(?:\/|$)/i.test(url)) return true;
   const value = `${title} ${url}`;
   return excludePatterns.some((pattern) => pattern.test(title) || pattern.test(value));
 }

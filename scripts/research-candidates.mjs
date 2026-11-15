@@ -514,6 +514,7 @@ const heavySignalKeywords = [
   "スラッシュ",
   ...discoveryArtistKeywords,
   "MORBIDFEST",
+  "KEEP IT TRUE",
 ];
 
 function inferSourceType(sourceType, sourceUrl) {
@@ -1579,6 +1580,7 @@ function buildPrompt(summaries, knownSummary) {
     "- If names or event details are corrupted/garbled in the source text, do not guess them; skip the candidate.",
     "- Exclude generic music news without an event-specific Japan date, venue, and performers, or an event with no evidence connecting it to the site's heavy-live audience.",
     "- If a page describes multiple dates of the same tour, create one candidate per clearly confirmed date when date and venue are visible. Do not return only the lead or first date.",
+    "- Split distinct shows, including warm-up/main/aftershow; endDate is only for one continuous event at one venue.",
     "- For a multi-date schedule page, inspect every date/venue row visible in the supplied summary and create one candidate for each clearly confirmed Japan date, even when all dates share one page and tour name.",
     "- When a candidate looks like a tour or multi-date run, do not stop at the first date. Check the artist/promoter/ticket tour page for other Japan dates and add every clearly confirmed date.",
     "- For tour-like candidates, reviewNotes must say whether the full tour schedule was checked. Use wording like `公式ツアーページとチケットページで全日程確認済み` or `他日程の有無は未確認`.",
