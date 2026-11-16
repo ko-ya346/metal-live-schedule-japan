@@ -90,7 +90,7 @@ const isCompactPrompt = promptMode === "compact";
 const bodyCharLimit = Number(args.get("body-chars") ?? (isCompactPrompt ? "450" : "5000"));
 const maxSnippets = Number(args.get("max-snippets") ?? "6");
 const snippetCharLimit = Number(args.get("snippet-chars") ?? "180");
-const knownSummaryLimit = Number(args.get("known-limit") ?? "16");
+const knownSummaryLimit = Number(args.get("known-limit") ?? "12");
 const promptTokenBudget = Number(args.get("prompt-token-budget") ?? "4000");
 const fetchTimeoutMs = Number(args.get("fetch-timeout-ms") ?? "25000");
 const fetchRetryCount = Number(args.get("fetch-retries") ?? "3");
@@ -1239,7 +1239,10 @@ function normalizeCandidate(candidate, knownIds, knownEvents) {
   const date = normalizeDateValue(rawDate);
   const endDate = normalizeDateValue(candidate.endDate);
   const prefecture = toNullableString(candidate.prefecture);
-  const venue = toNullableString(candidate.venue);
+  const rawVenue = toNullableString(candidate.venue);
+  const venue = rawVenue && !/^(?:未明|不明|未定|未確認|unknown|tbd)$/i.test(rawVenue)
+    ? rawVenue
+    : null;
   const primaryArtist = artists[0];
   const baseId = [
     slugify(primaryArtist) || "candidate",
@@ -2027,6 +2030,11 @@ async function main() {
 
     if (!candidate) {
       skipped += 1;
+      continue;
+    }
+    if (candidate.date && candidate.date < today) {
+      skipped += 1;
+      candidateRejectionReasons.push(candidate.id + ": 過去の公演日（" + candidate.date + "）");
       continue;
     }
 
