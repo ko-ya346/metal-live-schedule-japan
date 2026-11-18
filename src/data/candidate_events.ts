@@ -15500,4 +15500,32 @@ export const candidateEvents: CandidateEvent[] = [
         reviewedAt: null,
     },
 
+
+    {
+        id: "mardelas-raccoon-festival-vol-2-2027-tokyo",
+        artists: ["Mardelas"],
+        tourName: "Raccoon Festival vol.2",
+        date: "2027-01-09",
+        endDate: null,
+        prefecture: "東京都",
+        venue: "青山RizM",
+        genres: ["Heavy Metal", "Hard Rock"],
+        isInternational: false,
+        ticketUrl: "https://eplus.jp/sf/detail/4634150001-P0030001P021001",
+        ticketLinks: [{ provider: "eplus", url: "https://eplus.jp/sf/detail/4634150001-P0030001P021001", affiliateUrl: null, price: null, saleStartsAt: "2026-11-28", saleStatus: "not_started", saleEndsAt: "2027-01-08", priority: 1 }],
+        imageUrl: null,
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: null,
+        sourceUrl: "https://eplus.jp/sf/detail/4634150001-P0030001P021001",
+        sourceType: "ticket",
+        sourceName: "イープラス",
+        confidence: "high",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "Codex手動調査。e+公演ページで2027-01-09、青山RizM（東京都）、Mardelas出演、開場18:00/開演18:30を確認。既存データに同日・同会場の登録なし。",
+        collectedAt: "2026-11-19",
+        reviewedAt: null,
+    },
+
 ];
