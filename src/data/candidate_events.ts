@@ -14395,4 +14395,955 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-11-18",
         reviewedAt: null,
     },
+    {
+        "id": "earthshaker-2026-12-06-electric-lady-land",
+        "artists": [
+            "EARTHSHAKER"
+        ],
+        "tourName": "EARTHSHAKER TOUR PASSION 26-27",
+        "date": "2026-12-06",
+        "endDate": null,
+        "prefecture": "愛知県",
+        "venue": "Electric Lady Land",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "earthshaker-2026-12-12-zepp-sapporo",
+        "artists": [
+            "EARTHSHAKER",
+            "SABER TIGER",
+            "Carmen Maki & ELECTRIC MOTH",
+            "Punish",
+            "TEARS OF TRAGEDY"
+        ],
+        "tourName": "HAMMER BALL 2026",
+        "date": "2026-12-12",
+        "endDate": null,
+        "prefecture": "北海道",
+        "venue": "Zepp Sapporo",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "earthshaker-2026-12-13-crazy-monkey",
+        "artists": [
+            "EARTHSHAKER"
+        ],
+        "tourName": "PASSION 26-27 Special Edition",
+        "date": "2026-12-13",
+        "endDate": null,
+        "prefecture": "北海道",
+        "venue": "Crazy Monkey",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "earthshaker-2026-12-26-crazymama-kingdom",
+        "artists": [
+            "EARTHSHAKER"
+        ],
+        "tourName": "EARTHSHAKER TOUR PASSION 26-27",
+        "date": "2026-12-26",
+        "endDate": null,
+        "prefecture": "岡山県",
+        "venue": "CRAZYMAMA KINGDOM",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "earthshaker-2026-12-27-live-vanquish",
+        "artists": [
+            "EARTHSHAKER"
+        ],
+        "tourName": "EARTHSHAKER TOUR PASSION 26-27",
+        "date": "2026-12-27",
+        "endDate": null,
+        "prefecture": "広島県",
+        "venue": "LIVE VANQUISH",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "earthshaker-2027-01-09-浅草花劇場",
+        "artists": [
+            "EARTHSHAKER"
+        ],
+        "tourName": "EARTHSHAKER TOUR PASSION 26-27",
+        "date": "2027-01-09",
+        "endDate": null,
+        "prefecture": "東京都",
+        "venue": "浅草花劇場",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "earthshaker-2027-01-11-梅田banana-hall",
+        "artists": [
+            "EARTHSHAKER"
+        ],
+        "tourName": "EARTHSHAKER TOUR PASSION 26-27",
+        "date": "2027-01-11",
+        "endDate": null,
+        "prefecture": "大阪府",
+        "venue": "梅田BANANA HALL",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://earthshaker.jp/?p=1171",
+        "sourceUrl": "https://earthshaker.jp/?p=1171",
+        "sourceType": "band_official",
+        "sourceName": "EARTHSHAKER official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "EARTHSHAKER公式告知で日付と会場を確認。多日程ツアーの全日程を確認済み。12/12は公式告知のHAMMER BALL出演者も記録。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "graupel-exhale-release-tour-2027-01-09",
+        "artists": [
+            "Graupel"
+        ],
+        "tourName": "Graupel EXHALE RELEASE TOUR 2027",
+        "date": "2027-01-09",
+        "endDate": null,
+        "prefecture": "兵庫県",
+        "venue": "神戸 太陽と虎",
+        "genres": [
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4571850001-P0030002P021001?P1=0175",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4571850001-P0030002P021001?P1=0175",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-12",
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4571850001-P0030002P021001?P1=0175",
+        "sourceType": "ticket",
+        "sourceName": "eplus Graupel tickets",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "eplusの公演別チケットページで日付・会場を確認。2027年1〜2月の全6公演を確認済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "graupel-exhale-release-tour-2027-01-10",
+        "artists": [
+            "Graupel"
+        ],
+        "tourName": "Graupel EXHALE RELEASE TOUR 2027",
+        "date": "2027-01-10",
+        "endDate": null,
+        "prefecture": "福岡県",
+        "venue": "LIVE HOUSE Queblick",
+        "genres": [
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4571850001-P0030003P021001?P1=0175",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4571850001-P0030003P021001?P1=0175",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-12",
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4571850001-P0030003P021001?P1=0175",
+        "sourceType": "ticket",
+        "sourceName": "eplus Graupel tickets",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "eplusの公演別チケットページで日付・会場を確認。2027年1〜2月の全6公演を確認済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "graupel-exhale-release-tour-2027-01-17",
+        "artists": [
+            "Graupel"
+        ],
+        "tourName": "Graupel EXHALE RELEASE TOUR 2027",
+        "date": "2027-01-17",
+        "endDate": null,
+        "prefecture": "宮城県",
+        "venue": "仙台ROCKATERIA",
+        "genres": [
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4571850001-P0030004P021001?P1=0175",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4571850001-P0030004P021001?P1=0175",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-12",
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4571850001-P0030004P021001?P1=0175",
+        "sourceType": "ticket",
+        "sourceName": "eplus Graupel tickets",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "eplusの公演別チケットページで日付・会場を確認。2027年1〜2月の全6公演を確認済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "graupel-exhale-release-tour-2027-01-30",
+        "artists": [
+            "Graupel"
+        ],
+        "tourName": "Graupel EXHALE RELEASE TOUR 2027",
+        "date": "2027-01-30",
+        "endDate": null,
+        "prefecture": "愛知県",
+        "venue": "RAD NINE",
+        "genres": [
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4571850001-P0030005P021001?P1=0175",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4571850001-P0030005P021001?P1=0175",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-12",
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4571850001-P0030005P021001?P1=0175",
+        "sourceType": "ticket",
+        "sourceName": "eplus Graupel tickets",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "eplusの公演別チケットページで日付・会場を確認。2027年1〜2月の全6公演を確認済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "graupel-exhale-release-tour-2027-01-31",
+        "artists": [
+            "Graupel"
+        ],
+        "tourName": "Graupel EXHALE RELEASE TOUR 2027",
+        "date": "2027-01-31",
+        "endDate": null,
+        "prefecture": "大阪府",
+        "venue": "Yogibo HOLY MOUNTAIN",
+        "genres": [
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4571850001-P0030006P021001?P1=0175",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4571850001-P0030006P021001?P1=0175",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-12",
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4571850001-P0030006P021001?P1=0175",
+        "sourceType": "ticket",
+        "sourceName": "eplus Graupel tickets",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "eplusの公演別チケットページで日付・会場を確認。2027年1〜2月の全6公演を確認済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "graupel-exhale-release-tour-2027-02-20",
+        "artists": [
+            "Graupel"
+        ],
+        "tourName": "Graupel EXHALE RELEASE TOUR 2027",
+        "date": "2027-02-20",
+        "endDate": null,
+        "prefecture": "東京都",
+        "venue": "UNIT(代官山)",
+        "genres": [
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4571850001-P0030007P021001?P1=0175",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4571850001-P0030007P021001?P1=0175",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-12",
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4571850001-P0030007P021001?P1=0175",
+        "sourceType": "ticket",
+        "sourceName": "eplus Graupel tickets",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "eplusの公演別チケットページで日付・会場を確認。2027年1〜2月の全6公演を確認済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+
+    {
+        "id": "knosis-2027-01-03-space-odd",
+        "artists": [
+            "Knosis",
+            "Indication"
+        ],
+        "tourName": "Knosis / Indication",
+        "date": "2027-01-03",
+        "prefecture": "東京都",
+        "venue": "SPACE ODD",
+        "genres": [
+            "Metalcore",
+            "Loud Rock"
+        ],
+        "endDate": null,
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4043670001-P0030047P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4043670001-P0030047P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4043670001-P0030047P021001",
+        "sourceType": "ticket",
+        "sourceName": "eplus metal / hardcore",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "e+公演詳細で日付・会場・出演者を確認。Knosis / Indication。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2026-12-26-nishieifuku-jam",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2026-12-26",
+        "prefecture": "東京都",
+        "venue": "西永福JAM",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "endDate": null,
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4543870001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4543870001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4543870001-P0030001P021001",
+        "sourceType": "ticket",
+        "sourceName": "eplus metal / hardcore",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧・告知とe+公演詳細で日付・会場・出演者を確認。公式発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2027-01-23-live-theater-orpheus",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2027-01-23",
+        "prefecture": "東京都",
+        "venue": "LIVE THEATER ORPHEUS",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "endDate": null,
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4604850001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4604850001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4604850001-P0030001P021001",
+        "sourceType": "ticket",
+        "sourceName": "eplus metal / hardcore",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "e+メタル・ハードコア公演一覧で日付・会場・出演者を確認。別公演日の有無は追加確認中。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2027-01-30-machida-classix",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2027-01-30",
+        "prefecture": "東京都",
+        "venue": "町田CLASSIX",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "endDate": null,
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4607480001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4607480001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4607480001-P0030001P021001",
+        "sourceType": "ticket",
+        "sourceName": "eplus metal / hardcore",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧・告知とe+公演詳細で日付・会場・出演者を確認。公式発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "schonberg-chaosberg-2027-01-24",
+        "artists": [
+            "SCHONBERG",
+            "CHAOS CONTROL",
+            "DELRIUM"
+        ],
+        "tourName": "SCHONBERG presents CHAOSBERG ～日韓メタル・スペシャル3マン～",
+        "date": "2027-01-24",
+        "prefecture": "東京都",
+        "venue": "町田CLASSIX",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "endDate": null,
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4635710001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4635710001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4635710001-P0030001P021001",
+        "sourceType": "ticket",
+        "sourceName": "eplus metal / hardcore",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "e+公演詳細で日付・会場・3組を確認。DELRIUMは韓国からの出演。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "ryuketsu-blizzard-jigokuguruma-2027-01-08",
+        "artists": [
+            "流血ブリザード",
+            "地獄車"
+        ],
+        "tourName": "Outout PRESENTS 流血ブリザード VS 地獄車 OKINAWA TWO-MAN LIVE",
+        "date": "2027-01-08",
+        "prefecture": "沖縄県",
+        "venue": "output",
+        "genres": [
+            "Hardcore",
+            "Loud Rock"
+        ],
+        "endDate": null,
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4618100001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4618100001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": null,
+        "sourceUrl": "https://eplus.jp/sf/detail/4618100001-P0030001P021001",
+        "sourceType": "ticket",
+        "sourceName": "eplus metal / hardcore",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "e+公演詳細で日付・会場・出演者を確認。沖縄公演。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+
+    {
+        "id": "show-ya-2026-12-12-kumagaya",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2026-12-12",
+        "endDate": null,
+        "prefecture": "埼玉県",
+        "venue": "HEAVEN’S ROCK KUMAGAYA VJ-1",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4541980001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4541980001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://show-ya.jp/live/",
+        "sourceUrl": "https://show-ya.jp/live/",
+        "sourceType": "band_official",
+        "sourceName": "SHOW-YA official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧と公演告知で確認。公式に発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2026-12-19-shonan-bit",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2026-12-19",
+        "endDate": null,
+        "prefecture": "神奈川県",
+        "venue": "湘南 bit",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4545710001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4545710001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://show-ya.jp/live/",
+        "sourceUrl": "https://show-ya.jp/live/",
+        "sourceType": "band_official",
+        "sourceName": "SHOW-YA official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧と公演告知で確認。公式に発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2027-02-20-urawa-narciss",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2027-02-20",
+        "endDate": null,
+        "prefecture": "埼玉県",
+        "venue": "浦和ナルシス",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4603280001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4603280001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://show-ya.jp/live/",
+        "sourceUrl": "https://show-ya.jp/live/",
+        "sourceType": "band_official",
+        "sourceName": "SHOW-YA official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧と公演告知で確認。公式に発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2027-02-27-motoyawata-route-fourteen",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2027-02-27",
+        "endDate": null,
+        "prefecture": "千葉県",
+        "venue": "本八幡 Route Fourteen",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4604360001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4604360001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://show-ya.jp/live/",
+        "sourceUrl": "https://show-ya.jp/live/",
+        "sourceType": "band_official",
+        "sourceName": "SHOW-YA official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧と公演告知で確認。公式に発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2027-03-20-akita-club-swindle",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2027-03-20",
+        "endDate": null,
+        "prefecture": "秋田県",
+        "venue": "秋田 Club SWINDLE",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4621540001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4621540001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://show-ya.jp/live/",
+        "sourceUrl": "https://show-ya.jp/live/",
+        "sourceType": "band_official",
+        "sourceName": "SHOW-YA official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧と公演告知で確認。公式に発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
+    {
+        "id": "show-ya-2027-03-21-morioka-clubchange-wave",
+        "artists": [
+            "SHOW-YA"
+        ],
+        "tourName": "SHOW-YA 100 LIVE AGAIN",
+        "date": "2027-03-21",
+        "endDate": null,
+        "prefecture": "岩手県",
+        "venue": "盛岡 CLUBCHANGE WAVE",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4621780001-P0030001P021001",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/sf/detail/4621780001-P0030001P021001",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "on_sale",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://show-ya.jp/live/",
+        "sourceUrl": "https://show-ya.jp/live/",
+        "sourceType": "band_official",
+        "sourceName": "SHOW-YA official LIVE",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "SHOW-YA公式LIVE一覧と公演告知で確認。公式に発表済みの2026年12月〜2027年3月日程を全件照合済み。",
+        "collectedAt": "2026-11-18",
+        "reviewedAt": null
+    },
 ];
