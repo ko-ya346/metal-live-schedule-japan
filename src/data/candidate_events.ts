@@ -16238,7 +16238,7 @@ export const candidateEvents: CandidateEvent[] = [
         "date": "2027-01-16",
         "endDate": null,
         "prefecture": "宮城県",
-        "venue": "トークネットホール仙台 大ホール",
+        "venue": "トークネットホール仙台",
         "genres": [
             "Loud Rock"
         ],
@@ -16278,7 +16278,7 @@ export const candidateEvents: CandidateEvent[] = [
         "date": "2027-01-24",
         "endDate": null,
         "prefecture": "愛知県",
-        "venue": "Niterra日本特殊陶業市民会館フォレストホール",
+        "venue": "名古屋フォレストホール",
         "genres": [
             "Loud Rock"
         ],
