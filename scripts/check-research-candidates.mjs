@@ -235,7 +235,8 @@ try {
   );
   assert.ok(receivedRequestCount > 1, "oversized prompts are split into separate model requests");
   const batchReport = await readFile(report, "utf8");
-  assert.match(batchReport, /モデル入力バッチ数: [2-4]/);
+  const reportedBatchCount = Number(batchReport.match(/モデル入力バッチ数: (\d+)/)?.[1]);
+  assert.equal(reportedBatchCount, receivedRequestCount, "the report matches the number of model requests");
   const maxBatchTokens = Number(batchReport.match(/1バッチ最大プロンプト概算: ([0-9,]+) tokens/)?.[1]?.replaceAll(",", ""));
   assert.ok(maxBatchTokens <= 2500, "each prompt stays within the configured token budget");
   assert.match(batchReport, /test-metal-2099-tokyo/);
