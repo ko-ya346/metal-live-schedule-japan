@@ -16462,34 +16462,5 @@ export const candidateEvents: CandidateEvent[] = [
     },
 
 
-    {
-        id: "gip-2026-11-23-2",
-        artists: [
-            "打首獄門同好会",
-        ],
-        tourName: null,
-        date: "2026-11-23",
-        endDate: null,
-        prefecture: null,
-        venue: "日立システムズホール仙台(仙台市青年文化センター)シアターホール",
-        genres: [
-            "Heavy Metal",
-        ],
-        isInternational: false,
-        ticketUrl: null,
-        ticketLinks: [],
-        imageUrl: "https://www.gip-web.co.jp/images/ogp.png",
-        organizerName: null,
-        organizerUrl: null,
-        officialUrl: null,
-        sourceUrl: "https://www.gip-web.co.jp/schedule/",
-        sourceType: "venue",
-        sourceName: "GIP schedule（国内広域確認）",
-        confidence: "medium",
-        eventStatus: "scheduled",
-        reviewStatus: "review_needed",
-        reviewNotes: "Known heavy metal artist, but no explicit genre confirmation on the page.",
-        collectedAt: "2026-11-23",
-        reviewedAt: null,
-    },
+
 ];
