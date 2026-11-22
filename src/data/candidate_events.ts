@@ -15857,4 +15857,608 @@ export const candidateEvents: CandidateEvent[] = [
         collectedAt: "2026-11-22",
         reviewedAt: null,
     },
+
+    {
+        "id": "uchikubi-2026-11-23-sendai",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2026-11-23",
+        "endDate": null,
+        "prefecture": "宮城県",
+        "venue": "仙台GIGS",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "unknown",
+                "saleEndsAt": "2026-11-22",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "GIP",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.gip-web.co.jp/schedule/detail/8592",
+        "sourceType": "promoter",
+        "sourceName": "GIP公演詳細",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "open-weightモデルの候補。GIP公演詳細と公式ツアー日程で日付・会場を確認し、イベントID・ジャンルを補正。e+一般発売は前日終了。公式日程の今後の全公演を照合。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2026-11-27-shibuya-lovez",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2026-11-27",
+        "endDate": null,
+        "prefecture": "東京都",
+        "venue": "Shibuya LOVEZ",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "sold_out",
+                "saleEndsAt": "2026-11-26",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "ソーゴー東京",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "Codexが公式ツアー日程とe+公演一覧を照合。今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-ishigaki-fest-2026-11-29",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ISHIGAKI FEST 2026",
+        "date": "2026-11-29",
+        "endDate": null,
+        "prefecture": "沖縄県",
+        "venue": "舟蔵の里",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": null,
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "medium",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式アーティストスケジュールでISHIGAKI FEST 2026への出演日・会場を確認。公式ページに公演詳細とチケット発売は後日発表とあるため、詳細未確定の候補として登録。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2026-12-03-hiroshima-aster-plaza",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2026-12-03",
+        "endDate": null,
+        "prefecture": "広島県",
+        "venue": "広島JMSアステールプラザ大ホール",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "on_sale",
+                "saleEndsAt": "2026-12-02",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "YUMEBANCHI（広島）",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2026-12-14-sapporo-kanamoto-hall",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2026-12-14",
+        "endDate": null,
+        "prefecture": "北海道",
+        "venue": "カナモトホール（札幌市民ホール）",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "on_sale",
+                "saleEndsAt": "2026-12-13",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "ウエス",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "wasureranneyo-uchikubi-2026-12-18-nagoya-ell",
+        "artists": [
+            "忘れらんねえよ",
+            "打首獄門同好会"
+        ],
+        "tourName": "忘れらんねえよ 東名阪ツレ伝「武道館、どうだった？」",
+        "date": "2026-12-18",
+        "endDate": null,
+        "prefecture": "愛知県",
+        "venue": "名古屋 E.L.L.",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://w.pia.jp/t/wasureranneyo-tour26-27/",
+        "ticketLinks": [
+            {
+                "provider": "pia",
+                "url": "https://w.pia.jp/t/wasureranneyo-tour26-27/",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "unknown",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://w.pia.jp/t/wasureranneyo-tour26-27/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式アーティストスケジュールで日程・会場・打首獄門同好会の出演を確認。チケット案内は公式スケジュール記載のぴあページ。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2026-12-20-niigata-terrsa",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2026-12-20",
+        "endDate": null,
+        "prefecture": "新潟県",
+        "venue": "新潟テルサ",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "on_sale",
+                "saleEndsAt": "2026-12-19",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "FOB新潟",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-radio-crazy-2026-12-28-osaka",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "FM802 ROCK FESTIVAL RADIO CRAZY 2026",
+        "date": "2026-12-28",
+        "endDate": null,
+        "prefecture": "大阪府",
+        "venue": "インテックス大阪",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://radiocrazy.fm/",
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": "FM802",
+        "organizerUrl": null,
+        "officialUrl": "https://radiocrazy.fm/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式アーティストスケジュールとイベント公式サイトで日付・会場・出演を確認。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-countdown-japan-2026-12-31-chiba",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "rockin'on presents COUNTDOWN JAPAN 26/27",
+        "date": "2026-12-31",
+        "endDate": null,
+        "prefecture": "千葉県",
+        "venue": "幕張メッセ国際展示場",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://countdownjapan.jp/",
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": "ロッキング・オン・ジャパン",
+        "organizerUrl": null,
+        "officialUrl": "https://countdownjapan.jp/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式アーティストスケジュールとイベント公式サイトで日付・会場・出演を確認。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2027-01-09-kobe-kokusai-kaikan",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2027-01-09",
+        "endDate": null,
+        "prefecture": "兵庫県",
+        "venue": "神戸国際会館 こくさいホール",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "sold_out",
+                "saleEndsAt": "2027-01-08",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "清水音泉",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2027-01-16-sendai-talknet-hall",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2027-01-16",
+        "endDate": null,
+        "prefecture": "宮城県",
+        "venue": "トークネットホール仙台",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "on_sale",
+                "saleEndsAt": "2027-01-15",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "GIP",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程、GIP公演詳細とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2027-01-24-nagoya-forest-hall",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2027-01-24",
+        "endDate": null,
+        "prefecture": "愛知県",
+        "venue": "名古屋フォレストホール",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "on_sale",
+                "saleEndsAt": "2027-01-23",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "サンデーフォークプロモーション",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2027-01-31-fukuoka-international-conference-center",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2027-01-31",
+        "endDate": null,
+        "prefecture": "福岡県",
+        "venue": "福岡国際会議場 メインホール",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-08-29",
+                "saleStatus": "on_sale",
+                "saleEndsAt": "2027-01-30",
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "BEA",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアー日程とe+公演一覧で日付・会場・発売状況を照合。公式日程の今後の未登録日程を個別候補化。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-2027-02-07-sgc-hall-ariake",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ライブハウス＆ホール ワンマンツアー 2026-2027",
+        "date": "2027-02-07",
+        "endDate": null,
+        "prefecture": "東京都",
+        "venue": "SGC HALL ARIAKE",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/uchikubi/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/uchikubi/",
+                "affiliateUrl": null,
+                "saleStartsAt": "2026-11-07",
+                "saleStatus": "unknown",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": "ソーゴー東京",
+        "organizerUrl": null,
+        "officialUrl": "https://uchikubi.site/livehouse-hall-tour/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式ツアーファイナル告知とe+公演一覧で日付・会場を確認。e+ではオフィシャル先行の受付終了を確認。一般発売状況は未確認。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "uchikubi-bukurock-2027-02-11-makuhari",
+        "artists": [
+            "打首獄門同好会"
+        ],
+        "tourName": "ブクロックフェスティバル2027幕張",
+        "date": "2027-02-11",
+        "endDate": null,
+        "prefecture": "千葉県",
+        "venue": "幕張メッセ国際展示場",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://ldandk.com/bukurock/",
+        "ticketLinks": [],
+        "imageUrl": null,
+        "organizerName": "LD&K",
+        "organizerUrl": null,
+        "officialUrl": "https://ldandk.com/bukurock/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式アーティストスケジュールとイベント公式サイトで日付・会場・出演を確認。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+    {
+        "id": "pupirittoparo-uchikubi-2027-02-25-ebisu-liquidroom",
+        "artists": [
+            "プピリットパロ",
+            "打首獄門同好会"
+        ],
+        "tourName": "プピリットパロ Road to LIQUIDROOM「精神と時の部屋ツアー 2026-2027」TOUR FINAL ROOM",
+        "date": "2027-02-25",
+        "endDate": null,
+        "prefecture": "東京都",
+        "venue": "恵比寿LIQUIDROOM",
+        "genres": [
+            "Loud Rock"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/pupirittoparock/",
+        "ticketLinks": [
+            {
+                "provider": "eplus",
+                "url": "https://eplus.jp/pupirittoparock/",
+                "affiliateUrl": null,
+                "saleStartsAt": null,
+                "saleStatus": "unknown",
+                "saleEndsAt": null,
+                "priority": 1
+            }
+        ],
+        "imageUrl": null,
+        "organizerName": null,
+        "organizerUrl": null,
+        "officialUrl": "https://eplus.jp/pupirittoparock/",
+        "sourceUrl": "https://www.uchikubi.com/schedule.html",
+        "sourceType": "band_official",
+        "sourceName": "打首獄門同好会公式スケジュール",
+        "confidence": "high",
+        "eventStatus": "scheduled",
+        "reviewStatus": "review_needed",
+        "reviewNotes": "公式アーティストスケジュールで日程・会場・打首獄門同好会の出演を確認。チケット案内は公式スケジュール記載のe+ページ。",
+        "collectedAt": "2026-11-23",
+        "reviewedAt": null
+    },
+
 ];
