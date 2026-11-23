@@ -12,6 +12,7 @@ const temp = await mkdtemp(path.join(tmpdir(), "research-candidates-check-"));
 let receivedRequest = null;
 let receivedRequestCount = 0;
 let partialTimeoutRequestCount = 0;
+let malformedJsonRequestCount = 0;
 let timedOutConnectionClosed = false;
 let candidatesBeforeTimeout = null;
 let eventsBeforeTests = null;
@@ -48,6 +49,8 @@ const server = createServer(async (request, response) => {
     receivedRequestCount += 1;
     const shouldTimeout = receivedRequest.body.model === "timeout-model" ||
       (receivedRequest.body.model === "partial-timeout-model" && ++partialTimeoutRequestCount === 2);
+    const shouldReturnMalformedJson = receivedRequest.body.model === "malformed-json-model" &&
+      ++malformedJsonRequestCount === 1;
     if (shouldTimeout) {
       response.writeHead(200, { "Content-Type": "text/event-stream" });
       response.flushHeaders();
@@ -147,7 +150,7 @@ const server = createServer(async (request, response) => {
           confidence: "high",
           reviewNotes: "公式ページで全日程確認済み。",
         };
-    const content = JSON.stringify({ candidates: [candidate] });
+    const content = shouldReturnMalformedJson ? "{\"candidates\": [}" : JSON.stringify({ candidates: [candidate] });
     response.writeHead(200, { "Content-Type": "text/event-stream" });
     response.write(`data: ${JSON.stringify({ choices: [{ delta: { content } }] })}\n\n`);
     response.end("data: [DONE]\n\n");
@@ -373,6 +376,35 @@ try {
   assert.match(partialReportText, /バッチ実行・完了数: 2 \/ 1/);
   assert.match(partialReportText, /失敗バッチ: 2 \/ [2-9][0-9]*/);
   assert.match(partialReportText, /LLM batch 2 failed/);
+  await writeFile(candidateFile, candidatesBeforeTimeout);
+
+  receivedRequestCount = 0;
+  malformedJsonRequestCount = 0;
+  await run(
+    process.execPath,
+    [
+      "--experimental-strip-types",
+      "--disable-warning=MODULE_TYPELESS_PACKAGE_JSON",
+      "scripts/research-candidates.mjs",
+      "--input=" + batchInput,
+      "--report=" + partialReport,
+      "--prompt-token-budget=2500",
+    ],
+    {
+      cwd: new URL("..", import.meta.url),
+      env: {
+        ...process.env,
+        OPENAI_API_KEY: "",
+        CANDIDATE_LLM_API_KEY: "",
+        CANDIDATE_LLM_BASE_URL: "http://127.0.0.1:" + port + "/v1",
+        CANDIDATE_LLM_MODEL: "malformed-json-model",
+      },
+    },
+  );
+  const malformedJsonReport = await readFile(partialReport, "utf8");
+  assert.ok(receivedRequestCount > 2, "the collector continues with later batches after a malformed model response");
+  assert.match(malformedJsonReport, /LLM batch 1 failed/);
+  assert.match(malformedJsonReport, /test-metal-2099-tokyo/, "later successful batches still contribute candidates");
   await writeFile(candidateFile, candidatesBeforeTimeout);
 
   const knownInput = path.join(temp, "known-band-links.md");

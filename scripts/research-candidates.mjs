@@ -2002,13 +2002,16 @@ async function main() {
       parsedBatch = await callCandidateLlm(batchPrompt);
       completedLlmBatchCount += 1;
     } catch (error) {
-      failedLlmBatchIndex = index + 1;
+      failedLlmBatchIndex ??= index + 1;
       const reason = error instanceof Error ? error.message : String(error);
-      skippedReasons.push("LLM batch " + failedLlmBatchIndex + " failed: " + reason);
+      skippedReasons.push("LLM batch " + (index + 1) + " failed: " + reason);
       console.error(
         "[candidate-collection] stage=llm_batch status=failed index=" +
-          failedLlmBatchIndex + "/" + promptBatches.length + " reason=" + reason,
+          (index + 1) + "/" + promptBatches.length + " reason=" + reason,
       );
+      if (error instanceof Error && error.cause instanceof SyntaxError) {
+        continue;
+      }
       break;
     }
     if (Array.isArray(parsedBatch.candidates)) rawCandidates.push(...parsedBatch.candidates);
