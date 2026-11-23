@@ -1509,7 +1509,7 @@ async function callCandidateLlm(prompt) {
         model,
         temperature: 0.1,
         ...(isLoopbackUrl(llmBaseUrl) ? { reasoning_effort: "none" } : {}),
-        max_tokens: 2048,
+        max_tokens: 3072,
         stream: true,
         response_format: { type: "json_object" },
         messages: [

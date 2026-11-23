@@ -192,7 +192,7 @@ try {
   assert.equal(receivedRequest.body.model, "fixture-model");
   assert.equal(receivedRequest.body.stream, true);
   assert.equal(receivedRequest.body.reasoning_effort, "none");
-  assert.equal(receivedRequest.body.max_tokens, 2048);
+  assert.equal(receivedRequest.body.max_tokens, 3072);
   assert.match(receivedRequest.body.messages[0].content, /\/no_think/);
   assert.match(JSON.stringify(receivedRequest.body.messages), /direct ticket purchase\/application URL/, "the model receives ticket-link grounding rules");
   assert.match(JSON.stringify(receivedRequest.body.messages), /explicitly state the current status/, "the model must ground ticket availability in captured pages");
