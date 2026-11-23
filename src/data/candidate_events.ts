@@ -16637,4 +16637,45 @@ export const candidateEvents: CandidateEvent[] = [
         reviewedAt: null,
     },
 
+
+    {
+        id: "ailifdopa-2027-01-06-kyoto",
+        artists: [
+            "アイリフドーパ",
+        ],
+        tourName: null,
+        date: "2027-01-06",
+        endDate: null,
+        prefecture: "東京都",
+        venue: "吉祥寺Planet K",
+        genres: [
+            "Heavy Metal",
+        ],
+        isInternational: false,
+        ticketUrl: null,
+        ticketLinks: [
+                        {
+                provider: "eplus",
+                url: "https://eplus.jp/sf/detail/4618720001-P0030001P021001?P1=0175",
+                affiliateUrl: null,
+                saleStartsAt: "2026-11-21",
+                saleStatus: "on_sale",
+                saleEndsAt: "2027-01-05",
+                priority: 1,
+            },
+        ],
+        imageUrl: "https://eplus.jp/s/eplus/img/webclip.png",
+        organizerName: null,
+        organizerUrl: null,
+        officialUrl: null,
+        sourceUrl: "https://eplus.jp/sf/detail/4618720001-P0030001P021001?P1=0175",
+        sourceType: "ticket",
+        sourceName: "アイリフドーパ eplus",
+        confidence: "medium",
+        eventStatus: "scheduled",
+        reviewStatus: "review_needed",
+        reviewNotes: "アイリフドーパは金属系バンドとして知られているため、イベントのジャンルがHeavy Metalと推定されます。ただし、公式情報に明記されていないため、確認が必要です。",
+        collectedAt: "2026-11-24",
+        reviewedAt: null,
+    },
 ];
