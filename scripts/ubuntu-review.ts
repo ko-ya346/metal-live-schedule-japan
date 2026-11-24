@@ -187,6 +187,13 @@ function buildHumanReviewCard(evidenceReview: EvidenceReviewState): string {
   return lines.join("\n");
 }
 
+function sanitizeGithubMentions(value: string): string {
+  return value.replace(
+    /(^|[^A-Za-z0-9._%+-])@([A-Za-z0-9_-]{1,39})(?![A-Za-z0-9_-])/g,
+    (_match, prefix: string, username: string) => prefix + "@\u200B" + username,
+  );
+}
+
 async function notify() {
   const body = await fs.readFile(pendingPath, "utf8");
   const token = process.env.GH_TOKEN;
@@ -212,7 +219,7 @@ async function notify() {
   }
   const response = await fetch(endpoint, {
     method: "POST", headers: { ...headers, "Content-Type": "application/json" },
-    body: JSON.stringify({ body }), signal: AbortSignal.timeout(30_000),
+    body: JSON.stringify({ body: sanitizeGithubMentions(body) }), signal: AbortSignal.timeout(30_000),
   });
   if (!response.ok) throw new Error(`GitHub write HTTP ${response.status}`);
   await fs.writeFile(path.join(runDir, "notified"), marker);

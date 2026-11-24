@@ -50,5 +50,6 @@ Metal Calendar の探索範囲に加える出演名義を選んでください�
 BODY
 cat watchlist-expansion-report.md
 } > watchlist-expansion-pr.md
+node ops/ubuntu/sanitize-github-mentions.mjs watchlist-expansion-pr.md
 gh pr create --repo "$repo" --base main --head "$branch" --title "国内共演者の探索候補を報告する $today" --body-file watchlist-expansion-pr.md
 cp watchlist-expansion-candidates.sha256 "$signature_file"
