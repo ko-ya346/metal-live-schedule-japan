@@ -59,8 +59,22 @@ git add src/data/event_update_candidates.ts
 git commit -m "data: add published-event update candidates"
 git push -u origin "$branch"
 
+cat > event-update-pr.md <<'BODY'
+## 概要
+
+Ubuntuのopen-weightモデルが直近3か月の公開イベントを再確認した更新候補です。公開データへは未適用です。
+
+## 人間の確認場所
+
+/admin/candidates?queue=updates
+
+## 検証
+
+data:validate / copy:check / build
+BODY
+node ops/ubuntu/sanitize-github-mentions.mjs event-update-pr.md
 gh pr create --repo "$repo" --base main --head "$branch" \
   --title "公開イベントの更新候補を追加する $today" \
-  --body "Ubuntuのopen-weightモデルが直近3か月の公開イベントを再確認した更新候補です。公開データへは未適用です。\n\n人間の確認場所: \`/admin/candidates?queue=updates\`\n\n検証: data:validate / copy:check / build"
+  --body-file event-update-pr.md
 systemctl --user restart metals-candidate-review.service
 

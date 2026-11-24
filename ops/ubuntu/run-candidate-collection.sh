@@ -94,6 +94,7 @@ git push -u origin "$branch"
   echo "- npm run copy:check"
   echo "- npm run build"
 } > candidate-pr.md
+node ops/ubuntu/sanitize-github-mentions.mjs candidate-pr.md
 
 pr_url="$(gh pr create --repo "$repo" --base main --head "$branch" \
   --title "候補イベントを追加する $today" --body-file candidate-pr.md)"
