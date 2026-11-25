@@ -8,8 +8,7 @@ WorkingDirectory=%h/.local/share/metals-calendar/control
 Environment=PATH=%h/.local/share/metals-calendar/runtime/node-v24.21.0-linux-x64/bin:%h/.local/bin:/usr/local/bin:/usr/bin:/bin
 Environment=CANDIDATE_LLM_BASE_URL=http://127.0.0.1:11434/v1
 Environment=CANDIDATE_LLM_MODEL=metals-review:8b
-ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/run-candidate-collection.sh
-TimeoutStartSec=90min
+ExecStart=/usr/bin/bash -o pipefail -c 'git -C %h/.local/share/metals-calendar/control fetch origin main && git -C %h/.local/share/metals-calendar/control show origin/main:ops/ubuntu/run-candidate-collection.sh | /usr/bin/bash'
+TimeoutStartSec=3h
 UMask=0077
 NoNewPrivileges=true
-

@@ -65,12 +65,6 @@ npm run data:validate
 npm run copy:check
 npm run build
 
-git config user.name "metals-calendar-openweight"
-git config user.email "metals-calendar-openweight@users.noreply.github.com"
-git add src/data/candidate_events.ts src/data/events.ts
-git commit -m "data: add open-weight candidate events"
-git push -u origin "$branch"
-
 {
   echo "## What"
   echo
@@ -95,6 +89,15 @@ git push -u origin "$branch"
   echo "- npm run build"
 } > candidate-pr.md
 node ops/ubuntu/sanitize-github-mentions.mjs candidate-pr.md
+node ops/ubuntu/check-github-mentions.mjs candidate-pr.md
+
+git config user.name "metals-calendar-openweight"
+git config user.email "metals-calendar-openweight@users.noreply.github.com"
+git add src/data/candidate_events.ts src/data/events.ts
+git commit -m "data: add open-weight candidate events"
+git push -u origin "$branch"
+
+
 
 pr_url="$(gh pr create --repo "$repo" --base main --head "$branch" \
   --title "候補イベントを追加する $today" --body-file candidate-pr.md)"

@@ -188,10 +188,8 @@ function buildHumanReviewCard(evidenceReview: EvidenceReviewState): string {
 }
 
 function sanitizeGithubMentions(value: string): string {
-  return value.replace(
-    /(^|[^A-Za-z0-9._%+-])@([A-Za-z0-9_-]{1,39})(?![A-Za-z0-9_-])/g,
-    (_match, prefix: string, username: string) => prefix + "@\u200B" + username,
-  );
+  // Remove every raw ASCII at-sign so handles and email-like strings cannot notify users.
+  return value.replaceAll("@", "＠");
 }
 
 async function notify() {

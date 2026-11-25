@@ -1,0 +1,14 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+repo_root="$(git rev-parse --show-toplevel)"
+files=()
+for file in candidate-pr.md event-update-pr.md watchlist-expansion-pr.md; do
+  if [[ -f "$repo_root/$file" ]]; then
+    files+=("$repo_root/$file")
+  fi
+done
+
+if (("${#files[@]}" > 0)); then
+  node "$repo_root/ops/ubuntu/check-github-mentions.mjs" "${files[@]}"
+fi

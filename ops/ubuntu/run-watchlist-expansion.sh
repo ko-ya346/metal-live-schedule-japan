@@ -29,11 +29,6 @@ if grep -q '既存探索語に含まれない共演者: 0組' watchlist-expansio
 signature="$(cat watchlist-expansion-candidates.sha256)"
 signature_file="$state_dir/watchlist-expansion-candidates.sha256"
 if [[ -f "$signature_file" && "$(cat "$signature_file")" == "$signature" ]]; then echo "Candidate snapshot unchanged; no duplicate PR."; exit 0; fi
-git config user.name "metals-calendar-openweight"
-git config user.email "metals-calendar-openweight@users.noreply.github.com"
-git add watchlist-expansion-report.md
-git commit -m "docs: report domestic co-performer candidates"
-git push -u origin "$branch"
 {
 cat <<'BODY'
 ## 概要
@@ -51,5 +46,12 @@ BODY
 cat watchlist-expansion-report.md
 } > watchlist-expansion-pr.md
 node ops/ubuntu/sanitize-github-mentions.mjs watchlist-expansion-pr.md
+node ops/ubuntu/check-github-mentions.mjs watchlist-expansion-pr.md
+git config user.name "metals-calendar-openweight"
+git config user.email "metals-calendar-openweight@users.noreply.github.com"
+git add watchlist-expansion-report.md
+git commit -m "docs: report domestic co-performer candidates"
+git push -u origin "$branch"
+
 gh pr create --repo "$repo" --base main --head "$branch" --title "国内共演者の探索候補を報告する $today" --body-file watchlist-expansion-pr.md
 cp watchlist-expansion-candidates.sha256 "$signature_file"

@@ -4,5 +4,6 @@ After=ollama.service
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/run-watchlist-expansion.sh
+WorkingDirectory=%h/.local/share/metals-calendar/control
+ExecStart=/usr/bin/bash -o pipefail -c 'git -C %h/.local/share/metals-calendar/control fetch origin main && git -C %h/.local/share/metals-calendar/control show origin/main:ops/ubuntu/run-watchlist-expansion.sh | /usr/bin/bash'
 TimeoutStartSec=30min
