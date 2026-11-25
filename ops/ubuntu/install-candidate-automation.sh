@@ -4,7 +4,6 @@ set -euo pipefail
 root="${METALS_CALENDAR_HOME:-$HOME/.local/share/metals-calendar}"
 source_repo="${METALS_CALENDAR_BOOTSTRAP_REPO:-$root/repo}"
 control="$root/control"
-installed_ops="$root/ops/ubuntu"
 units="$HOME/.config/systemd/user"
 
 mkdir -p "$root/ops" "$units"
@@ -14,12 +13,6 @@ if [[ ! -e "$control/.git" ]]; then
 else
   git -C "$control" reset --hard origin/main
 fi
-
-mkdir -p "$installed_ops"
-cp ops/ubuntu/run-candidate-collection.sh "$installed_ops/"
-cp ops/ubuntu/run-event-update-audit.sh "$installed_ops/"
-cp ops/ubuntu/serve-candidate-review.sh "$installed_ops/"
-chmod 0755 "$installed_ops"/*.sh
 
 cp ops/ubuntu/metals-candidate-collection.service "$units/"
 cp ops/ubuntu/metals-candidate-collection.timer "$units/"

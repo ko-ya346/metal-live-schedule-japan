@@ -4,5 +4,6 @@ After=ollama.service
 
 [Service]
 Type=oneshot
-ExecStart=%h/.local/share/metals-calendar/ops/ubuntu/run-watchlist-expansion.sh
+WorkingDirectory=%h/.local/share/metals-calendar/control
+ExecStart=%h/.local/share/metals-calendar/control/ops/ubuntu/run-watchlist-expansion.sh
 TimeoutStartSec=30min
