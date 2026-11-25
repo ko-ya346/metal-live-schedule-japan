@@ -53,12 +53,6 @@ fi
 npm run data:validate
 npm run copy:check
 npm run build
-git config user.name "metals-calendar-openweight"
-git config user.email "metals-calendar-openweight@users.noreply.github.com"
-git add src/data/event_update_candidates.ts
-git commit -m "data: add published-event update candidates"
-git push -u origin "$branch"
-
 cat > event-update-pr.md <<'BODY'
 ## 概要
 
@@ -73,6 +67,14 @@ Ubuntuのopen-weightモデルが直近3か月の公開イベントを再確認�
 data:validate / copy:check / build
 BODY
 node ops/ubuntu/sanitize-github-mentions.mjs event-update-pr.md
+node ops/ubuntu/check-github-mentions.mjs event-update-pr.md
+git config user.name "metals-calendar-openweight"
+git config user.email "metals-calendar-openweight@users.noreply.github.com"
+git add src/data/event_update_candidates.ts
+git commit -m "data: add published-event update candidates"
+git push -u origin "$branch"
+
+
 gh pr create --repo "$repo" --base main --head "$branch" \
   --title "公開イベントの更新候補を追加する $today" \
   --body-file event-update-pr.md
