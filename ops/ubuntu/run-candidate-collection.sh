@@ -78,8 +78,8 @@ npm run build
   echo
   echo "### 人間が確認する内容"
   echo
-  echo "- `review_needed` の候補: Ubuntuの `/admin/candidates?queue=new&status=review_needed` で採用・修正・対象外を判断してください。確認結果はこのPRへ自動保存されます。"
-  echo "- 自動採用提案: Open-weight outputの採用件数と `src/data/events.ts` の差分を確認してください。根拠不足や誤りがあれば、PR上で修正してからマージしてください。"
+  printf '%s\n' '- review_needed の候補: Ubuntuの /admin/candidates?queue=new&status=review_needed で採用・修正・対象外を判断してください。確認結果はこのPRへ自動保存されます。'
+  printf '%s\n' '- 自動採用提案: Open-weight outputの採用件数と src/data/events.ts の差分を確認してください。根拠不足や誤りがあれば、PR上で修正してからマージしてください。'
   echo "- マージ後に公開サイトへ反映されます。"
   echo
   echo "## Validation"
@@ -88,6 +88,20 @@ npm run build
   echo "- npm run copy:check"
   echo "- npm run build"
 } > candidate-pr.md
+
+required_review_copy=(
+  "### 人間が確認する内容"
+  "review_needed の候補"
+  "/admin/candidates?queue=new&status=review_needed"
+  "src/data/events.ts"
+)
+for required in "${required_review_copy[@]}"; do
+  if ! grep -Fq -- "$required" candidate-pr.md; then
+    echo "Candidate PR body is missing required human-review text." >&2
+    exit 1
+  fi
+done
+
 node ops/ubuntu/sanitize-github-mentions.mjs candidate-pr.md
 node ops/ubuntu/check-github-mentions.mjs candidate-pr.md
 
