@@ -11299,6 +11299,263 @@ const realEvents: Event[] = [
         publishedAt: "2026-11-14",
         updatedAt: "2026-11-14",
     },
+    {
+        "id": "wildside-tokyo-2026-year-end-hell-gig",
+        "artists": [
+            "TAKANAGER CRUE",
+            "World Song Equipment",
+            "Execution of Luo Wei Daya"
+        ],
+        "tourName": "歳末地獄GIG",
+        "date": "2026-12-10",
+        "prefecture": "東京都",
+        "venue": "WildSide Tokyo",
+        "genres": [
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://ws-tokyo.com/events/46186",
+        "officialUrl": "https://ws-tokyo.com/events/46186",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "unchained-2026-tokyo-sweetest-sweat",
+        "artists": [
+            "UNCHAINED"
+        ],
+        "tourName": "UNCHAINED 2026 HEADLINE SHOW Sweetest Sweat in TOKYO",
+        "date": "2026-12-05",
+        "prefecture": "東京都",
+        "venue": "池袋BlackHole",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4601450001-P0030001",
+        "officialUrl": "https://unchained.jp/ticket/",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "unchained-2026-tokyo-venom-injection",
+        "artists": [
+            "UNCHAINED",
+            "The DUST'N'BONEZ"
+        ],
+        "tourName": "UNCHAINED x The DUST'N'BONEZ VENOM INJECTION Vol.1 2026",
+        "date": "2026-12-06",
+        "prefecture": "東京都",
+        "venue": "池袋BlackHole",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4601470001-P0030001",
+        "officialUrl": "https://unchained.jp/ticket/",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "cokehead-hipsters-playback-in-the-circle-23-2026",
+        "artists": [
+            "COKEHEAD HIPSTERS",
+            "COCOBAT",
+            "ネリチャギ"
+        ],
+        "tourName": "COKEHEAD HIPSTERS PRESENTS PLAYBACK IN THE CIRCLE 23",
+        "date": "2026-12-13",
+        "prefecture": "東京都",
+        "venue": "渋谷THE GAME",
+        "genres": [
+            "Hardcore",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4605960001",
+        "officialUrl": "https://eplus.jp/sf/detail/4605960001",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "abiuro-convinum-vol21-2026-tokyo",
+        "artists": [
+            "Abiuro",
+            "ANATOMIA",
+            "THE BORNBARFRUST",
+            "Oaktails",
+            "OGAHM",
+            "Presence of Soul",
+            "Sore"
+        ],
+        "tourName": "CONVINIUM vol21 Abiuro pre",
+        "date": "2026-12-05",
+        "prefecture": "東京都",
+        "venue": "初台ライブハウスWALL",
+        "genres": [
+            "Death Metal",
+            "Doom Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4617060001-P0030001",
+        "officialUrl": "https://eplus.jp/sf/detail/4617060001-P0030001",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "wall-nothing-is-real-vol5-2026-tokyo",
+        "artists": [
+            "Cloudy Boots",
+            "hellIll",
+            "NEGATIVE SUN",
+            "Sheoldred",
+            "ぶっ恋呂百花",
+            "2Beef",
+            "NGYL"
+        ],
+        "tourName": "NOTHING IS REAL vol.5",
+        "date": "2026-12-04",
+        "prefecture": "東京都",
+        "venue": "初台ライブハウスWALL",
+        "genres": [
+            "Hardcore",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4638560001",
+        "officialUrl": "https://eplus.jp/sf/detail/4638560001",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "tilt-dangerous-night-iii-2026-nagoya",
+        "artists": [
+            "TILT"
+        ],
+        "tourName": "TILT ONE MAN GIG DANGEROUS NIGHT III NAGOYA ver.",
+        "date": "2026-12-26",
+        "prefecture": "愛知県",
+        "venue": "ell.SIZE",
+        "genres": [
+            "Hard Rock",
+            "Heavy Metal"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4608260001-P0030001P021001",
+        "officialUrl": "https://www.ell.co.jp/liveinfo/sizeliveschedule-new2/top.html",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "shadows-enth-eazy-winter-2026-osaka",
+        "artists": [
+            "SHADOWS",
+            "ENTH"
+        ],
+        "tourName": "SHADOWS x ENTH Presents. -EAZY- WINTER 2026",
+        "date": "2026-12-14",
+        "prefecture": "大阪府",
+        "venue": "BIGCAT",
+        "genres": [
+            "Hardcore",
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4343170001?P1=0402&P59=1&P6=001",
+        "officialUrl": "https://greens-corp.co.jp/schedule/info/index.php?event_id=14336",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "shadows-enth-eazy-winter-2026-fukuoka",
+        "artists": [
+            "SHADOWS",
+            "ENTH"
+        ],
+        "tourName": "SHADOWS x ENTH Presents. -EAZY- WINTER 2026",
+        "date": "2026-12-16",
+        "prefecture": "福岡県",
+        "venue": "福岡BEAT STATION",
+        "genres": [
+            "Hardcore",
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4343170001?P1=0402&P59=1&P6=001",
+        "officialUrl": "https://enth-nagoya.com/schedule/shadows-x-enth-presents-eazy-winter-2026-2/",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "shadows-enth-eazy-winter-2026-hofu",
+        "artists": [
+            "SHADOWS",
+            "ENTH"
+        ],
+        "tourName": "SHADOWS x ENTH Presents. -EAZY- WINTER 2026",
+        "date": "2026-12-17",
+        "prefecture": "山口県",
+        "venue": "BAR 印度洋",
+        "genres": [
+            "Hardcore",
+            "Metalcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://eplus.jp/sf/detail/4343170001-P0030025",
+        "officialUrl": "https://enth-nagoya.com/schedule/",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
+    {
+        "id": "date-back-to-dawn-cinderella-time-vol18-2026-tokyo",
+        "artists": [
+            "DEATH TRIBUTE",
+            "Lilz",
+            "東京百鬼夜攻",
+            "NOCTORNIA",
+            "ハヂチ",
+            "DATE BACK TO DAWN",
+            "Alphoenix",
+            "Ajna"
+        ],
+        "tourName": "shinjuku ANTIKNOCK presents Cinderella time vol.18",
+        "date": "2026-12-02",
+        "prefecture": "東京都",
+        "venue": "新宿ANTIKNOCK",
+        "genres": [
+            "Metal",
+            "Hardcore"
+        ],
+        "isInternational": false,
+        "ticketUrl": "https://livepocket.jp/e/ctime18",
+        "officialUrl": "https://datebacktodawn.com/live/cinderella-time-vol18-20261202/",
+        "status": "scheduled",
+        "candidateCreatedAt": "2026-11-26",
+        "publishedAt": "2026-11-27",
+        "updatedAt": "2026-11-27"
+    },
 ];
 
 export const publishedEvents = realEvents;
