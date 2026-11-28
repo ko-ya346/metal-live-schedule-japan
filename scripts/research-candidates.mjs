@@ -1683,7 +1683,7 @@ function buildPromptBatches(summaries, knownSummary, tokenBudget) {
   for (const originalSummary of summaries) {
     const summary = fitSummaryToPromptBudget(originalSummary, knownSummary, tokenBudget);
     const singlePromptTokens = estimateTokens(buildPrompt([summary], knownSummary));
-    if (singlePromptTokens > tokenBudget) throw new Error("A page summary exceeds prompt-token-budget even after trimming its body: " + summary.url);
+    if (singlePromptTokens > tokenBudget) throw new Error("A page summary exceeds prompt-token-budget even after trimming its body: " + summary.url + " (" + singlePromptTokens + " tokens > " + tokenBudget + " budget)");
     const nextBatch = [...currentBatch, summary];
     if (currentBatch.length > 0 && estimateTokens(buildPrompt(nextBatch, knownSummary)) > tokenBudget) {
       batches.push(currentBatch);

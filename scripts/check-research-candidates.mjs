@@ -8,6 +8,7 @@ import { promisify } from "node:util";
 import { hasOfficialBandMetalEvidence } from "./lib/candidate-scope-evidence.mjs";
 
 const run = promisify(execFile);
+const batchPromptTokenBudget = 3000;
 const temp = await mkdtemp(path.join(tmpdir(), "research-candidates-check-"));
 let receivedRequest = null;
 let receivedRequestCount = 0;
@@ -223,7 +224,7 @@ try {
       "scripts/research-candidates.mjs",
       "--input=" + batchInput,
       "--report=" + report,
-      "--prompt-token-budget=2500",
+      "--prompt-token-budget=" + batchPromptTokenBudget,
     ],
     {
       cwd: new URL("..", import.meta.url),
@@ -241,7 +242,7 @@ try {
   const reportedBatchCount = Number(batchReport.match(/モデル入力バッチ数: (\d+)/)?.[1]);
   assert.equal(reportedBatchCount, receivedRequestCount, "the report matches the number of model requests");
   const maxBatchTokens = Number(batchReport.match(/1バッチ最大プロンプト概算: ([0-9,]+) tokens/)?.[1]?.replaceAll(",", ""));
-  assert.ok(maxBatchTokens <= 2500, "each prompt stays within the configured token budget");
+  assert.ok(maxBatchTokens <= batchPromptTokenBudget, "each prompt stays within the configured token budget");
   assert.match(batchReport, /test-metal-2099-tokyo/);
 
   receivedRequest = null;
@@ -353,7 +354,7 @@ try {
       "--input=" + batchInput,
       "--report=" + partialReport,
       "--write",
-      "--prompt-token-budget=2500",
+      "--prompt-token-budget=" + batchPromptTokenBudget,
     ],
     {
       cwd: new URL("..", import.meta.url),
@@ -388,7 +389,7 @@ try {
       "scripts/research-candidates.mjs",
       "--input=" + batchInput,
       "--report=" + partialReport,
-      "--prompt-token-budget=2500",
+      "--prompt-token-budget=" + batchPromptTokenBudget,
     ],
     {
       cwd: new URL("..", import.meta.url),
